@@ -1,0 +1,5 @@
+- Visualizar o tamanho da diferença média das chaves criadas
+- Adicionar amplificação de segurança com hash
+- Adicionar a opção de distância entre dispositivos para geração de chaves
+- Adicionar mais parâmetros de ambiente
+- Retirar excesso de plotagens individuais e compilar em plotagens de mais fácil visualização
