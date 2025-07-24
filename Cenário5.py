@@ -8,7 +8,7 @@ class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
     def calculaY(self, h, x, variancia, media, ntestes):
         # Gera ruído com variância aumentada (+1.3)
         def geraRuido(variancia, media):
-            return [random.gauss(media, variancia + 1.3) for _ in range(len(x))]
+            return [random.gauss(media, variancia) for _ in range(len(x))]
 
         n = geraRuido(variancia, media)
         # Calcula y aplicando o efeito Rayleigh e limiarização
@@ -16,7 +16,7 @@ class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
         return y
 
     # Função principal do cenário
-    def cenario(self, x, h1, h2, plot, size, tabela, nBits):
+    def cenario(self, x, h1, h2, size, tabela, nBits):
 
         print("Cenário 5: Alto Ruido Canal Rayleigh\n")
 
@@ -37,10 +37,6 @@ class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
             print('y2 =', y2)
             erros_y2 = self.encontraErros(x, y2)
             print('Erros do y2 =', erros_y2)
-
-            # Plota diferenças se solicitado
-            if plot:
-                self.plota_diferencas(x, y1, y2, len(x))
 
             # Converte listas para strings binárias
             toStringY1 = ''.join(map(str, y1))
@@ -65,9 +61,5 @@ class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
         # Calcula a porcentagem de acertos
         porcentagem_de_acertos = contagem_de_acertos * 100.00 / self.ntestes
         print(f"Porcentagem de vezes que a chave gerada foi encontrada na tabela BCH: {porcentagem_de_acertos:.2f}%")
-
-        # Plota resultados finais se solicitado
-        if plot:
-            self.plotar(x, y1, y2, len(x), porcentagem_de_acertos)
 
         return porcentagem_de_acertos

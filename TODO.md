@@ -1,5 +1,5 @@
-- Visualizar o tamanho da diferença média das chaves criadas
-- Adicionar amplificação de segurança com hash
-- Adicionar a opção de distância entre dispositivos para geração de chaves
-- Adicionar mais parâmetros de ambiente
-- Retirar excesso de plotagens individuais e compilar em plotagens de mais fácil visualização
+- db de sinal-ruído = 10*log10(sinal/ruído) 
+- fading -> Var = (2 - π/2) * σ²
+- organizar melhor o código para conseguir plotar o SNR x KAR da forma correta e trocar KAR por KDR (mais utilizado)
+- criar dicionário e rota de código
+- especificar melhor o que está sendo plotado em plotkar
