@@ -1,5 +1,6 @@
-- db de sinal-ruído = 10*log10(sinal/ruído) 
-- fading -> Var = (2 - π/2) * σ²
-- organizar melhor o código para conseguir plotar o SNR x KAR da forma correta e trocar KAR por KDR (mais utilizado)
-- criar dicionário e rota de código
-- especificar melhor o que está sendo plotado em plotkar
+- mudar classes para apenas funções e mudar seus nomes
+- trocar KAR por KDR
+- retirar plotagem antiga
+- juntar Cenário5 com CenárioBase
+- melhorar o nome das variáveis de CodeGenerator e achar um nome melhor para esse pobre coitado
+- tentar não ficar maluco
