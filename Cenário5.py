@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from CenárioBase import CenárioBase
 from Plotagem import Plotagem
@@ -8,7 +9,10 @@ class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
     def calculaY(self, h, x, variancia, media, ntestes):
         # Gera ruído gaussiano
         # TODO: colocar a função em um lugar melhor e consertar os nomes
+        # TODO: adicionar utilidade para o sigma e entender como ele se relaciona com as variâncias
+        # TODO: melhor usar np.random.normal ao invés de random.gauss
         def gerar_ruido_gaussiano(variancia, media):
+            sigma = np.sqrt(variancia)
             return [random.gauss(media, variancia) for _ in range(len(x))]
 
         n = gerar_ruido_gaussiano(variancia, media)

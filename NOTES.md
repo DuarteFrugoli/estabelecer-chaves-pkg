@@ -12,4 +12,4 @@ Qual o caminho atual de informações do código:
     2. entradas
     3. inicializa_canais (descessário e ainda por cima tem definição de variáveis nesse lugar)
 
-a última coisa que eu fiz em 28/07 foi adicionar os TODOS em comentário de onde eu vou mudar mais tarde
+a última coisa que eu fiz em 28/07 foi adicionar os TODOS em comentário de onde eu vou mudar mais tarde.
