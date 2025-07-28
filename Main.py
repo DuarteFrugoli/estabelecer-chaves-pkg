@@ -25,6 +25,9 @@ escala_rayleigh = 1.0 # parâmetro de escala para a distribuição Rayleigh (0.1
 rayleigh_params = [0.5, 1.0, 2.0] # parâmetros Rayleigh para teste
 snr_db_range = np.linspace(-10, 30, 18) # 10 valores de SNR de -10 a 30 dB
 variancias_ruido = potencia_sinal / (10 ** (snr_db_range / 10))
+# TODO: usar apenas as variancias e não a de teste
+variancia_ruido = 1.0 # variância para teste
+media_ruido = 0 # média do ruído (padrão 0.0)
 
 # Marca o tempo inicial
 start_time = time.time()
@@ -44,7 +47,7 @@ tamanho_espaco_amostral = None if tamanho_cadeia_bits <= 15 else solicita_entrad
 code_generator = CodeGenerator(tamanho_cadeia_bits)
 tabela = code_generator.generate_code_table(tamanho_espaco_amostral)  # tabela: Tabela de códigos gerada
 
-canais = AltoRuidoCanalRayleigh(media=0.5, variancia=1.5, ntestes=quantidade_de_testes) # TODO: remover dicionário de canais, pois só possui um cenário
+canais = AltoRuidoCanalRayleigh(media=media_ruido, variancia=variancia_ruido, ntestes=quantidade_de_testes) # TODO: remover dicionário de canais, pois só possui um cenário
 
 # Coleta as porcentagens_acerto de acertos
 porcentagens_acerto = AltoRuidoCanalRayleigh.cenario(canais, palavra_informacao, canal_rayleigh_1, canal_rayleigh_2, tamanho_espaco_amostral, tabela, tamanho_cadeia_bits)

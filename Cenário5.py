@@ -6,11 +6,12 @@ from Plotagem import Plotagem
 class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
     # Função para calcular y considerando o efeito Rayleigh (h) e ruído alto
     def calculaY(self, h, x, variancia, media, ntestes):
-        # Gera ruído com variância aumentada (+1.3)
-        def geraRuido(variancia, media):
+        # Gera ruído gaussiano
+        # TODO: colocar a função em um lugar melhor e consertar os nomes
+        def gerar_ruido_gaussiano(variancia, media):
             return [random.gauss(media, variancia) for _ in range(len(x))]
 
-        n = geraRuido(variancia, media)
+        n = gerar_ruido_gaussiano(variancia, media)
         # Calcula y aplicando o efeito Rayleigh e limiarização
         y = [1 if h[i] * x[i] + n[i] > 0.5 else 0 for i in range(len(x))]
         return y
