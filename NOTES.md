@@ -10,6 +10,11 @@ Qual o caminho atual de informações do código:
 1. Main
     1. variáveis iniciais
     2. entradas
-    3. inicializa_canais (descessário e ainda por cima tem definição de variáveis nesse lugar)
+    3. cria instância de CodeGenerator com o parâmetro "tamanho_cadeia_bits"
+    4. cria uma tabela (nome pouco intuitivo) usando o método "generate_code_table" da classe CodeGenerator
+    5. cria uma instância de AltoRuidoCanalRayleigh com os parâmetros media_ruido, variancia_ruido e quantidade_de_testes e guarda em canais
+        1. AltoRuidoCanalRayleigh cria uma instância de CenárioBase e uma instância de Plotagem
+    6. chama o método "cenario" de AltoRuidoCanalRayleigh
+        1.
 
 a última coisa que eu fiz em 28/07 foi adicionar os TODOS em comentário de onde eu vou mudar mais tarde.

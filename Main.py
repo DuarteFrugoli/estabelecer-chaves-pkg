@@ -3,8 +3,8 @@ import numpy as np
 import random
 
 # Importa as classes necessárias
-from CodeGenerator import CodeGenerator
-from Cenário5 import AltoRuidoCanalRayleigh
+from bch import *
+from canal_rayleigh import *
 from Plotagem import Plotagem
 from plotkar import plot_kar
 from util import *
@@ -34,18 +34,18 @@ start_time = time.time()
 
 # Solicita parâmetros ao usuário
 quantidade_de_testes = solicita_entrada("Entre com a quantidade de testes: ", int, lambda v: v > 0)
-
 tamanho_cadeia_bits = solicita_entrada("Entre com o tamanho da cadeia de Bits (7, 15, 127, 255): ", int, lambda v: v in {7, 15, 127, 255})
 
 # Inicializa variáveis e canais
-palavra_informacao = [random.randint(0, 1) for _ in range(tamanho_cadeia_bits)]  # palavra_informacao: Palavra de informação aleatória
-canal_rayleigh_1 = np.random.rayleigh(escala_rayleigh, tamanho_cadeia_bits)               # canal_rayleigh_1: Vetor de canal Rayleigh
-canal_rayleigh_2 = np.random.rayleigh(escala_rayleigh, tamanho_cadeia_bits)               # canal_rayleigh_2: Vetor de canal Rayleigh
+palavra_informacao = [random.randint(0, 1) for _ in range(tamanho_cadeia_bits)] # palavra_informacao: Palavra de informação aleatória
+print(palavra_informacao)
+canal_rayleigh_1 = np.random.rayleigh(escala_rayleigh, tamanho_cadeia_bits) # canal_rayleigh_1: Vetor de canal Rayleigh
+canal_rayleigh_2 = np.random.rayleigh(escala_rayleigh, tamanho_cadeia_bits) # canal_rayleigh_2: Vetor de canal Rayleigh
 tamanho_espaco_amostral = None if tamanho_cadeia_bits <= 15 else solicita_entrada(
     "Entre com tamanho do espaço amostral: ", int, lambda v: v > 0
 )
-code_generator = CodeGenerator(tamanho_cadeia_bits)
-tabela = code_generator.generate_code_table(tamanho_espaco_amostral)  # tabela: Tabela de códigos gerada
+# tabela: Tabela de códigos gerada
+tabela = generate_code_table(tamanho_cadeia_bits, tamanho_espaco_amostral) # TODO: consertar bch.py
 
 canais = AltoRuidoCanalRayleigh(media=media_ruido, variancia=variancia_ruido, ntestes=quantidade_de_testes) # TODO: remover dicionário de canais, pois só possui um cenário
 
@@ -73,7 +73,7 @@ for rayleigh_param in rayleigh_params:
         # Gera canal_rayleigh_1 e canal_rayleigh_2 com o parâmetro Rayleigh atual
         canal_rayleigh_1 = np.random.rayleigh(rayleigh_param, tamanho_cadeia_bits)
         canal_rayleigh_2 = np.random.rayleigh(rayleigh_param, tamanho_cadeia_bits)
-        canal = AltoRuidoCanalRayleigh(media=0.5, variancia=variancia, ntestes=quantidade_de_testes)
+        canal = AltoRuidoCanalRayleigh(media=media_ruido, variancia=variancia, ntestes=quantidade_de_testes)
         porcentagem = canal.cenario(palavra_informacao, canal_rayleigh_1, canal_rayleigh_2, size=tamanho_espaco_amostral, tabela=tabela, nBits=tamanho_cadeia_bits)
         snr_db = 10 * np.log10(potencia_sinal / variancia)
         snrs_db.append(snr_db)

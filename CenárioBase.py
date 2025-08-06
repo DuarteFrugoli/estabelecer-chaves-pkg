@@ -46,7 +46,7 @@ class CenárioBase(ABC):
         P = self.subtract_binary(fc, y)
         return P
 
-    def comparaSinais(self, y, P, tabela):
+    def comparaSinais(self, y, P, tabela):3
         # Compara sinais para gerar a chave final
         fc = self.comparacao_mais_proxima(self.subtract_binary(y, P), tabela)
         min_len = min(len(fc), len(P))
