@@ -1,10 +1,60 @@
 import random
 import numpy as np
 
-from CenárioBase import CenárioBase
-from Plotagem import Plotagem
+def encontraErros(x, y):
+    # Conta o número de erros entre duas listas de bits x e y
+    return sum(1 for i in range(len(x)) if y[i] != x[i])
 
-class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
+def hamming_distance(s1, s2):
+    # Calcula a distância de Hamming entre duas strings binárias
+    length = min(len(s1), len(s2))
+    return sum(ch1 != ch2 for ch1, ch2 in zip(s1[:length], s2[:length]))
+
+def comparacao_mais_proxima(y, tabela):
+    # Compara y com todos os códigos na tabela e retorna o mais próximo (menor distância de Hamming)
+    min_dist = float('inf')
+    pos = -1
+
+    for i, code in enumerate(tabela):
+        aux = hamming_distance(y, code)
+        if aux < min_dist:
+            pos = i
+            min_dist = aux
+
+    return tabela[pos]
+
+def encontraParidade(y, tabela):
+    # Encontra a paridade entre y e o código mais próximo na tabela
+    fc = comparacao_mais_proxima(y, tabela)
+    P = subtract_binary(fc, y)
+    return P
+
+def comparaSinais(y, P, tabela):
+    # Compara sinais para gerar a chave final
+    fc = comparacao_mais_proxima(subtract_binary(y, P), tabela)
+    min_len = min(len(fc), len(P))
+    fc_padded = fc[:min_len]
+    P_padded = P[:min_len]
+    return xor_binary(fc_padded, P_padded)
+
+def subtract_binary(fc, y):
+    # Subtrai dois valores binários (bit a bit, XOR)
+    assert len(fc) == len(y), "Os valores devem ter o mesmo número de dígitos binários."
+    min_len = min(len(fc), len(y))
+    return ''.join('0' if a == b else '1' for a, b in zip(fc[:min_len], y[:min_len]))
+
+def xor_binary(fc, P):
+    # Realiza operação XOR entre duas strings binárias
+    assert len(fc) == len(P), "Os valores devem ter o mesmo número de dígitos binários."
+    return ''.join('0' if a == b else '1' for a, b in zip(fc, P))
+
+class AltoRuidoCanalRayleigh:
+    
+    def __init__(self, media, variancia, ntestes):
+        self.media = media
+        self.variancia = variancia
+        self.ntestes = ntestes
+
     # Função para calcular y considerando o efeito Rayleigh (h) e ruído alto
     def calculaY(self, h, x, variancia, media, ntestes):
         # Gera ruído gaussiano
@@ -34,13 +84,13 @@ class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
             # Gera y1 com h1 e ruído alto
             y1 = self.calculaY(x, h1, self.variancia, self.media, nBits)
             print('y1 =', y1)
-            erros_y1 = self.encontraErros(x, y1)
+            erros_y1 = encontraErros(x, y1)
             print('Erros do y1 =', erros_y1)
 
             # Gera y2 com h2 e ruído alto
             y2 = self.calculaY(x, h2, self.variancia, self.media, nBits)
             print('y2 =', y2)
-            erros_y2 = self.encontraErros(x, y2)
+            erros_y2 = encontraErros(x, y2)
             print('Erros do y2 =', erros_y2)
 
             # Converte listas para strings binárias
@@ -48,9 +98,9 @@ class AltoRuidoCanalRayleigh(CenárioBase, Plotagem):
             toStringY2 = ''.join(map(str, y2))
 
             c = random.choice(tabela)
-            s = self.xor_binary(toStringY1, c)
-            c_B = self.xor_binary(toStringY2 , s)
-            chave = self.xor_binary(s, self.comparacao_mais_proxima(c_B, tabela))
+            s = xor_binary(toStringY1, c)
+            c_B = xor_binary(toStringY2 , s)
+            chave = xor_binary(s, comparacao_mais_proxima(c_B, tabela))
             print(f"Chave gerada por código de BCH:", chave)
 
             # Verifica se a chave gerada é igual ao y1

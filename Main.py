@@ -5,7 +5,6 @@ import random
 # Importa as classes necessárias
 from bch import *
 from canal_rayleigh import *
-from Plotagem import Plotagem
 from plotkar import plot_kar
 from util import *
 
@@ -51,9 +50,6 @@ canais = AltoRuidoCanalRayleigh(media=media_ruido, variancia=variancia_ruido, nt
 
 # Coleta as porcentagens_acerto de acertos
 porcentagens_acerto = AltoRuidoCanalRayleigh.cenario(canais, palavra_informacao, canal_rayleigh_1, canal_rayleigh_2, tamanho_espaco_amostral, tabela, tamanho_cadeia_bits)
-
-# Plota os resultados
-Plotagem().plota(porcentagens_acerto, len(palavra_informacao))
 
 # Marca o tempo final e exibe o tempo de execução
 execution_time = time.time() - start_time
