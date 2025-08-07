@@ -1,6 +1,4 @@
 - mudar classes para apenas funções e mudar seus nomes
 - trocar KAR por KDR
-- retirar plotagem antiga
-- juntar Cenário5 com CenárioBase
 - melhorar o nome das variáveis de CodeGenerator e achar um nome melhor para esse pobre coitado
 - tentar não ficar maluco

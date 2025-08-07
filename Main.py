@@ -46,10 +46,8 @@ tamanho_espaco_amostral = None if tamanho_cadeia_bits <= 15 else solicita_entrad
 # tabela: Tabela de códigos gerada
 tabela = generate_code_table(tamanho_cadeia_bits, tamanho_espaco_amostral) # TODO: consertar bch.py
 
-canais = AltoRuidoCanalRayleigh(media=media_ruido, variancia=variancia_ruido, ntestes=quantidade_de_testes) # TODO: remover dicionário de canais, pois só possui um cenário
-
 # Coleta as porcentagens_acerto de acertos
-porcentagens_acerto = AltoRuidoCanalRayleigh.cenario(canais, palavra_informacao, canal_rayleigh_1, canal_rayleigh_2, tamanho_espaco_amostral, tabela, tamanho_cadeia_bits)
+porcentagens_acerto = cenario(palavra_informacao, canal_rayleigh_1, canal_rayleigh_2, tamanho_espaco_amostral, tabela, tamanho_cadeia_bits, quantidade_de_testes, variancia_ruido, media_ruido)
 
 # Marca o tempo final e exibe o tempo de execução
 execution_time = time.time() - start_time
@@ -69,8 +67,16 @@ for rayleigh_param in rayleigh_params:
         # Gera canal_rayleigh_1 e canal_rayleigh_2 com o parâmetro Rayleigh atual
         canal_rayleigh_1 = np.random.rayleigh(rayleigh_param, tamanho_cadeia_bits)
         canal_rayleigh_2 = np.random.rayleigh(rayleigh_param, tamanho_cadeia_bits)
-        canal = AltoRuidoCanalRayleigh(media=media_ruido, variancia=variancia, ntestes=quantidade_de_testes)
-        porcentagem = canal.cenario(palavra_informacao, canal_rayleigh_1, canal_rayleigh_2, size=tamanho_espaco_amostral, tabela=tabela, nBits=tamanho_cadeia_bits)
+        porcentagem = cenario(
+            palavra_informacao,
+            canal_rayleigh_1,
+            canal_rayleigh_2,
+            tamanho_espaco_amostral,
+            tabela, tamanho_cadeia_bits,
+            quantidade_de_testes,
+            variancia,
+            media_ruido
+            )
         snr_db = 10 * np.log10(potencia_sinal / variancia)
         snrs_db.append(snr_db)
         kar_rates.append(porcentagem)

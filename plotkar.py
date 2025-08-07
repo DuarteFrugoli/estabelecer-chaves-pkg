@@ -2,6 +2,7 @@
 # Importa a biblioteca matplotlib para geração de gráficos
 import matplotlib.pyplot as plt
 
+# TODO: trocar kar por kdr (padrão da literatura)
 def plot_kar(snr_db, kar_rates):
     # Função que plota um gráfico de linha com os dados de decibéis e KAR (Key Agreement Rate)
 
