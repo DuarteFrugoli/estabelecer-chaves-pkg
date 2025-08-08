@@ -13,3 +13,5 @@ o artigo do método 2 usa o CSI e não o ganho, além disso a quantização é f
 arquivo bch.py OK
 
 O KDR é a taxa de erro entre as chaves extraídas, ou seja, a quantidade de vezes (em percentual) que as chaves geradas são diferentes.
+
+PKG = Physical-layer Key Generation

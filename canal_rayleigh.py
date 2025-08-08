@@ -44,8 +44,8 @@ def xor_binario(seq1, seq2):
 def simular_canal(ganho_canal, bits_informacao, variancia_ruido, media_ruido):
     """Simula transmissão por canal Rayleigh com ruído gaussiano"""
     # Gera ruído gaussiano vetorizado
-    sigma = np.sqrt(variancia_ruido)
-    ruido = np.random.normal(media_ruido, sigma, len(bits_informacao))
+    sigma_ruido = np.sqrt(variancia_ruido)
+    ruido = np.random.normal(media_ruido, sigma_ruido, len(bits_informacao))
 
     # Converte para arrays NumPy para operação vetorizada
     ganho_array = np.array(ganho_canal)
@@ -59,11 +59,15 @@ def simular_canal(ganho_canal, bits_informacao, variancia_ruido, media_ruido):
     return sinal_recebido
 
 # Função principal do cenário
-def extrair_kar_kdr(bits_informacao, ganho_canal_1, ganho_canal_2, quantidade_de_testes, variancia_ruido, media_ruido):
+def extrair_kar_kdr(bits_informacao, rayleigh_param, tamanho_bits_informacao, quantidade_de_testes, variancia_ruido, media_ruido):
     """Executa a simulação do canal Rayleigh com ruído e gera chaves usando códigos BCH."""
     contagem_de_acertos = 0  # Contador de acertos
 
     for i in range(quantidade_de_testes):
+        # Gera ganho_canal_1 e ganho_canal_2 com o parâmetro Rayleigh atual
+        ganho_canal_1 = np.random.rayleigh(rayleigh_param, tamanho_bits_informacao)
+        ganho_canal_2 = np.random.rayleigh(rayleigh_param, tamanho_bits_informacao)
+
         # Geram os sinais recebidos para os dois canais
         sinal_recebido_1 = simular_canal(ganho_canal_1, bits_informacao, variancia_ruido, media_ruido)
         sinal_recebido_2 = simular_canal(ganho_canal_2, bits_informacao, variancia_ruido, media_ruido)
