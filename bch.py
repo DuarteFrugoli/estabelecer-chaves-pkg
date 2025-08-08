@@ -2,6 +2,7 @@ import numpy as np
 import galois
 import random
 
+# Retorna o valor de k (número de bits de informação) para o código especificado
 def get_tamanho_bits_informacao(tamanho_cadeia_bits):
     """Retorna o valor de k (número de bits de informação) para o código especificado."""
     # Dicionário com valores de k para diferentes tamanhos de código BCH
@@ -11,41 +12,32 @@ def get_tamanho_bits_informacao(tamanho_cadeia_bits):
         127: 64,
         255: 247
     }
-    return tamanho_bits_informacao.get(tamanho_cadeia_bits, None)  # Retorna None se o valor de tamanho_cadeia_bits não for encontrado
+    return tamanho_bits_informacao.get(tamanho_cadeia_bits, None) # Retorna None se o valor de tamanho_cadeia_bits não for encontrado
 
-def binary_product(X, Y):
-    """Calcula o produto de uma matriz e vetor no campo binário."""
-    A = X.dot(Y)
-    try:
-        A = A.toarray()
-    except AttributeError:
-        pass
-    return A % 2
-
-def encode_bch(tamanho_cadeia_bits, tamanho_bits_informacao, info_word):
+def codificar_bch(tamanho_cadeia_bits, tamanho_bits_informacao, bits_informacao):
     """Codifica uma palavra de informação usando o código BCH."""
-    t = {7: 1, 15: 3, 127: 10, 255: 1}
-    d = 2 * t.get(tamanho_cadeia_bits, 0) + 1
-    bch_code = galois.BCH(tamanho_cadeia_bits, tamanho_bits_informacao, d)
-    return ''.join(map(str, bch_code.encode(info_word)))
+    t = {7: 1, 15: 3, 127: 10, 255: 8} # Número de erros que o código pode corrigir
+    d = 2 * t.get(tamanho_cadeia_bits, 0) + 1 # Distância mínima do código
+    codigo_bch = galois.BCH(tamanho_cadeia_bits, tamanho_bits_informacao, d) 
+    return codigo_bch.encode(bits_informacao).tolist()
 
-def generate_code_table(tamanho_cadeia_bits, tamanho_espaco_amostral=None):
-    """Gera uma tabela de códigos para todas as palavras de informação possíveis."""
-    tamanho_bits_informacao = get_tamanho_bits_informacao(tamanho_cadeia_bits)
-
+def gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, tamanho_espaco_amostral=None):
+    """Gera uma tabela de códigos para todas as palavras de informação possíveis (sem repetições)."""
+    # Se o tamanho do espaço amostral não for especificado, calcula automaticamente
     if tamanho_espaco_amostral is None:
-        tamanho_espaco_amostral = 2 ** tamanho_bits_informacao  # tamanho_espaco_amostral: Tamanho do espaço amostral para geração da tabela de códigos
+        tamanho_espaco_amostral = 2 ** tamanho_bits_informacao
 
-    # info_words: Lista de todas as palavras de informação possíveis (ou amostradas, se o espaço for grande)
+    # palavras_informacao: Lista de todas as palavras de informação possíveis (ou amostradas, se o espaço for grande)
     if tamanho_cadeia_bits > 15:
-        info_words = [list(map(int, format(random.randint(0, 2**tamanho_bits_informacao - 1), f'0{tamanho_bits_informacao}b'))) for _ in range(tamanho_espaco_amostral)]
+        palavras_informacao_set = set()
+        while len(palavras_informacao_set) < tamanho_espaco_amostral:
+            palavra = tuple(map(int, format(random.randint(0, 2**tamanho_bits_informacao - 1), f'0{tamanho_bits_informacao}b')))
+            palavras_informacao_set.add(palavra)
+        palavras_informacao = [list(p) for p in palavras_informacao_set]
+    else:
+        palavras_informacao = [list(map(int, format(i, f'0{tamanho_bits_informacao}b'))) for i in range(tamanho_espaco_amostral)]
 
-    elif tamanho_cadeia_bits <= 15:
-        info_words = [list(map(int, format(i, f'0{tamanho_bits_informacao}b'))) for i in range(tamanho_espaco_amostral)]
+    # Codifica as palavras de informação do espaço amostral usando o código BCH
+    tabela_codigos = [codificar_bch(tamanho_cadeia_bits, tamanho_bits_informacao, bits_informacao) for bits_informacao in palavras_informacao]
 
-    # Seleciona o codificador apropriado
-    code_table = [encode_bch(tamanho_cadeia_bits, tamanho_bits_informacao, info_word) for info_word in info_words]  # code_table: Lista de todas as palavras codificadas geradas a partir das palavras de informação
-
-    for codeword in code_table:
-        print(f'Código BCH: {codeword}')
-    return code_table
+    return tabela_codigos

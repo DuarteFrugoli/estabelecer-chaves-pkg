@@ -1,4 +1,8 @@
-- mudar classes para apenas funções e mudar seus nomes
-- trocar KAR por KDR
-- melhorar o nome das variáveis de CodeGenerator e achar um nome melhor para esse pobre coitado
 - tentar não ficar maluco
+- descobrir porque tem saltos tão grandes nos gráficos plotados
+- fazer a reconciliação BCH do jeito correto (antes mandava codificado direto do sinal)
+- plotar lado a lado kdr ou kar e como taxa de reconciliação
+- devemos obter o BER (bit error rate)
+- podemos colocar novamente os outros métodos de reconciliação agora que está tudo funcionando perfeitamente e muito mais organizado. Vai ser bom para refazer a análise que o João tinha feito antes entre os métodos usando o SNR como um parâmetro.
+- o método 2 não usa o ganho do canal como segredo, podemos tentar usar o CSI como parâmetro e testar a sua eficiência/eficácia. Recomendo a leitura dos dois artigos novamente agora que o estudo já está mais avançado.
+- no final seria bom um teste com dispositivos reais conforme o artigo do método 2 usando ESP32

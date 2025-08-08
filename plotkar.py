@@ -2,10 +2,8 @@
 # Importa a biblioteca matplotlib para geração de gráficos
 import matplotlib.pyplot as plt
 
-# TODO: trocar kar por kdr (padrão da literatura)
-def plot_kar(snr_db, kar_rates):
-    # Função que plota um gráfico de linha com os dados de decibéis e KAR (Key Agreement Rate)
-
+def plot_kar(snr_db, kar_rates, rayleigh_param):
+    """Função que plota um gráfico de linha com os dados de decibéis e KAR (Key Agreement Rate)"""
     # Define o tamanho da figura do gráfico
     plt.figure(figsize=(8, 6))
 
@@ -19,7 +17,7 @@ def plot_kar(snr_db, kar_rates):
     plt.ylabel('Key Agreement Rate (KAR)')
 
     # Define o título do gráfico
-    plt.title('KAR em função de SNR')
+    plt.title(f'KAR em função de SNR (Rayleigh σ = {rayleigh_param})')
 
     # Ativa a grade (linhas de fundo para facilitar a leitura dos valores)
     plt.grid(True)

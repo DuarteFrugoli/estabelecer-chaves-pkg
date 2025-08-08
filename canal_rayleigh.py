@@ -1,117 +1,101 @@
 import random
 import numpy as np
 
+from bch import *
+
 # TODO: organizar funções em diferentes arquivos
 
-def encontraErros(palavra_informacao, y):
-    # Conta o número de erros entre duas listas de bits palavra_informacao e y
-    return sum(1 for i in range(len(palavra_informacao)) if y[i] != palavra_informacao[i])
+def calcular_distancia_hamming(seq1, seq2):
+    """Calcula a distância de Hamming entre duas listas de bits. Gera erro se os tamanhos forem diferentes."""
+    assert len(seq1) == len(seq2), f"Listas devem ter o mesmo comprimento: {len(seq1)} vs {len(seq2)}"
+    return sum(a != b for a, b in zip(seq1, seq2))
 
-def hamming_distance(s1, s2):
-    # Calcula a distância de Hamming entre duas strings binárias
-    length = min(len(s1), len(s2))
-    return sum(ch1 != ch2 for ch1, ch2 in zip(s1[:length], s2[:length]))
+def contar_erros_bits(seq1, seq2):
+    """Conta o número de bits diferentes entre duas listas de bits. Gera erro se os tamanhos forem diferentes."""
+    # Tem a mesma funcionalidade que calcular_distancia_hamming, mas é mais explícita
+    return calcular_distancia_hamming(seq1, seq2)
 
-def comparacao_mais_proxima(y, tabela):
-    # Compara y com todos os códigos na tabela e retorna o mais próximo (menor distância de Hamming)
+def encontrar_codigo_mais_proximo(sinal_recebido, tabela_codigos):
+    """
+    Compara sinal_recebido com todos os códigos na tabela e retorna o mais próximo (menor distância de Hamming).
+    """
+    if not tabela_codigos:
+        raise ValueError("A tabela de códigos está vazia.")
+
     min_dist = float('inf')
-    pos = -1
+    indice_min = -1
 
-    for i, code in enumerate(tabela):
-        aux = hamming_distance(y, code)
+    for i, code in enumerate(tabela_codigos):
+        aux = calcular_distancia_hamming(sinal_recebido, code)
         if aux < min_dist:
-            pos = i
+            indice_min = i
             min_dist = aux
 
-    return tabela[pos]
+    return tabela_codigos[indice_min]
 
-def encontraParidade(y, tabela):
-    # Encontra a paridade entre y e o código mais próximo na tabela
-    fc = comparacao_mais_proxima(y, tabela)
-    P = subtract_binary(fc, y)
-    return P
-
-def comparaSinais(y, P, tabela):
-    # Compara sinais para gerar a chave final
-    fc = comparacao_mais_proxima(subtract_binary(y, P), tabela)
-    min_len = min(len(fc), len(P))
-    fc_padded = fc[:min_len]
-    P_padded = P[:min_len]
-    return xor_binary(fc_padded, P_padded)
-
-def subtract_binary(fc, y):
-    # Subtrai dois valores binários (bit a bit, XOR)
-    assert len(fc) == len(y), "Os valores devem ter o mesmo número de dígitos binários."
-    min_len = min(len(fc), len(y))
-    return ''.join('0' if a == b else '1' for a, b in zip(fc[:min_len], y[:min_len]))
-
-def xor_binary(fc, P):
-    # Realiza operação XOR entre duas strings binárias
-    assert len(fc) == len(P), "Os valores devem ter o mesmo número de dígitos binários."
-    return ''.join('0' if a == b else '1' for a, b in zip(fc, P))
+def xor_binario(seq1, seq2):
+    """Realiza operação XOR entre duas listas de bits"""
+    assert len(seq1) == len(seq2), f"Listas devem ter o mesmo comprimento: {len(seq1)} vs {len(seq2)}"
+    return [0 if a == b else 1 for a, b in zip(seq1, seq2)]
 
 # FIXME: antiga classe AltoRuidoCanalRayleigh
 
 # Função para calcular y considerando o efeito Rayleigh (h) e ruído alto
-def calculaY(h, palavra_informacao, variancia, media, ntestes):
-    # Gera ruído gaussiano
-    # TODO: colocar a função em um lugar melhor e consertar os nomes
-    # TODO: adicionar utilidade para o sigma e entender como ele se relaciona com as variâncias
-    # TODO: melhor usar np.random.normal ao invés de random.gauss
-    def gerar_ruido_gaussiano(variancia, media):
-        sigma = np.sqrt(variancia)
-        return [random.gauss(media, variancia) for _ in range(len(palavra_informacao))]
+def simular_canal(ganho_canal, bits_informacao, variancia_ruido, media_ruido):
+    """Simula transmissão por canal Rayleigh com ruído gaussiano"""
+    # Gera ruído gaussiano vetorizado
+    sigma = np.sqrt(variancia_ruido)
+    ruido = np.random.normal(media_ruido, sigma, len(bits_informacao))
 
-    n = gerar_ruido_gaussiano(variancia, media)
-    # Calcula y aplicando o efeito Rayleigh e limiarização
-    y = [1 if h[i] * palavra_informacao[i] + n[i] > 0.5 else 0 for i in range(len(palavra_informacao))]
-    return y
+    # Converte para arrays NumPy para operação vetorizada
+    ganho_array = np.array(ganho_canal)
+    bits_informacao_array = np.array(bits_informacao)
+
+    # Calcula y = h*x + n de forma vetorizada
+    sinal_recebido_continuo = ganho_array * bits_informacao_array + ruido
+
+    # Aplica limiarização vetorizada
+    sinal_recebido = (sinal_recebido_continuo > 0.5).astype(int).tolist()
+    return sinal_recebido
 
 # Função principal do cenário
-def cenario(palavra_informacao, canal_rayleigh_1, canal_rayleigh_2, tamanho_espaco_amostral, tabela, tamanho_cadeia_bits, ntestes, variancia, media):
-
-    print("Cenário 5: Alto Ruido Canal Rayleigh\n")
-
+def extrair_kar_kdr(bits_informacao, ganho_canal_1, ganho_canal_2, quantidade_de_testes, variancia_ruido, media_ruido):
+    """Executa a simulação do canal Rayleigh com ruído e gera chaves usando códigos BCH."""
     contagem_de_acertos = 0  # Contador de acertos
 
-    for i in range(ntestes):
-        print(f'Teste {i+1}/{ntestes}')
-        print('palavra_informacao =', palavra_informacao)
+    for i in range(quantidade_de_testes):
+        # Geram os sinais recebidos para os dois canais
+        sinal_recebido_1 = simular_canal(ganho_canal_1, bits_informacao, variancia_ruido, media_ruido)
+        sinal_recebido_2 = simular_canal(ganho_canal_2, bits_informacao, variancia_ruido, media_ruido)
 
-        # Gera y1 com canal_rayleigh_1 e ruído alto
-        y1 = calculaY(palavra_informacao, canal_rayleigh_1, variancia, media, tamanho_cadeia_bits)
-        print('y1 =', y1)
-        erros_y1 = encontraErros(palavra_informacao, y1)
-        print('Erros do y1 =', erros_y1)
-
-        # Gera y2 com canal_rayleigh_2 e ruído alto
-        y2 = calculaY(palavra_informacao, canal_rayleigh_2, variancia, media, tamanho_cadeia_bits)
-        print('y2 =', y2)
-        erros_y2 = encontraErros(palavra_informacao, y2)
-        print('Erros do y2 =', erros_y2)
-
-        # Converte listas para strings binárias
-        toStringY1 = ''.join(map(str, y1))
-        toStringY2 = ''.join(map(str, y2))
-
-        c = random.choice(tabela)
-        s = xor_binary(toStringY1, c)
-        c_B = xor_binary(toStringY2 , s)
-        chave = xor_binary(s, comparacao_mais_proxima(c_B, tabela))
-        print(f"Chave gerada por código de BCH:", chave)
-
-        # Verifica se a chave gerada é igual ao y1
-        if toStringY1 == chave:
+        # Contabiliza acertos (se os sinais recebidos forem iguais)
+        if sinal_recebido_1 == sinal_recebido_2:
             contagem_de_acertos += 1
-        else:
-            print(f"Não são iguais por BCH")
+        
+    # Calcula a porcentagem de acertos e de erros (kar e kdr)
+    kar = contagem_de_acertos * 100.0 / quantidade_de_testes
+    kdr = 100.0 - kar
 
+    return kar, kdr
 
-        print("\n--------------------------------------------------------")
+def reconciliar_chaves():
+    """Função para reconciliar chaves entre Alice e Bob"""
+    # Placeholder para implementação futura
 
+    # c = random.choice(tabela_codigos)
+        # s = xor_binario(palavra_codigo_1, c)
+        # c_B = xor_binario(palavra_codigo_2, s)
+        # chave = xor_binario(s, encontrar_codigo_mais_proximo(c_B, tabela_codigos))
+        # print(f"Chave gerada por código de BCH:", chave)
 
-    # Calcula a porcentagem de acertos
-    porcentagem_de_acertos = contagem_de_acertos * 100.00 / ntestes
-    print(f"Porcentagem de vezes que a chave gerada foi encontrada na tabela BCH: {porcentagem_de_acertos:.2f}%")
+        # Verifica se a chave gerada é igual ao sinal_recebido_1
+        # if sinal_recebido_1 == chave:
+        #     contagem_de_acertos += 1
+        # else:
+        #     print(f"Não são iguais por BCH")
+    return None
 
-    return porcentagem_de_acertos
+def executar_simulacao():
+    """Executa a simulação do canal Rayleigh com os parâmetros definidos."""
+    # Placeholder para implementação da simulação
+    return None
