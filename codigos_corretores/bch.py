@@ -1,6 +1,7 @@
-import numpy as np
 import galois
 import random
+
+from util.binario_util import calcular_distancia_hamming
 
 # Retorna o valor de k (número de bits de informação) para o código especificado
 def get_tamanho_bits_informacao(tamanho_cadeia_bits):
@@ -41,3 +42,21 @@ def gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, taman
     tabela_codigos = [codificar_bch(tamanho_cadeia_bits, tamanho_bits_informacao, bits_informacao) for bits_informacao in palavras_informacao]
 
     return tabela_codigos
+
+def encontrar_codigo_mais_proximo(sinal_recebido, tabela_codigos):
+    """
+    Compara sinal_recebido com todos os códigos na tabela e retorna o mais próximo (menor distância de Hamming).
+    """
+    if not tabela_codigos:
+        raise ValueError("A tabela de códigos está vazia.")
+
+    min_dist = float('inf')
+    indice_min = -1
+
+    for i, code in enumerate(tabela_codigos):
+        aux = calcular_distancia_hamming(sinal_recebido, code)
+        if aux < min_dist:
+            indice_min = i
+            min_dist = aux
+
+    return tabela_codigos[indice_min]

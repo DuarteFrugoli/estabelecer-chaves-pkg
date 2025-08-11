@@ -1,5 +1,5 @@
 - tentar não ficar maluco
-- descobrir porque tem saltos tão grandes nos gráficos plotados
+- entender se é necessário quantizar todos os bits da palavra código de uma vez ou apenas os bits de informação
 - fazer a reconciliação BCH do jeito correto (antes mandava codificado direto do sinal)
 - plotar lado a lado kdr ou kar e como taxa de reconciliação
 - devemos obter o BER (bit error rate)

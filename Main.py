@@ -12,15 +12,14 @@ handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)
 logger.addHandler(handler)
 logger.propagate = False  # Não propaga para o root logger
 
-from bch import *
-from canal_rayleigh import *
+from codigos_corretores.bch import *
+from canal.canal import *
 from plotkar import plot_kar
-from util import *
+from util.util import *
 
 potencia_sinal = 1.0 # potência do sinal (1.0 pois o que importa é o SNR)
 rayleigh_params = [0.5, 1.0, 2.0] # parâmetros Rayleigh (sigma), pode ir de 0.1 a 5.0
 snr_db_range = np.linspace(-10, 30, 18) # 18 valores de SNR de -10 a 30 dB
-print(snr_db_range)
 snr_linear_range = 10 ** (snr_db_range / 10)
 variancias_ruido = potencia_sinal / snr_linear_range # variâncias do ruído para cada SNR
 media_ruido = 0 # média do ruído (padrão 0.0)
