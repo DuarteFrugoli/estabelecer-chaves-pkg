@@ -9,21 +9,31 @@ def get_tamanho_bits_informacao(tamanho_cadeia_bits):
     # Dicionário com valores de k para diferentes tamanhos de código BCH
     tamanho_bits_informacao = {
         7: 4,
-        15: 5,
+        15: 7,
         127: 64,
-        255: 247
+        255: 139
     }
     return tamanho_bits_informacao.get(tamanho_cadeia_bits, None) # Retorna None se o valor de tamanho_cadeia_bits não for encontrado
 
-def codificar_bch(tamanho_cadeia_bits, tamanho_bits_informacao, bits_informacao):
-    """Codifica uma palavra de informação usando o código BCH."""
-    t = {7: 1, 15: 3, 127: 10, 255: 8} # Número de erros que o código pode corrigir
+def instanciar_codigo_bch(tamanho_cadeia_bits, tamanho_bits_informacao):
+    """Instancia um objeto BCH com os parâmetros especificados."""
+    t = {7: 1, 15: 2, 127: 10, 255: 15} # Número de erros que o código pode corrigir
     d = 2 * t.get(tamanho_cadeia_bits, 0) + 1 # Distância mínima do código
-    codigo_bch = galois.BCH(tamanho_cadeia_bits, tamanho_bits_informacao, d) 
-    return codigo_bch.encode(bits_informacao).tolist()
+    return galois.BCH(tamanho_cadeia_bits, tamanho_bits_informacao, d)
+
+def codificar_bch(bch, bits_informacao):
+    """Codifica uma palavra de informação usando o código BCH."""
+    return bch.encode(bits_informacao).tolist()
+
+def decodificar_bch(bch, bits_codificados):
+    """Decodifica uma palavra codificada usando o código BCH."""
+    return bch.decode(bits_codificados).tolist()
 
 def gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, tamanho_espaco_amostral=None):
     """Gera uma tabela de códigos para todas as palavras de informação possíveis (sem repetições)."""
+    # Instancia o código BCH
+    bch = instanciar_codigo_bch(tamanho_cadeia_bits, tamanho_bits_informacao)
+
     # Se o tamanho do espaço amostral não for especificado, calcula automaticamente
     if tamanho_espaco_amostral is None:
         tamanho_espaco_amostral = 2 ** tamanho_bits_informacao
@@ -39,7 +49,7 @@ def gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, taman
         palavras_informacao = [list(map(int, format(i, f'0{tamanho_bits_informacao}b'))) for i in range(tamanho_espaco_amostral)]
 
     # Codifica as palavras de informação do espaço amostral usando o código BCH
-    tabela_codigos = [codificar_bch(tamanho_cadeia_bits, tamanho_bits_informacao, bits_informacao) for bits_informacao in palavras_informacao]
+    tabela_codigos = [codificar_bch(bch, bits_informacao) for bits_informacao in palavras_informacao]
 
     return tabela_codigos
 

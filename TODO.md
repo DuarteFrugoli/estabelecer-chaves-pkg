@@ -1,8 +1,5 @@
-- tentar não ficar maluco
-- entender se é necessário quantizar todos os bits da palavra código de uma vez ou apenas os bits de informação
-- fazer a reconciliação BCH do jeito correto (antes mandava codificado direto do sinal)
-- plotar lado a lado kdr ou kar e como taxa de reconciliação
-- devemos obter o BER (bit error rate)
-- podemos colocar novamente os outros métodos de reconciliação agora que está tudo funcionando perfeitamente e muito mais organizado. Vai ser bom para refazer a análise que o João tinha feito antes entre os métodos usando o SNR como um parâmetro.
-- o método 2 não usa o ganho do canal como segredo, podemos tentar usar o CSI como parâmetro e testar a sua eficiência/eficácia. Recomendo a leitura dos dois artigos novamente agora que o estudo já está mais avançado.
-- no final seria bom um teste com dispositivos reais conforme o artigo do método 2 usando ESP32
+1. permanecer são (difícil)
+2. entender se o método usado na reconciliação no artigo 2 é realmente funcional.
+3. verificar se a opção de codificar e decodificar da biblioteca galois é melhor ou pior do que os XORs usados no artigo 2.
+4. fazer histogramas.
+5. arrumar de novo as funções e tirar as que não forem necessárias após descobrir qual a implementação correta do BCH.

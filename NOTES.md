@@ -1,36 +1,3 @@
-# Anotações aleatórias
-
-y = h * x + n
-
-o artigo do método 2 usa o CSI e não o ganho, além disso a quantização é feita utilizando o block-gray. A reconciliação é com BCH mesmo.
-
-O KDR é a taxa de erro entre as chaves extraídas, ou seja, a quantidade de vezes (em percentual) que as chaves geradas são diferentes. Podemos fazer o kdr pós-processamento para ver a eficácia dos códigos de correção de erros.
-
-
-
-# sobre PKG
-
-PKG = Physical-layer Key Generation
-
-a) Comunicação clássica (não PKG)
-Você transmite o código BCH inteiro (informação + paridade).
-Exemplo: pega 4 bits info, gera 3 bits paridade, envia os 7 bits.
-
-b) PKG com reconciliação
-Você não transmite a palavra código inteira — porque o objetivo é não revelar a chave toda.
-
-Alice calcula os bits de paridade a partir dos bits dela.
-
-Ela envia somente os bits de paridade.
-
-Bob pega a sequência dele (que é quase igual à de Alice) e aplica o algoritmo BCH usando os bits de paridade recebidos para corrigir erros.
-
-Assim, Bob chega exatamente na sequência de Alice.
-
-O espião Eve pode ouvir os bits de paridade, mas isso não é suficiente para reconstruir a chave inteira, desde que a reconciliação seja bem projetada.
-
-
-
 # Sobre BCH
 
 O BCH é definido como (n, k, t):
@@ -73,7 +40,7 @@ Alguns exemplos:
 | (127, 120) | 120           | 7                | 1         |
 | (127, 64)  | 64            | 63               | 10        |
 | (255, 247) | 247           | 8                | 1         |
-| (255, 131) | 131           | 124              | 15        |
+| (255, 139) | 139           | 116              | 15        |
 
 Repare: para o mesmo n, se você escolher um 𝑡 diferente, o número de bits de paridade muda, mas para um BCH específico (n,k) ele é sempre fixo.
 
@@ -87,3 +54,8 @@ Repare: para o mesmo n, se você escolher um 𝑡 diferente, o número de bits d
 1. Bob calcula Cb = S ⊕ Kb → versão corrompida de C
 2. Bob compara Cb com todos os códigos na tabela e encontra o código válido mais próximo
 3. Bob reconstrói a chave → Ka = S ⊕ Cb
+
+# Dúvidas
+    eu tenho quase certeza que algo está errado, não sei se é no método de reconciliação proposto no artigo 2, não sei se é no meu código, não sei de nada, estou ficando maluco. BCH não foi feito para ser usado desse jeito.
+
+    pelo menos agora dá para saber quais métodos de reconciliação estão funcionando ou não e também testar outros tipos de quantização. creio que estas partes estejam corretas.

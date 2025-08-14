@@ -3,7 +3,7 @@
 Este projeto faz parte da Iniciação Científica (IC) **"Segurança em Camada Física: Estabelecimento de Chaves Criptográficas para Comunicações Móveis de Próxima Geração"**.
 
 - **Autores:** Pedro Henrique Duarte Frugoli e Henrique Rodrigues Mendonça
-- **Baseado em código anterior de:** João [SOBRENOME]
+- **Baseado em código anterior de:** João Gabriel Ferreira Ribeiro
 
 ## 🎯 Objetivo
 

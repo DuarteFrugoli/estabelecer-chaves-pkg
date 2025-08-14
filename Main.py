@@ -3,6 +3,7 @@ import numpy as np
 import random
 import logging
 
+# Logger para fazer o acompanhamento do fluxo de execução
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO) # DEBUG, INFO, WARNING, ERROR, CRITICAL
 
@@ -14,7 +15,7 @@ logger.propagate = False  # Não propaga para o root logger
 
 from codigos_corretores.bch import *
 from canal.canal import *
-from plotkar import plot_kar
+from plotkdr import plot_kdr
 from util.util import *
 
 potencia_sinal = 1.0 # potência do sinal (1.0 pois o que importa é o SNR)
@@ -33,7 +34,8 @@ tamanho_cadeia_bits = solicita_entrada("Entre com o tamanho da cadeia de Bits (7
 
 # Bits de informação (k bits) - dados originais antes da codificação
 tamanho_bits_informacao = get_tamanho_bits_informacao(tamanho_cadeia_bits)
-bits_informacao = [random.randint(0, 1) for _ in range(tamanho_bits_informacao)]  # Gera bits de informação aleatórios
+palavra_codigo = [random.randint(0, 1) for _ in range(tamanho_cadeia_bits)]  # Gera bits de informação aleatórios
+logger.info(f"Palavra de código gerada: {palavra_codigo} (tamanho {tamanho_cadeia_bits} bits, k={tamanho_bits_informacao})")
 
 # Pede o tamanho do espaço amostral caso o tamanho da cadeia de bits seja maior que 15
 tamanho_espaco_amostral = None if tamanho_cadeia_bits <= 15 else solicita_entrada(
@@ -45,18 +47,21 @@ tabela_codigos = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_info
 
 # Gera e plota os resultados para diferentes parâmetros Rayleigh
 for rayleigh_param in rayleigh_params:
-    percentuais_acordo = []
+    kdr_rates = []
+    kdr_pos_rates = []
     for variancia in variancias_ruido:
-        kar, kdr = extrair_kar_kdr(
-            bits_informacao,
+        kdr, kdr_pos_reconciliacao = extrair_kdr(
+            palavra_codigo,
             rayleigh_param,
-            tamanho_bits_informacao,
+            tamanho_cadeia_bits,
             quantidade_de_testes,
             variancia,
-            media_ruido
+            media_ruido,
+            tabela_codigos
             )
-        percentuais_acordo.append(kar)
-    plot_kar(snr_db_range, percentuais_acordo, rayleigh_param)
+        kdr_rates.append(kdr)
+        kdr_pos_rates.append(kdr_pos_reconciliacao)
+    plot_kdr(snr_db_range, kdr_rates, kdr_pos_rates, rayleigh_param)
 
 # Marca o tempo final e exibe o tempo de execução
 execution_time = time.time() - start_time
