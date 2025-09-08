@@ -1,4 +1,191 @@
-# Ignorar todos os diretórios __pycache__ e arquivos .pyc
+# ========================================
+# Python - Arquivos de cache e compilados
+# ========================================
 __pycache__/
 **/__pycache__/
+*.py[cod]
+*.pyo
 *.pyc
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ========================================
+# Ambientes virtuais
+# ========================================
+.venv/
+venv/
+env/
+ENV/
+.env
+.env.*
+.envrc
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ========================================
+# IDEs e Editores
+# ========================================
+.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+.idea/
+*.swp
+*.swo
+*~
+.vs/
+.project
+.classpath
+.settings/
+
+# ========================================
+# Jupyter Notebooks
+# ========================================
+.ipynb_checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+.jupyter/
+*.ipynb_output
+
+# ========================================
+# Matplotlib - Arquivos temporários
+# ========================================
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.pdf
+
+# ========================================
+# Dados temporários e logs
+# ========================================
+*.log
+*.tmp
+*.temp
+temp/
+tmp/
+logs/
+*.out
+*.err
+*.debug
+*.trace
+
+# ========================================
+# Arquivos de sistema (Windows)
+# ========================================
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ========================================
+# Arquivos de sistema (macOS)  
+# ========================================
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+
+# ========================================
+# Arquivos de sistema (Linux)
+# ========================================
+*~
+.directory
+
+# ========================================
+# Documentação temporária 
+# ========================================
+docs/_build/
+.readthedocs.yml
+site/
+.mkdocs.yml
+mkdocs.yml
+
+
+# ========================================
+# Resultados de testes e benchmarks
+# ========================================
+benchmark_results/
+test_outputs/
+*.benchmark
+.tox/
+.nox/
+.cache
+nosetests.xml
+.coverage.*
+.pytest_cache/
+.mypy_cache/
+.pyre/
+.pytype/
+cov.xml
+*.profraw
+
+# ========================================
+# Backups e arquivos temporários
+# ========================================
+*.bak
+*.backup
+*.old
+*.orig
+
+# ========================================
+# Arquivos de configuração local
+# ========================================
+config.local.py
+settings.local.py
+
+# ========================================
+# Certificados e chaves (IMPORTANTE!)
+# ========================================
+*.key
+*.pem
+*.crt
+*.cer
+*.p12
+*.pfx
+
+# ========================================
+# Coverage e relatórios de teste
+# ========================================
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# ========================================
+# Específico do projeto PKG
+# ========================================
+# Gráficos gerados pelos testes
+graficos_output/
+plots/
+# Dados de simulação
+simulacao_dados/
+# Resultados de benchmark
+benchmark_pkg/
+# Chaves geradas em testes
+chaves_teste/
+*.key_output
