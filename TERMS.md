@@ -1,0 +1,6 @@
+- frequência de portadora
+- taxa de transmissão
+- taxa de bits
+- taxa de símbolos
+- tempo de coerência
+- banda de coerência
