@@ -155,41 +155,6 @@ python -m pytest tests/ -v
 
 ## Arquitetura
 
-### Estrutura de Diretórios
-
-```
-Criptografia/
-├── main.py                    # Script principal
-├── plotkdr.py                 # Geração de gráficos
-├── pyproject.toml            # Configuração Poetry e dependências
-├── LICENSE                   # Licença MIT
-├── canal/                     # Simulação de canal
-│   ├── canal.py                  # Implementação Rayleigh + BPSK
-│   └── __init__.py
-├── codigos_corretores/        # Códigos de correção
-│   ├── bch.py                    # Implementação BCH
-│   └── __init__.py
-├── pilares/                   # Três pilares do PKG
-│   ├── reconciliacao.py         # Code-offset algorithm
-│   ├── amplificacao_privacidade.py # SHA-256
-│   └── __init__.py
-├── util/                      # Utilitários
-│   ├── binario_util.py          # Operações binárias
-│   ├── util.py                  # Funções auxiliares
-│   └── __init__.py
-├── tests/                     # Suite de testes
-│   ├── test_binario_util.py     # Testes unitários utilitários
-│   ├── test_bch.py              # Testes códigos BCH
-│   ├── test_reconciliacao.py    # Testes reconciliação
-│   ├── test_amplificacao_privacidade.py # Testes amplificação
-│   ├── test_canal.py            # Testes simulação canal
-│   └── test_sistema_completo.py # Testes integração
-└── docs/                      # Documentação
-    ├── RELATORIO_FINAL.md       # Relatório executivo
-    ├── MELHORIAS_IMPLEMENTADAS.md
-    └── NOTES.md
-```
-
 ### Fluxo de Dados do Sistema
 
 O sistema PKG funciona seguindo este fluxo:
