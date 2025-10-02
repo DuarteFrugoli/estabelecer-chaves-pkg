@@ -23,10 +23,9 @@ rayleigh_params = [0.5, 1.0, 2.0] # parâmetros Rayleigh (sigma), pode ir de 0.1
 snr_db_range = np.linspace(-10, 30, 18) # 18 valores de SNR de -10 a 30 dB
 snr_linear_range = 10 ** (snr_db_range / 10)
 
-# Relação SNR correta para BPSK
 # SNR = Es/N0, onde sigma² = N0/2 para canal real de banda base
 # Logo: sigma² = Es / (2·SNR) = 1 / (2·SNR_linear)
-variancias_ruido = potencia_sinal / (2 * snr_linear_range)  # variâncias corretas para BPSK
+variancias_ruido = potencia_sinal / (2 * snr_linear_range)
 media_ruido = 0 # média do ruído (padrão 0.0)
 
 # Coeficiente de correlação entre canais Alice-Bob (reciprocidade)
@@ -42,14 +41,14 @@ tamanho_cadeia_bits = solicita_entrada("Entre com o tamanho da cadeia de Bits (7
 # Pergunta se deseja usar amplificação de privacidade
 print("\nAMPLIFICAÇÃO DE PRIVACIDADE")
 print("A amplificação de privacidade aplica função hash SHA-256 para gerar chaves de 256 bits com segurança criptográfica.")
-usar_amplificacao = input("Deseja usar amplificação de privacidade? (s/N): ").lower().strip() in ['s', 'sim', 'yes', 'y']
+usar_amplificacao = input("Deseja usar amplificação de privacidade? (s/n): ").lower().strip() in ['s', 'sim', 'yes', 'y']
 
 if usar_amplificacao:
     print("Amplificação habilitada - Chaves finais terão 256 bits")
 else:
     print("Amplificação desabilitada - Usando apenas reconciliação BCH")
 
-# Bits de informação (k bits) - dados originais antes da codificação
+# Palavra de código original/referência (n bits) - base para geração de síndrome BCH
 tamanho_bits_informacao = get_tamanho_bits_informacao(tamanho_cadeia_bits)
 palavra_codigo = [random.randint(0, 1) for _ in range(tamanho_cadeia_bits)]  # Gera bits de informação aleatórios
 logger.info(f"Palavra de código gerada: {palavra_codigo} (tamanho {tamanho_cadeia_bits} bits, k={tamanho_bits_informacao})")

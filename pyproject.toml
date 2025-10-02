@@ -1,0 +1,31 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "pkg-criptografia"
+version = "1.0.0"
+description = "Sistema de Physical Key Generation (PKG)"
+authors = [
+    "Pedro Henrique Duarte Frugoli <pedro.frugoli@ges.inatel.br>",
+    "Henrique Rodrigues Mendonça <henrique.mendonca@ges.inatel.br>"
+]
+readme = "README.md"
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+numpy = "*"
+galois = "*"
+matplotlib = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+pytest-cov = "*"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --cov=. --cov-report=html"

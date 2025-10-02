@@ -16,6 +16,10 @@ def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, tabela_codigos):
     
     Se peso(e) ≤ t (capacidade de correção do BCH), então Ĉ = C e Ka = K̂.
     """
+    # Validação de entrada
+    if not tabela_codigos:
+        raise ValueError("Tabela de códigos não pode estar vazia")
+    
     # 1. Alice escolhe um código aleatório C
     c = random.choice(tabela_codigos)
     
