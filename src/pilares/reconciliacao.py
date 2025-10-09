@@ -1,6 +1,6 @@
 import random
-from util.binario_util import xor_binario
-from codigos_corretores.bch import *
+from ..util.binario_util import xor_binario
+from ..codigos_corretores.bch import *
 
 def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, tabela_codigos):
     """

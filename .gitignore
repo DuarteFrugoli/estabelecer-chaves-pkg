@@ -58,6 +58,7 @@ pip-delete-this-directory.txt
 .project
 .classpath
 .settings/
+.copilot-preferences.md
 
 # ========================================
 # Jupyter Notebooks

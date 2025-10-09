@@ -1,7 +1,7 @@
 import galois
 import random
 
-from util.binario_util import calcular_distancia_hamming
+from ..util.binario_util import calcular_distancia_hamming
 
 # Retorna o valor de k (número de bits de informação) para o código especificado
 def get_tamanho_bits_informacao(tamanho_cadeia_bits):

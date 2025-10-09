@@ -2,6 +2,11 @@ import time
 import numpy as np
 import random
 import logging
+import sys
+import os
+
+# Adiciona o diretório raiz ao path para permitir imports relativos
+sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 
 # Logger para fazer o acompanhamento do fluxo de execução
 logger = logging.getLogger(__name__)
@@ -13,10 +18,10 @@ handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)
 logger.addHandler(handler)
 logger.propagate = False  # Não propaga para o root logger
 
-from codigos_corretores.bch import *
-from canal.canal import *
-from plotkdr import plot_kdr
-from util.util import *
+from src.codigos_corretores.bch import *
+from src.canal.canal import *
+from src.visualization.plotkdr import plot_kdr
+from src.util.util import *
 
 potencia_sinal = 1.0 # potência do sinal (Es = 1 para BPSK)
 rayleigh_params = [0.5, 1.0, 2.0] # parâmetros Rayleigh (sigma), pode ir de 0.1 a 5.0

@@ -1,10 +1,10 @@
 import random
 import numpy as np
 
-from codigos_corretores.bch import *
-from util.binario_util import *
-from pilares.reconciliacao import reconciliar_chaves
-from pilares.amplificacao_privacidade import amplificacao_privacidade
+from ..codigos_corretores.bch import *
+from ..util.binario_util import *
+from ..pilares.reconciliacao import reconciliar_chaves
+from ..pilares.amplificacao_privacidade import amplificacao_privacidade
 
 # Função para calcular y considerando o efeito Rayleigh (h) e ruído gaussiano com BPSK
 def simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido):

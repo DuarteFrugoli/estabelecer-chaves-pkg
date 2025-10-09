@@ -6,6 +6,7 @@ Chegar a um estado em que seja possível simular a distância entre dispositivos
 3. bpsk modulado * frenquencia de portadora
 4. implementar qpsk para testar sua eficiência na geração de chaves (comparar kdr com o bpsk)
 5. colocar explicação dos termos no todo
+6. criar modo avançado (main_advanced.py e gui_advanced.py) com parâmetros configuráveis
 
 ## Importante
 - simular invasor

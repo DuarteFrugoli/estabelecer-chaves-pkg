@@ -45,11 +45,19 @@ Physical Key Generation é uma técnica de segurança que utiliza as caracterís
 - **Detecção otimizada** com limiarização simétrica
 - **Validação experimental** com análise estatística
 
-### Interface Amigável
-- **Menu interativo** para configuração de parâmetros
-- **Gráficos automáticos** comparando KDR vs SNR
-- **Logs detalhados** do processo de execução
-- **Suite de testes** automatizada
+### Funcionalidades
+
+#### Modo Básico (Atual)
+- **Amplificação sempre ativa**: SHA-256 aplicado automaticamente
+- **Parâmetros otimizados**: σ = 0.5, 1.0, 2.0 (cientificamente relevantes)
+- **Visualização em grid 2x2**: Layout otimizado para comparação
+- **Interface simplificada**: Foco na facilidade de uso
+
+#### Modo Avançado (Planejado)
+- **Parâmetros configuráveis**: Range de valores Rayleigh personalizável
+- **Amplificação opcional**: Controle total sobre o processo
+- **Exportação de dados**: Gráficos e dados em múltiplos formatos
+- **Interface profissional**: Para usuários experientes
 
 ---
 
@@ -110,13 +118,31 @@ pip install numpy>=1.21.0 matplotlib>=3.5.0 galois>=0.3.7
 
 ## Como Usar
 
-### Execução Principal
+### Interfaces Disponíveis
+
+#### Modo Básico (Recomendado)
+Interface simplificada com parâmetros otimizados:
 
 ```bash
-python main.py
+# Interface CLI
+cd interfaces/basic && python main.py
+
+# Interface Gráfica
+cd interfaces/basic && python gui.py
 ```
 
-### Fluxo de Execução Passo a Passo
+#### Modo Avançado (Em Desenvolvimento)
+Interface com parâmetros totalmente configuráveis:
+
+```bash
+# Interface CLI Avançada
+cd interfaces/advanced && python main_advanced.py
+
+# Interface Gráfica Avançada  
+cd interfaces/advanced && python gui_advanced.py
+```
+
+### Fluxo de Execução (Modo Básico)
 
 #### 1. **Configuração de Parâmetros**
 ```
@@ -124,26 +150,18 @@ Entre com a quantidade de testes: 100
 Entre com o tamanho da cadeia de Bits (7, 15, 127, 255): 15
 ```
 
-#### 2. **Escolha da Amplificação**
-```
-AMPLIFICAÇÃO DE PRIVACIDADE
-A amplificação de privacidade aplica função hash SHA-256 para gerar chaves de 256 bits com segurança criptográfica.
-Deseja usar amplificação de privacidade? (s/n): s
-```
-
-#### 3. **Processamento Automático**
+#### 2. **Processamento Automático**
 O sistema executa automaticamente:
-- **Geração de códigos BCH** para o tamanho especificado
-- **Simulação de canais Rayleigh correlacionados** (ρ=0.9)
-- **Aplicação de ruído gaussiano** com diferentes SNRs
-- **Reconciliação usando code-offset** para corrigir erros
-- **Amplificação com SHA-256** (se habilitada)
+- **Amplificação sempre habilitada**: SHA-256 aplicado automaticamente
+- **Parâmetros Rayleigh fixos**: σ = 0.5, 1.0, 2.0 (otimizados)
+- **Simulação de canais correlacionados** (ρ=0.9)
+- **Reconciliação usando códigos BCH**
 - **Análise estatística** dos resultados
 
-#### 4. **Visualização dos Resultados**
-- Gráficos KDR vs SNR são gerados automaticamente
-- Comparação entre diferentes parâmetros Rayleigh (σ = 0.5, 1.0, 2.0)
-- Análise com e sem amplificação de privacidade
+#### 3. **Visualização dos Resultados**
+- **Grid 2x2**: Três gráficos em layout otimizado
+- **Comparação simultânea**: Todos os parâmetros Rayleigh visíveis
+- **Análise completa**: Original → Reconciliado → Amplificado
 
 ### Executar Testes
 
@@ -195,7 +213,12 @@ O sistema PKG funciona seguindo este fluxo:
 
 ### Interpretação dos Gráficos
 
-Os gráficos gerados mostram:
+O sistema gera **3 gráficos em layout 2x2** mostrando:
+- **Superior esquerdo**: Rayleigh σ = 0.5 (baixa variância)
+- **Superior direito**: Rayleigh σ = 1.0 (variância padrão)
+- **Inferior esquerdo**: Rayleigh σ = 2.0 (alta variância)
+
+Cada gráfico contém três linhas:
 - **Linha vermelha**: KDR antes da reconciliação (erro bruto do canal)
 - **Linha azul**: KDR pós reconciliação BCH (após correção de erros)
 - **Linha verde**: KDR pós amplificação SHA-256 (chave final)
