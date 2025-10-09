@@ -27,7 +27,7 @@ def simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido):
     return sinal_recebido
 
 # Função principal do cenário
-def extrair_kdr(palavra_codigo, rayleigh_param, tamanho_cadeia_bits, quantidade_de_testes, variancia_ruido, media_ruido, tabela_codigos, correlacao_canal=0.9, usar_amplificacao=True):
+def extrair_kdr(palavra_codigo, rayleigh_param, tamanho_cadeia_bits, quantidade_de_testes, variancia_ruido, media_ruido, bch_codigo, correlacao_canal=0.9, usar_amplificacao=True):
     """Executa a simulação do canal Rayleigh com ruído e gera chaves usando códigos BCH."""
     total_erros = 0  # Soma dos erros bit a bit
     total_erros_pos_reconciliacao = 0  # Soma dos erros pós reconciliação
@@ -60,7 +60,7 @@ def extrair_kdr(palavra_codigo, rayleigh_param, tamanho_cadeia_bits, quantidade_
         erros = contar_erros_bits(sinal_recebido_1, sinal_recebido_2)
         total_erros += erros
 
-        chave = reconciliar_chaves(sinal_recebido_1, sinal_recebido_2, tabela_codigos)
+        chave = reconciliar_chaves(sinal_recebido_1, sinal_recebido_2, bch_codigo)
         
         erros_pos_reconciliacao = contar_erros_bits(sinal_recebido_1, chave)
         total_erros_pos_reconciliacao += erros_pos_reconciliacao

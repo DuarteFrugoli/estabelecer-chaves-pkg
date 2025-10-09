@@ -41,7 +41,9 @@ Physical Key Generation é uma técnica de segurança que utiliza as caracterís
 
 ### Implementação Robusta
 - **Canal Rayleigh** com ruído gaussiano e BPSK
-- **Códigos BCH** para múltiplos tamanhos (7, 15, 127, 255 bits)
+- **Códigos BCH** com algoritmos eficientes de codificação/decodificação
+- **Algoritmos otimizados** - Síndromes, Berlekamp-Massey e busca de Chien
+- **Escalabilidade** para códigos grandes (até 255 bits) com alta performance
 - **Detecção otimizada** com limiarização simétrica
 - **Validação experimental** com análise estatística
 
@@ -229,7 +231,7 @@ Criptografia/
 O sistema PKG funciona seguindo este fluxo:
 
 1. **Configuração**: Usuário define parâmetros via `interfaces/basic/main.py`
-2. **Geração BCH**: Sistema gera tabela de códigos usando `src/codigos_corretores/bch.py`
+2. **Instanciação BCH**: Sistema instancia código BCH usando `src/codigos_corretores/bch.py`
 3. **Simulação de Canal**: 
    - Alice e Bob observam canais Rayleigh correlacionados via `src/canal/canal.py`
    - Modulação BPSK com símbolos {-1, +1}
@@ -258,6 +260,9 @@ O sistema PKG funciona seguindo este fluxo:
 | **Máxima melhoria** | 41.5 pontos (SNR baixo) |
 | **Convergência** | SNR ≥ 4dB → KDR = 0% |
 | **Segurança** | 256 bits (2^256 operações) |
+| **Tempo execução** | 0.5-2s (configuração típica) |
+| **Performance BCH** | Algoritmos eficientes O(n²) vs O(2^k) força bruta |
+| **Escalabilidade** | Suporte eficiente para códigos de 255 bits |
 | **Tempo execução** | 0.5-2s (configuração típica) |
 | **Performance amplificação** | < 0.2ms por operação |
 
@@ -307,9 +312,9 @@ bits_recebidos = (sinal_recebido >= 0).astype(int)
 # Alice calcula syndrome S = Ka ⊕ C
 syndrome = alice_key XOR codigo_aleatorio
 
-# Bob decodifica Cb = S ⊕ Kb para encontrar C
+# Bob decodifica Cb = S ⊕ Kb usando algoritmos BCH
 codigo_bob = bob_key XOR syndrome  
-codigo_corrigido = decodificar_bch(codigo_bob)
+codigo_corrigido = bch_decode(codigo_bob)  # Síndromes + Berlekamp-Massey + Chien
 
 # Chave final K = S ⊕ C_corrigido
 chave_final = syndrome XOR codigo_corrigido

@@ -2,7 +2,7 @@ import random
 from ..util.binario_util import xor_binario
 from ..codigos_corretores.bch import *
 
-def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, tabela_codigos):
+def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, bch_codigo):
     """
     Função para reconciliar chaves entre Alice e Bob usando code-offset (secure sketch).
     
@@ -16,12 +16,23 @@ def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, tabela_codigos):
     
     Se peso(e) ≤ t (capacidade de correção do BCH), então Ĉ = C e Ka = K̂.
     """
-    # Validação de entrada
-    if not tabela_codigos:
-        raise ValueError("Tabela de códigos não pode estar vazia")
+def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, bch_codigo):
+    """
+    Função para reconciliar chaves entre Alice e Bob usando code-offset com BCH.
     
-    # 1. Alice escolhe um código aleatório C
-    c = random.choice(tabela_codigos)
+    Algoritmo:
+    1. Alice escolhe um código aleatório C (gerado via encode BCH)
+    2. Alice calcula S = Ka ⊕ C (syndrome)
+    3. Alice envia S para Bob (informação de reconciliação)
+    4. Bob calcula Cb = S ⊕ Kb = C ⊕ e (onde e = Ka ⊕ Kb é o vetor de erro)
+    5. Bob decodifica Cb para encontrar Ĉ (palavra-código mais próxima)
+    6. Bob calcula a chave reconciliada: K̂ = S ⊕ Ĉ
+    """
+    
+    # 1. Alice gera um código aleatório C usando BCH encode
+    k = bch_codigo.k  # número de bits de informação
+    bits_aleatorios = [random.randint(0, 1) for _ in range(k)]
+    c = codificar_bch(bch_codigo, bits_aleatorios)
     
     # 2. Alice calcula o syndrome S = Ka ⊕ C
     s = xor_binario(palavra_codigo_1, c)
@@ -30,7 +41,7 @@ def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, tabela_codigos):
     c_b = xor_binario(palavra_codigo_2, s)
     
     # 4. Bob decodifica Cb para encontrar a palavra-código mais próxima Ĉ
-    codigo_decodificado = encontrar_codigo_mais_proximo(c_b, tabela_codigos)
+    codigo_decodificado = encontrar_codigo_mais_proximo(c_b, bch_codigo)
     
     # 5. Bob calcula a chave reconciliada K̂ = S ⊕ Ĉ
     chave = xor_binario(s, codigo_decodificado)

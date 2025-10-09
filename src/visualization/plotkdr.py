@@ -38,7 +38,14 @@ def plot_kdr(snr_db, dados_todos_sigmas):
         ax.set_ylabel('Key Disagreement Rate (KDR) (%)')
         ax.set_title(f'Rayleigh σ = {sigma}')
         ax.grid(True, alpha=0.3)
-        ax.set_ylim(0, 100)
+        
+        # Escala automática do eixo Y baseada nos dados
+        todos_valores = (dados['kdr_rates'] + dados['kdr_pos_rates'] + 
+                        dados['kdr_amplificacao_rates'])
+        y_min = max(0, min(todos_valores) - 5)  # Margem de 5% abaixo do mínimo
+        y_max = min(100, max(todos_valores) + 5)  # Margem de 5% acima do máximo
+        ax.set_ylim(y_min, y_max)
+        
         ax.legend()
 
     # Remove o subplot vazio (posição [1,1])

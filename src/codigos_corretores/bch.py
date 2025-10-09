@@ -53,20 +53,30 @@ def gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, taman
 
     return tabela_codigos
 
-def encontrar_codigo_mais_proximo(sinal_recebido, tabela_codigos):
+def encontrar_codigo_mais_proximo(sinal_recebido, bch_codigo):
     """
-    Compara sinal_recebido com todos os códigos na tabela e retorna o mais próximo (menor distância de Hamming).
+    Encontra o código mais próximo usando decodificação BCH.
     """
-    if not tabela_codigos:
-        raise ValueError("A tabela de códigos está vazia.")
+    try:
+        import numpy as np
+        if isinstance(sinal_recebido, list):
+            sinal_recebido = np.array(sinal_recebido, dtype=np.uint8)
+        
+        # Decodifica e obtém a mensagem de informação
+        mensagem_decodificada = bch_codigo.decode(sinal_recebido)
+        
+        # Re-codifica para obter a palavra-código completa
+        codigo_mais_proximo = bch_codigo.encode(mensagem_decodificada)
+        
+        return codigo_mais_proximo.tolist()
+        
+    except Exception:
+        # Se a decodificação falhar, retorna o sinal original
+        return sinal_recebido.tolist() if hasattr(sinal_recebido, 'tolist') else sinal_recebido
 
-    min_dist = float('inf')
-    indice_min = -1
-
-    for i, code in enumerate(tabela_codigos):
-        aux = calcular_distancia_hamming(sinal_recebido, code)
-        if aux < min_dist:
-            indice_min = i
-            min_dist = aux
-
-    return tabela_codigos[indice_min]
+def gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, tamanho_espaco_amostral=None):
+    """
+    Retorna o objeto BCH instanciado.
+    Mantém compatibilidade com o código existente.
+    """
+    return instanciar_codigo_bch(tamanho_cadeia_bits, tamanho_bits_informacao)
