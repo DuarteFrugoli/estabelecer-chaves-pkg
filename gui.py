@@ -32,18 +32,8 @@ class App(tk.Tk):
         self.combo_bits.set(15)
         self.combo_bits.pack(fill="x", pady=(0, 10))
 
-        # Amplificação de privacidade
-        self.use_amplificacao = tk.BooleanVar(value=False)
-        tk.Checkbutton(
-            frame,
-            text="Usar amplificação de privacidade (SHA-256)",
-            variable=self.use_amplificacao,
-            bg="#1e1e1e",
-            fg="white",
-            selectcolor="#333333",
-            activebackground="#1e1e1e",
-            activeforeground="white"
-        ).pack(fill="x", pady=(0, 10))
+        # Amplificação de privacidade sempre habilitada
+        tk.Label(frame, text="Amplificação de privacidade (SHA-256): HABILITADA", fg="#00ff00", bg="#1e1e1e", anchor="w").pack(fill="x", pady=(0, 10))
 
         # Botões
         btn_frame = tk.Frame(frame, bg="#1e1e1e")
@@ -72,13 +62,13 @@ class App(tk.Tk):
             messagebox.showerror("Erro", "Por favor, insira valores numéricos válidos.")
             return
 
-        amplificacao = 's' if self.use_amplificacao.get() else 'n'
+        amplificacao = 's'  # Amplificação sempre habilitada
 
         self.output.delete("1.0", tk.END)
         self.append_output(f"Iniciando execução...\n\n")
 
-        # Monta o input simulado
-        user_input = f"{quantidade}\n{bits}\n{amplificacao}\n"
+        # Monta o input simulado (sem pergunta de amplificação)
+        user_input = f"{quantidade}\n{bits}\n"
 
         # Caminho do main.py
         script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main.py")

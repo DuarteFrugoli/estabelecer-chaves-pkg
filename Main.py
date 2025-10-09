@@ -38,15 +38,9 @@ start_time = time.time()
 quantidade_de_testes = solicita_entrada("Entre com a quantidade de testes: ", int, lambda v: v > 0)
 tamanho_cadeia_bits = solicita_entrada("Entre com o tamanho da cadeia de Bits (7, 15, 127, 255): ", int, lambda v: v in {7, 15, 127, 255})
 
-# Pergunta se deseja usar amplificação de privacidade
-print("\nAMPLIFICAÇÃO DE PRIVACIDADE")
-print("A amplificação de privacidade aplica função hash SHA-256 para gerar chaves de 256 bits com segurança criptográfica.")
-usar_amplificacao = input("Deseja usar amplificação de privacidade? (s/n): ").lower().strip() in ['s', 'sim', 'yes', 'y']
-
-if usar_amplificacao:
-    print("Amplificação habilitada - Chaves finais terão 256 bits")
-else:
-    print("Amplificação desabilitada - Usando apenas reconciliação BCH")
+# Amplificação de privacidade sempre habilitada
+usar_amplificacao = True
+print("\nAmplificação de privacidade habilitada - Chaves finais terão 256 bits")
 
 # Palavra de código original/referência (n bits) - base para geração de síndrome BCH
 tamanho_bits_informacao = get_tamanho_bits_informacao(tamanho_cadeia_bits)
@@ -61,45 +55,39 @@ tamanho_espaco_amostral = None if tamanho_cadeia_bits <= 15 else solicita_entrad
 # Gera a tabela de códigos BCH para o tamanho da cadeia de bits especificado
 tabela_codigos = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, tamanho_espaco_amostral)
 
-# Gera e plota os resultados para diferentes parâmetros Rayleigh
+# Coleta dados para todos os parâmetros Rayleigh
+dados_todos_sigmas = {}
+
 for rayleigh_param in rayleigh_params:
     kdr_rates = []
     kdr_pos_rates = []
-    kdr_amplificacao_rates = [] if usar_amplificacao else None
+    kdr_amplificacao_rates = []
     
     for variancia in variancias_ruido:
-        if usar_amplificacao:
-            kdr, kdr_pos_reconciliacao, kdr_pos_amplificacao = extrair_kdr(
-                palavra_codigo,
-                rayleigh_param,
-                tamanho_cadeia_bits,
-                quantidade_de_testes,
-                variancia,
-                media_ruido,
-                tabela_codigos,
-                correlacao_canal,
-                usar_amplificacao=True
-            )
-            kdr_rates.append(kdr)
-            kdr_pos_rates.append(kdr_pos_reconciliacao)
-            kdr_amplificacao_rates.append(kdr_pos_amplificacao)
-        else:
-            kdr, kdr_pos_reconciliacao = extrair_kdr(
-                palavra_codigo,
-                rayleigh_param,
-                tamanho_cadeia_bits,
-                quantidade_de_testes,
-                variancia,
-                media_ruido,
-                tabela_codigos,
-                correlacao_canal,
-                usar_amplificacao=False
-            )
-            kdr_rates.append(kdr)
-            kdr_pos_rates.append(kdr_pos_reconciliacao)
+        kdr, kdr_pos_reconciliacao, kdr_pos_amplificacao = extrair_kdr(
+            palavra_codigo,
+            rayleigh_param,
+            tamanho_cadeia_bits,
+            quantidade_de_testes,
+            variancia,
+            media_ruido,
+            tabela_codigos,
+            correlacao_canal,
+            usar_amplificacao=True
+        )
+        kdr_rates.append(kdr)
+        kdr_pos_rates.append(kdr_pos_reconciliacao)
+        kdr_amplificacao_rates.append(kdr_pos_amplificacao)
     
-    # Plota com ou sem amplificação conforme escolha do usuário
-    plot_kdr(snr_db_range, kdr_rates, kdr_pos_rates, rayleigh_param, kdr_amplificacao_rates)
+    # Armazena os dados para este sigma
+    dados_todos_sigmas[rayleigh_param] = {
+        'kdr_rates': kdr_rates,
+        'kdr_pos_rates': kdr_pos_rates,
+        'kdr_amplificacao_rates': kdr_amplificacao_rates
+    }
+
+# Plota todos os sigmas em um único gráfico
+plot_kdr(snr_db_range, dados_todos_sigmas)
 
 # Marca o tempo final e exibe o tempo de execução
 execution_time = time.time() - start_time
