@@ -171,21 +171,80 @@ python -m pytest tests/ -v
 
 ---
 
-## Arquitetura
+## Arquitetura do Projeto
+
+### Estrutura de Diretórios
+
+```
+Criptografia/
+├── README.md                   # Documentação principal
+├── LICENSE                     # Licença MIT
+├── pyproject.toml             # Configuração e dependências
+├── .gitignore                 # Arquivos ignorados
+│
+├── docs/                      # Documentação técnica
+│   ├── NOTES.md              # Notas de desenvolvimento
+│   ├── TERMS.md              # Glossário técnico
+│   └── TODO.md               # Lista de tarefas
+│
+├── src/                       # Código fonte principal
+│   ├── __init__.py
+│   ├── canal/                # Simulação de canal Rayleigh
+│   │   ├── __init__.py
+│   │   └── canal.py
+│   ├── codigos_corretores/   # Implementação códigos BCH
+│   │   ├── __init__.py
+│   │   └── bch.py
+│   ├── pilares/              # Três pilares do PKG
+│   │   ├── __init__.py
+│   │   ├── reconciliacao.py  # Code-offset BCH
+│   │   └── amplificacao_privacidade.py  # SHA-256
+│   ├── util/                 # Utilitários e funções auxiliares
+│   │   ├── __init__.py
+│   │   ├── util.py
+│   │   └── binario_util.py
+│   └── visualization/        # Geração de gráficos
+│       ├── __init__.py
+│       └── plotkdr.py
+│
+├── interfaces/               # Interfaces de usuário
+│   ├── __init__.py
+│   ├── basic/               # Interface simplificada
+│   │   ├── __init__.py
+│   │   ├── main.py          # CLI principal
+│   │   └── gui.py           # Interface gráfica
+│   └── advanced/            # Interface avançada (futuro)
+│       ├── __init__.py
+│       ├── main_advanced.py
+│       └── gui_advanced.py
+│
+└── tests/                   # Suite de testes
+    ├── __init__.py
+    ├── test_*.py           # Testes unitários
+    └── executar_testes.py  # Runner de testes
+```
 
 ### Fluxo de Dados do Sistema
 
 O sistema PKG funciona seguindo este fluxo:
 
-1. **Configuração**: Usuário define parâmetros (quantidade de testes, tamanho da cadeia)
-2. **Geração BCH**: Sistema gera tabela de códigos para correção de erros
+1. **Configuração**: Usuário define parâmetros via `interfaces/basic/main.py`
+2. **Geração BCH**: Sistema gera tabela de códigos usando `src/codigos_corretores/bch.py`
 3. **Simulação de Canal**: 
-   - Alice e Bob observam canais Rayleigh correlacionados (ρ=0.9)
+   - Alice e Bob observam canais Rayleigh correlacionados via `src/canal/canal.py`
    - Modulação BPSK com símbolos {-1, +1}
    - Adição de ruído gaussiano com variância σ² = Es/(2·SNR)
-4. **Reconciliação**: Algoritmo code-offset corrige discrepâncias usando BCH
-5. **Amplificação**: SHA-256 gera chave final de 256 bits (opcional)
-6. **Análise**: Cálculo de KDR e geração de gráficos comparativos
+4. **Reconciliação**: Algoritmo code-offset em `src/pilares/reconciliacao.py`
+5. **Amplificação**: SHA-256 via `src/pilares/amplificacao_privacidade.py`
+6. **Visualização**: Gráficos gerados por `src/visualization/plotkdr.py`
+
+### Princípios de Design
+
+- **Separação de responsabilidades**: Cada módulo tem função específica
+- **Interfaces organizadas**: Básica vs avançada em diretórios separados
+- **Código reutilizável**: Lógica core em `src/` independente das interfaces
+- **Testes abrangentes**: Cobertura completa em `tests/`
+- **Documentação centralizada**: Guias técnicos em `docs/`
 
 ---
 
@@ -268,38 +327,27 @@ chave_final_256bits = bytes_to_bits(hash_digest)
 
 ## Testes e Validação
 
-### Executar Suite Completa
-```bash
-python -m pytest tests/ -v
-```
-
-### Testes Disponíveis
-- **test_binario_util.py**: Validação operações binárias
-- **test_bch.py**: Validação códigos BCH e correção de erros
-- **test_reconciliacao.py**: Validação algoritmo code-offset
-- **test_amplificacao_privacidade.py**: Validação SHA-256
-- **test_canal.py**: Validação simulação canal Rayleigh
-- **test_sistema_completo.py**: Validação sistema end-to-end
-
-### Análise Estatística
-- **Centenas de iterações** para cada ponto SNR
-- **Múltiplos parâmetros** Rayleigh (σ = 0.5, 1.0, 2.0)
-- **Intervalos de confiança** para todas as métricas
-
----
-
-## Testes
-
 ### Executar Suite Completa de Testes
+
 ```bash
+# Na raiz do projeto
+python -m pytest tests/ -v
+
 # Com Poetry
 poetry run pytest tests/ -v
 
-# Com pip
-python -m pytest tests/ -v
-
 # Com cobertura
-python -m pytest tests/ --cov=. --cov-report=html
+python -m pytest tests/ --cov=src --cov-report=html
+```
+
+### Executar Testes Específicos
+
+```bash
+# Testes de um módulo específico
+python -m pytest tests/test_canal.py -v
+
+# Executar runner personalizado
+cd tests && python executar_testes.py
 ```
 
 ---
