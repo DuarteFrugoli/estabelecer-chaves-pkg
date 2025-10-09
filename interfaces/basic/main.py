@@ -53,12 +53,10 @@ palavra_codigo = [random.randint(0, 1) for _ in range(tamanho_cadeia_bits)]  # G
 logger.info(f"Palavra de código gerada: {palavra_codigo} (tamanho {tamanho_cadeia_bits} bits, k={tamanho_bits_informacao})")
 
 # Pede o tamanho do espaço amostral caso o tamanho da cadeia de bits seja maior que 15
-tamanho_espaco_amostral = None if tamanho_cadeia_bits <= 15 else solicita_entrada(
-    "Entre com tamanho do espaço amostral: ", int, lambda v: v > 0
-)
+# REMOVIDO: Não é mais necessário com BCH real
 
-# Gera a tabela de códigos BCH para o tamanho da cadeia de bits especificado
-tabela_codigos = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, tamanho_espaco_amostral)
+# Gera o objeto BCH (não precisa mais de tabela de códigos)
+bch_codigo = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao)
 
 # Coleta dados para todos os parâmetros Rayleigh
 dados_todos_sigmas = {}
@@ -76,7 +74,7 @@ for rayleigh_param in rayleigh_params:
             quantidade_de_testes,
             variancia,
             media_ruido,
-            tabela_codigos,
+            bch_codigo,
             correlacao_canal,
             usar_amplificacao=True
         )
