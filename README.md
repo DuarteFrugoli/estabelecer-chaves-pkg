@@ -67,54 +67,173 @@ Physical Key Generation é uma técnica de segurança que utiliza as caracterís
 
 ### Pré-requisitos
 - Python 3.8 ou superior
-- Poetry (gerenciador de dependências moderno)
+- pip (gerenciador de pacotes Python)
+- Bibliotecas gráficas para matplotlib
 
-### Opção 1: Instalação com Poetry (Recomendada)
+---
+
+## 🐧 **Linux (Ubuntu/Debian)**
+
+### Opção 1: Instalação Completa com Poetry (Recomendada)
 
 ```bash
-# Instale o Poetry (se não tiver)
-curl -sSL https://install.python-poetry.org | python3 -
-# ou no Windows:
-# (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
+# 1. Instale dependências do sistema
+sudo apt update
+sudo apt install python3-pip python3-venv python3-tk git
 
-# Clone o repositório
+# 2. Clone o repositório
 git clone https://github.com/DuarteFrugoli/estabelecer-chaves-pkg.git
-cd Criptografia
+cd estabelecer-chaves-pkg
 
-# Instale as dependências
+# 3. Crie um ambiente virtual
+python3 -m venv .venv
+
+# 4. Ative o ambiente virtual
+source .venv/bin/activate
+
+# 5. Instale o Poetry
+pip install poetry
+
+# 6. Instale as dependências do projeto
 poetry install
 
-# Ative o ambiente virtual
-poetry shell
+# 7. Execute o programa
+python interfaces/basic/main.py
 ```
 
-### Opção 2: Instalação com pip (Alternativa)
+### Opção 2: Instalação Simples com pip
 
 ```bash
-# Clone o repositório
+# 1. Instale dependências do sistema
+sudo apt update
+sudo apt install python3-pip python3-venv python3-tk git
+
+# 2. Clone e configure
 git clone https://github.com/DuarteFrugoli/estabelecer-chaves-pkg.git
-cd Criptografia
+cd estabelecer-chaves-pkg
+python3 -m venv .venv
+source .venv/bin/activate
 
-# Instale as dependências principais
-pip install numpy>=1.21.0 matplotlib>=3.5.0 galois>=0.3.7
+# 3. Instale dependências Python
+pip install numpy matplotlib galois pytest pytest-cov
 
-# Para desenvolvimento (opcional)
-pip install pytest>=7.0.0 pytest-cov>=4.0.0
+# 4. Execute o programa
+python interfaces/basic/main.py
 ```
 
-### Opção 3: Ambiente Virtual Manual
+---
+
+## 🍎 **macOS**
+
+### Opção 1: Instalação Completa com Poetry (Recomendada)
 
 ```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-pip install numpy>=1.21.0 matplotlib>=3.5.0 galois>=0.3.7
+# 1. Instale Homebrew (se não tiver)
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 
-# Linux/Mac
-python -m venv venv
-source venv/bin/activate
-pip install numpy>=1.21.0 matplotlib>=3.5.0 galois>=0.3.7
+# 2. Instale Python e dependências
+brew install python python-tk git
+
+# 3. Clone o repositório
+git clone https://github.com/DuarteFrugoli/estabelecer-chaves-pkg.git
+cd estabelecer-chaves-pkg
+
+# 4. Crie um ambiente virtual
+python3 -m venv .venv
+
+# 5. Ative o ambiente virtual
+source .venv/bin/activate
+
+# 6. Instale o Poetry
+pip install poetry
+
+# 7. Instale as dependências do projeto
+poetry install
+
+# 8. Execute o programa
+python interfaces/basic/main.py
 ```
+
+### Opção 2: Instalação Simples com pip
+
+```bash
+# 1. Instale dependências (se não tiver Homebrew)
+# Python já vem no macOS, mas recomenda-se instalar via Homebrew
+brew install python python-tk git
+
+# 2. Clone e configure
+git clone https://github.com/DuarteFrugoli/estabelecer-chaves-pkg.git
+cd estabelecer-chaves-pkg
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 3. Instale dependências Python
+pip install numpy matplotlib galois pytest pytest-cov
+
+# 4. Execute o programa
+python interfaces/basic/main.py
+```
+
+---
+
+## 🪟 **Windows**
+
+### Opção 1: Instalação Completa com Poetry (Recomendada)
+
+```powershell
+# 1. Instale Python do site oficial: https://www.python.org/downloads/
+# Certifique-se de marcar "Add Python to PATH" durante a instalação
+
+# 2. Abra PowerShell ou Command Prompt
+
+# 3. Clone o repositório (instale Git se necessário: https://git-scm.com/)
+git clone https://github.com/DuarteFrugoli/estabelecer-chaves-pkg.git
+cd estabelecer-chaves-pkg
+
+# 4. Crie um ambiente virtual
+python -m venv .venv
+
+# 5. Ative o ambiente virtual
+.venv\Scripts\activate
+
+# 6. Instale o Poetry
+pip install poetry
+
+# 7. Instale as dependências do projeto
+poetry install
+
+# 8. Execute o programa
+python interfaces/basic/main.py
+```
+
+### Opção 2: Instalação Simples com pip
+
+```powershell
+# 1. Certifique-se que Python está instalado e no PATH
+
+# 2. Clone e configure
+git clone https://github.com/DuarteFrugoli/estabelecer-chaves-pkg.git
+cd estabelecer-chaves-pkg
+python -m venv .venv
+.venv\Scripts\activate
+
+# 3. Instale dependências Python
+pip install numpy matplotlib galois pytest pytest-cov
+
+# 4. Execute o programa
+python interfaces/basic/main.py
+```
+
+---
+
+### ⚠️ Solução de Problemas Comuns
+
+| Problema | Solução |
+|----------|---------|
+| **Linux**: `ModuleNotFoundError: No module named '_tkinter'` | `sudo apt install python3-tk` |
+| **macOS**: Gráficos não aparecem | `brew install python-tk` |
+| **Windows**: `'python' não é reconhecido` | Reinstale Python marcando "Add to PATH" |
+| **Qualquer OS**: `poetry: command not found` | Use a Opção 2 (pip) em vez do Poetry |
 
 ---
 
