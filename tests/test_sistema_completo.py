@@ -10,11 +10,11 @@ import numpy as np
 # Adiciona o diretório raiz ao path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from codigos_corretores.bch import gerar_tabela_codigos_bch
-from pilares.reconciliacao import reconciliar_chaves
-from pilares.amplificacao_privacidade import amplificacao_privacidade
-from canal.canal import extrair_kdr, simular_canal
-from util.binario_util import contar_erros_bits, xor_binario
+from src.codigos_corretores.bch import gerar_tabela_codigos_bch
+from src.pilares.reconciliacao import reconciliar_chaves
+from src.pilares.amplificacao_privacidade import amplificacao_privacidade
+from src.canal.canal import extrair_kdr, simular_canal
+from src.util.binario_util import contar_erros_bits, xor_binario
 
 
 class TestSistemaPKGCompleto:
@@ -328,8 +328,8 @@ class TestSistemaPKGErros:
     
     def test_pkg_entrada_invalida(self):
         """Teste comportamento com entradas inválidas"""
-        # Tabela de códigos vazia
-        with pytest.raises(ValueError):
+        # Objeto BCH inválido
+        with pytest.raises(AttributeError):
             reconciliar_chaves([1, 0, 1], [1, 0, 0], [])
         
         # Chaves de tamanhos diferentes

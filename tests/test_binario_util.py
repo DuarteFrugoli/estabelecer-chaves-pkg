@@ -8,7 +8,7 @@ import os
 # Adiciona o diretório raiz ao path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from util.binario_util import calcular_distancia_hamming, contar_erros_bits, xor_binario
+from src.util.binario_util import calcular_distancia_hamming, contar_erros_bits, xor_binario
 
 
 class TestBinarioUtil:

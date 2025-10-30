@@ -4,6 +4,7 @@ import random
 import logging
 import sys
 import os
+from tqdm import tqdm
 
 # Adiciona o diretório raiz ao path para permitir imports relativos
 sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
@@ -43,9 +44,17 @@ start_time = time.time()
 quantidade_de_testes = solicita_entrada("Entre com a quantidade de testes: ", int, lambda v: v > 0)
 tamanho_cadeia_bits = solicita_entrada("Entre com o tamanho da cadeia de Bits (7, 15, 127, 255): ", int, lambda v: v in {7, 15, 127, 255})
 
+# Solicita tipo de modulação
+print("\nEscolha o tipo de modulação:")
+print("1 - BPSK (Binary Phase Shift Keying) - 1 bit por símbolo")
+print("2 - QPSK (Quadrature Phase Shift Keying) - 2 bits por símbolo")
+opcao_modulacao = solicita_entrada("Digite 1 para BPSK ou 2 para QPSK: ", int, lambda v: v in {1, 2})
+modulacao = 'bpsk' if opcao_modulacao == 1 else 'qpsk'
+print(f"\nModulação selecionada: {modulacao.upper()}")
+
 # Amplificação de privacidade sempre habilitada
 usar_amplificacao = True
-print("\nAmplificação de privacidade habilitada - Chaves finais terão 256 bits")
+print("Amplificação de privacidade habilitada - Chaves finais terão 256 bits")
 
 # Palavra de código original/referência (n bits) - base para geração de síndrome BCH
 tamanho_bits_informacao = get_tamanho_bits_informacao(tamanho_cadeia_bits)
@@ -61,12 +70,23 @@ bch_codigo = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informac
 # Coleta dados para todos os parâmetros Rayleigh
 dados_todos_sigmas = {}
 
-for rayleigh_param in rayleigh_params:
+print("\n" + "="*70)
+print("INICIANDO SIMULAÇÃO")
+print("="*70)
+print(f"Modulação: {modulacao.upper()}")
+print(f"Quantidade de testes por configuração: {quantidade_de_testes}")
+print(f"Tamanho da cadeia de bits: {tamanho_cadeia_bits}")
+print(f"Parâmetros Rayleigh (σ): {rayleigh_params}")
+print(f"Níveis de SNR: {len(variancias_ruido)} valores de {snr_db_range[0]} a {snr_db_range[-1]} dB")
+print(f"Total de simulações: {len(rayleigh_params)} × {len(variancias_ruido)} = {len(rayleigh_params) * len(variancias_ruido)}")
+print("="*70 + "\n")
+
+for rayleigh_param in tqdm(rayleigh_params, desc="Progresso geral", unit="σ", colour="green"):
     kdr_rates = []
     kdr_pos_rates = []
     kdr_amplificacao_rates = []
     
-    for variancia in variancias_ruido:
+    for variancia in tqdm(variancias_ruido, desc=f"  σ={rayleigh_param}", unit="SNR", leave=False, colour="blue"):
         kdr, kdr_pos_reconciliacao, kdr_pos_amplificacao = extrair_kdr(
             palavra_codigo,
             rayleigh_param,
@@ -76,7 +96,8 @@ for rayleigh_param in rayleigh_params:
             media_ruido,
             bch_codigo,
             correlacao_canal,
-            usar_amplificacao=True
+            usar_amplificacao=True,
+            modulacao=modulacao
         )
         kdr_rates.append(kdr)
         kdr_pos_rates.append(kdr_pos_reconciliacao)
@@ -88,6 +109,10 @@ for rayleigh_param in rayleigh_params:
         'kdr_pos_rates': kdr_pos_rates,
         'kdr_amplificacao_rates': kdr_amplificacao_rates
     }
+
+print("\n" + "="*70)
+print("✓ SIMULAÇÃO CONCLUÍDA COM SUCESSO!")
+print("="*70)
 
 # Plota todos os sigmas em um único gráfico
 plot_kdr(snr_db_range, dados_todos_sigmas)

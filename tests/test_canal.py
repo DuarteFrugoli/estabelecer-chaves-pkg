@@ -10,8 +10,8 @@ import random
 # Adiciona o diretório raiz ao path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from canal.canal import simular_canal, extrair_kdr
-from codigos_corretores.bch import gerar_tabela_codigos_bch
+from src.canal.canal import simular_canal, extrair_kdr
+from src.codigos_corretores.bch import gerar_tabela_codigos_bch
 
 
 class TestSimularCanal:
@@ -30,7 +30,7 @@ class TestSimularCanal:
         variancia_ruido = 0.1
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         assert len(resultado) == len(palavra_codigo)
         assert all(bit in {0, 1} for bit in resultado)
@@ -42,7 +42,7 @@ class TestSimularCanal:
         variancia_ruido = 0.0  # Sem ruído
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         # Sem ruído, deve manter os bits originais
         assert resultado == palavra_codigo
@@ -54,7 +54,7 @@ class TestSimularCanal:
         variancia_ruido = 0.1
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         assert len(resultado) == len(palavra_codigo)
         # Com ganho alto, ruído tem menos impacto
@@ -67,7 +67,7 @@ class TestSimularCanal:
         variancia_ruido = 0.1
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         assert len(resultado) == len(palavra_codigo)
         assert all(bit in {0, 1} for bit in resultado)
@@ -80,7 +80,7 @@ class TestSimularCanal:
         variancia_ruido = 0.0
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         # BPSK: 0 -> -1, 1 -> +1. Com detecção >= 0
         # 0 -> -100 -> reamostrado como 0
@@ -94,7 +94,7 @@ class TestSimularCanal:
         variancia_ruido = 0.1
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         assert resultado == []
     
@@ -105,7 +105,7 @@ class TestSimularCanal:
         variancia_ruido = 0.1
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         assert len(resultado) == 1
         assert resultado[0] in {0, 1}
@@ -117,7 +117,7 @@ class TestSimularCanal:
         variancia_ruido = 0.0
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         # Ganho negativo inverte o sinal
         # 0 -> -1 * -1 = +1 -> reamostrado como 1
@@ -131,11 +131,62 @@ class TestSimularCanal:
         variancia_ruido = 100.0  # Ruído muito alto
         media_ruido = 0.0
         
-        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido)
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
         
         assert len(resultado) == len(palavra_codigo)
         assert all(bit in {0, 1} for bit in resultado)
         # Com ruído muito alto, resultado pode ser aleatório
+    
+    def test_simular_canal_qpsk_basic(self):
+        """Teste básico da simulação de canal com QPSK"""
+        ganho_canal = [1.0, 1.0]  # 2 símbolos QPSK = 4 bits
+        palavra_codigo = [1, 0, 1, 0]
+        variancia_ruido = 0.1
+        media_ruido = 0.0
+        
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'qpsk')
+        
+        assert len(resultado) == len(palavra_codigo)
+        assert all(bit in {0, 1} for bit in resultado)
+    
+    def test_simular_canal_qpsk_no_noise(self):
+        """Testa simulação QPSK com ruído zero"""
+        ganho_canal = [1.0, 1.0]
+        palavra_codigo = [1, 0, 1, 0]
+        variancia_ruido = 0.0  # Sem ruído
+        media_ruido = 0.0
+        
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'qpsk')
+        
+        # Sem ruído, deve manter os bits originais
+        assert resultado == palavra_codigo
+    
+    def test_simular_canal_qpsk_odd_length(self):
+        """Testa simulação QPSK com número ímpar de bits"""
+        ganho_canal = [1.0, 1.0]  # Precisa de ganho suficiente
+        palavra_codigo = [1, 0, 1]  # 3 bits (ímpar)
+        variancia_ruido = 0.0
+        media_ruido = 0.0
+        
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'qpsk')
+        
+        # Deve retornar 3 bits (o padding é removido)
+        assert len(resultado) == 3
+        assert all(bit in {0, 1} for bit in resultado)
+    
+    def test_simular_canal_qpsk_mapping(self):
+        """Testa mapeamento QPSK correto"""
+        # Com ganho muito alto e sem ruído, deve mapear corretamente
+        ganho_canal = [100.0, 100.0]
+        palavra_codigo = [0, 0, 1, 1]  # 00 e 11
+        variancia_ruido = 0.0
+        media_ruido = 0.0
+        
+        resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'qpsk')
+        
+        # QPSK: 00 -> -1-1j, 11 -> +1+1j
+        # Com detecção >= 0 em I e Q
+        assert resultado == [0, 0, 1, 1]
 
 
 class TestExtrairKDR:
@@ -165,7 +216,8 @@ class TestExtrairKDR:
             self.variancia_ruido,
             self.media_ruido,
             self.tabela_codigos,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         assert isinstance(kdr, float)
@@ -187,7 +239,8 @@ class TestExtrairKDR:
             self.variancia_ruido,
             self.media_ruido,
             self.tabela_codigos,
-            usar_amplificacao=True
+            usar_amplificacao=True,
+            modulacao='bpsk'
         )
         
         assert isinstance(kdr, float)
@@ -208,7 +261,8 @@ class TestExtrairKDR:
             0.0,
             self.tabela_codigos,
             correlacao_canal=1.0,  # Canais idênticos
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         # Sem ruído e canais idênticos, KDR deve ser muito baixo
@@ -226,7 +280,8 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             correlacao_canal=0.95,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         kdr_baixa, _ = extrair_kdr(
@@ -238,7 +293,8 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             correlacao_canal=0.1,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         # Alta correlação deve resultar em menor KDR
@@ -255,7 +311,8 @@ class TestExtrairKDR:
             self.variancia_ruido,
             self.media_ruido,
             self.tabela_codigos,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         # Parâmetro maior = canal mais forte
@@ -267,7 +324,8 @@ class TestExtrairKDR:
             self.variancia_ruido,
             self.media_ruido,
             self.tabela_codigos,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         # Canal mais forte pode ter menor KDR (melhor SNR)
@@ -284,7 +342,8 @@ class TestExtrairKDR:
             self.variancia_ruido,
             self.media_ruido,
             self.tabela_codigos,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         assert isinstance(kdr, float)
@@ -306,7 +365,8 @@ class TestExtrairKDR:
             self.variancia_ruido,
             self.media_ruido,
             tabela_maior,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         assert isinstance(kdr, float)
@@ -325,13 +385,92 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             correlacao_canal=0.0,  # Canais independentes
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         # Com canais independentes, KDR deve ser mais alto
         assert isinstance(kdr, float)
         assert isinstance(kdr_pos_reconciliacao, float)
         # Pode ter alta taxa de erro devido à falta de reciprocidade
+    
+    def test_extrair_kdr_qpsk_basic(self):
+        """Teste básico da extração KDR com QPSK"""
+        kdr, kdr_pos_reconciliacao = extrair_kdr(
+            self.palavra_codigo,
+            self.rayleigh_param,
+            self.tamanho_cadeia_bits,
+            5,
+            self.variancia_ruido,
+            self.media_ruido,
+            self.tabela_codigos,
+            usar_amplificacao=False,
+            modulacao='qpsk'
+        )
+        
+        assert isinstance(kdr, float)
+        assert isinstance(kdr_pos_reconciliacao, float)
+        assert 0.0 <= kdr <= 100.0
+        assert 0.0 <= kdr_pos_reconciliacao <= 100.0
+    
+    def test_extrair_kdr_qpsk_with_amplification(self):
+        """Teste da extração KDR com QPSK e amplificação"""
+        kdr, kdr_pos_reconciliacao, kdr_pos_amplificacao = extrair_kdr(
+            self.palavra_codigo,
+            self.rayleigh_param,
+            self.tamanho_cadeia_bits,
+            5,
+            self.variancia_ruido,
+            self.media_ruido,
+            self.tabela_codigos,
+            usar_amplificacao=True,
+            modulacao='qpsk'
+        )
+        
+        assert isinstance(kdr, float)
+        assert isinstance(kdr_pos_reconciliacao, float)
+        assert isinstance(kdr_pos_amplificacao, float)
+        assert 0.0 <= kdr <= 100.0
+        assert 0.0 <= kdr_pos_reconciliacao <= 100.0
+        assert 0.0 <= kdr_pos_amplificacao <= 100.0
+    
+    def test_extrair_kdr_compare_bpsk_qpsk(self):
+        """Compara KDR entre BPSK e QPSK"""
+        # Fixa seed para comparação justa
+        np.random.seed(100)
+        random.seed(100)
+        
+        kdr_bpsk, _ = extrair_kdr(
+            self.palavra_codigo,
+            self.rayleigh_param,
+            self.tamanho_cadeia_bits,
+            5,
+            self.variancia_ruido,
+            self.media_ruido,
+            self.tabela_codigos,
+            usar_amplificacao=False,
+            modulacao='bpsk'
+        )
+        
+        np.random.seed(100)
+        random.seed(100)
+        
+        kdr_qpsk, _ = extrair_kdr(
+            self.palavra_codigo,
+            self.rayleigh_param,
+            self.tamanho_cadeia_bits,
+            5,
+            self.variancia_ruido,
+            self.media_ruido,
+            self.tabela_codigos,
+            usar_amplificacao=False,
+            modulacao='qpsk'
+        )
+        
+        # Ambos devem ser valores válidos
+        assert isinstance(kdr_bpsk, float)
+        assert isinstance(kdr_qpsk, float)
+        # QPSK pode ter diferentes características de erro
 
 
 class TestExtrairKDRIntegration:
@@ -361,7 +500,8 @@ class TestExtrairKDRIntegration:
             media_ruido,
             tabela_codigos,
             correlacao_canal=0.8,
-            usar_amplificacao=True
+            usar_amplificacao=True,
+            modulacao='bpsk'
         )
         
         # Sem amplificação
@@ -374,7 +514,8 @@ class TestExtrairKDRIntegration:
             media_ruido,
             tabela_codigos,
             correlacao_canal=0.8,
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         # Verifica estrutura dos resultados
@@ -405,7 +546,8 @@ class TestExtrairKDRIntegration:
             0.1,
             0.0,
             gerar_tabela_codigos_bch(7, 4),
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         np.random.seed(456)
@@ -419,7 +561,8 @@ class TestExtrairKDRIntegration:
             0.1,
             0.0,
             gerar_tabela_codigos_bch(7, 4),
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         assert resultado1 == resultado2
@@ -442,7 +585,8 @@ class TestExtrairKDRPerformance:
             0.1,
             0.0,
             gerar_tabela_codigos_bch(7, 4),
-            usar_amplificacao=False
+            usar_amplificacao=False,
+            modulacao='bpsk'
         )
         
         end = time.time()
@@ -463,7 +607,8 @@ class TestExtrairKDRPerformance:
                 0.1,
                 0.0,
                 gerar_tabela_codigos_bch(7, 4),
-                usar_amplificacao=False
+                usar_amplificacao=False,
+                modulacao='bpsk'
             )
             
             assert len(resultado) == 2

@@ -32,9 +32,24 @@ class App(tk.Tk):
         self.combo_bits.set(15)
         self.combo_bits.pack(fill="x", pady=(0, 10))
 
+        # Tipo de modulação
+        tk.Label(frame, text="Tipo de modulação:", fg="white", bg="#1e1e1e", anchor="w").pack(fill="x")
+        self.combo_modulacao = ttk.Combobox(frame, values=["BPSK", "QPSK"], state="readonly")
+        self.combo_modulacao.set("BPSK")
+        self.combo_modulacao.pack(fill="x", pady=(0, 10))
+
         # Amplificação de privacidade sempre habilitada
         tk.Label(frame, text="Amplificação de privacidade (SHA-256): HABILITADA", fg="#00ff00", bg="#1e1e1e", anchor="w").pack(fill="x", pady=(0, 10))
 
+        # Barra de progresso
+        self.progress_frame = tk.Frame(frame, bg="#1e1e1e")
+        self.progress_frame.pack(fill="x", pady=(0, 10))
+        
+        self.progress_label = tk.Label(self.progress_frame, text="", fg="#cccccc", bg="#1e1e1e", anchor="w")
+        self.progress_label.pack(fill="x")
+        
+        self.progressbar = ttk.Progressbar(self.progress_frame, mode='indeterminate')
+        
         # Botões
         btn_frame = tk.Frame(frame, bg="#1e1e1e")
         btn_frame.pack(fill="x", pady=10)
@@ -62,13 +77,22 @@ class App(tk.Tk):
             messagebox.showerror("Erro", "Por favor, insira valores numéricos válidos.")
             return
 
+        # Determina o tipo de modulação selecionado
+        modulacao_tipo = self.combo_modulacao.get()
+        modulacao_input = "1" if modulacao_tipo == "BPSK" else "2"
+
         amplificacao = 's'  # Amplificação sempre habilitada
 
         self.output.delete("1.0", tk.END)
         self.append_output(f"Iniciando execução...\n\n")
+        
+        # Mostra e inicia a barra de progresso
+        self.progress_label.config(text="Executando simulação...")
+        self.progressbar.pack(fill="x", pady=(5, 0))
+        self.progressbar.start(10)
 
-        # Monta o input simulado (sem pergunta de amplificação)
-        user_input = f"{quantidade}\n{bits}\n"
+        # Monta o input simulado (com escolha de modulação)
+        user_input = f"{quantidade}\n{bits}\n{modulacao_input}\n"
 
         # Caminho do main.py
         script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main.py")
@@ -82,14 +106,31 @@ class App(tk.Tk):
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
                     text=True,
-                    bufsize=1
+                    bufsize=1,
+                    universal_newlines=True
                 )
 
-                # Envia todo o input e obtém a saída completa
-                output, _ = self.process.communicate(user_input)
+                # Envia o input
+                self.process.stdin.write(user_input)
+                self.process.stdin.flush()
+                self.process.stdin.close()
 
-                # Mostra a saída no TextBox
-                self.append_output(output)
+                # Lê a saída linha por linha em tempo real
+                for line in iter(self.process.stdout.readline, ''):
+                    if line:
+                        # Atualiza label de progresso se for linha de progresso
+                        if "Progresso geral" in line or "σ=" in line:
+                            # Extrai informação de progresso
+                            import re
+                            match = re.search(r'(\d+)%', line)
+                            if match:
+                                percent = match.group(1)
+                                self.progress_label.config(text=f"Progresso: {percent}%")
+                        
+                        self.append_output(line)
+                    
+                # Aguarda o processo terminar
+                self.process.wait()
 
             except Exception as e:
                 self.append_output(f"\n[ERRO] {e}\n")
@@ -98,6 +139,12 @@ class App(tk.Tk):
                 self.process = None
                 self.btn_run.config(state="normal")
                 self.btn_stop.config(state="disabled")
+                
+                # Para e esconde a barra de progresso
+                self.progressbar.stop()
+                self.progressbar.pack_forget()
+                self.progress_label.config(text="")
+                
                 self.append_output("\nExecução finalizada.\n")
 
         # Atualiza botões
@@ -113,6 +160,12 @@ class App(tk.Tk):
             self.process.terminate()
             self.process = None
             self.append_output("\nProcesso interrompido pelo usuário.\n")
+        
+        # Para e esconde a barra de progresso
+        self.progressbar.stop()
+        self.progressbar.pack_forget()
+        self.progress_label.config(text="")
+        
         self.btn_run.config(state="normal")
         self.btn_stop.config(state="disabled")
 
