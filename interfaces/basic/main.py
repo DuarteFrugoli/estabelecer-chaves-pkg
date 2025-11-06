@@ -25,7 +25,12 @@ from src.visualizacao.plotkdr import plot_kdr
 from src.util.util import *
 
 potencia_sinal = 1.0 # potência do sinal (Es = 1 para BPSK)
-rayleigh_params = [0.5, 1.0, 2.0] # parâmetros Rayleigh (sigma), pode ir de 0.1 a 5.0
+# Parâmetros Rayleigh (sigma): 
+# - 0.5: canal fraco (E[|h|²] = 0.5, -3 dB)
+# - 1/√2 ≈ 0.707: canal normalizado (E[|h|²] = 1.0, 0 dB) - PADRÃO TEÓRICO
+# - 1.0: canal moderado (E[|h|²] = 2.0, +3 dB)
+# - 2.0: canal forte (E[|h|²] = 8.0, +9 dB)
+rayleigh_params = [0.5, 1.0/np.sqrt(2), 1.0, 2.0]
 snr_db_range = np.linspace(-10, 30, 18) # 18 valores de SNR de -10 a 30 dB
 snr_linear_range = 10 ** (snr_db_range / 10)
 

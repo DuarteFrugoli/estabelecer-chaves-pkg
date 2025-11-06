@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 
 def plot_kdr(snr_db, dados_todos_sigmas):
     """
-    Função que plota 3 subplots na mesma janela, um para cada parâmetro Rayleigh
+    Função que plota 4 subplots em grid 2x2, um para cada parâmetro Rayleigh
     """
-    # Cria uma figura com 3 subplots em grid 2x2
+    # Cria uma figura com 4 subplots em grid 2x2
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     fig.suptitle('KDR em função de SNR - Parâmetros Rayleigh', fontsize=16, fontweight='bold')
     
@@ -13,7 +13,7 @@ def plot_kdr(snr_db, dados_todos_sigmas):
     sigmas_ordenados = sorted(dados_todos_sigmas.keys())
     
     # Posições dos subplots no grid 2x2
-    posicoes = [(0, 0), (0, 1), (1, 0)]
+    posicoes = [(0, 0), (0, 1), (1, 0), (1, 1)]
     
     for i, sigma in enumerate(sigmas_ordenados):
         dados = dados_todos_sigmas[sigma]
@@ -47,9 +47,6 @@ def plot_kdr(snr_db, dados_todos_sigmas):
         ax.set_ylim(y_min, y_max)
         
         ax.legend()
-
-    # Remove o subplot vazio (posição [1,1])
-    fig.delaxes(axes[1, 1])
 
     # Ajusta o layout automaticamente
     plt.tight_layout()
