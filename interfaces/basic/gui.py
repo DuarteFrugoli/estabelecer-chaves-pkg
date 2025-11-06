@@ -41,14 +41,23 @@ class App(tk.Tk):
         # Amplificação de privacidade sempre habilitada
         tk.Label(frame, text="Amplificação de privacidade (SHA-256): HABILITADA", fg="#00ff00", bg="#1e1e1e", anchor="w").pack(fill="x", pady=(0, 10))
 
-        # Barra de progresso
+        # Barra de progresso geral
+        self.progress_frame_geral = tk.Frame(frame, bg="#1e1e1e")
+        self.progress_frame_geral.pack(fill="x", pady=(0, 5))
+        
+        self.progress_label_geral = tk.Label(self.progress_frame_geral, text="", fg="#00ff00", bg="#1e1e1e", anchor="w", font=("Arial", 9, "bold"))
+        self.progress_label_geral.pack(fill="x")
+        
+        self.progressbar_geral = ttk.Progressbar(self.progress_frame_geral, mode='determinate')
+        
+        # Barra de progresso do subplot atual
         self.progress_frame = tk.Frame(frame, bg="#1e1e1e")
         self.progress_frame.pack(fill="x", pady=(0, 10))
         
-        self.progress_label = tk.Label(self.progress_frame, text="", fg="#cccccc", bg="#1e1e1e", anchor="w")
+        self.progress_label = tk.Label(self.progress_frame, text="", fg="#00aaff", bg="#1e1e1e", anchor="w", font=("Arial", 8))
         self.progress_label.pack(fill="x")
         
-        self.progressbar = ttk.Progressbar(self.progress_frame, mode='indeterminate')
+        self.progressbar = ttk.Progressbar(self.progress_frame, mode='determinate')
         
         # Botões
         btn_frame = tk.Frame(frame, bg="#1e1e1e")
@@ -86,10 +95,14 @@ class App(tk.Tk):
         self.output.delete("1.0", tk.END)
         self.append_output(f"Iniciando execução...\n\n")
         
-        # Mostra e inicia a barra de progresso
-        self.progress_label.config(text="Executando simulação...")
+        # Mostra e inicia as barras de progresso
+        self.progress_label_geral.config(text="Progresso geral: 0%")
+        self.progressbar_geral.pack(fill="x", pady=(5, 0))
+        self.progressbar_geral['value'] = 0
+        
+        self.progress_label.config(text="Aguardando início...")
         self.progressbar.pack(fill="x", pady=(5, 0))
-        self.progressbar.start(10)
+        self.progressbar['value'] = 0
 
         # Monta o input simulado (com escolha de modulação)
         user_input = f"{quantidade}\n{bits}\n{modulacao_input}\n"
@@ -119,13 +132,26 @@ class App(tk.Tk):
                 for line in iter(self.process.stdout.readline, ''):
                     if line:
                         # Atualiza label de progresso se for linha de progresso
-                        if "Progresso geral" in line or "σ=" in line:
-                            # Extrai informação de progresso
-                            import re
+                        import re
+                        
+                        # Progresso geral (barra verde)
+                        if "Progresso geral" in line:
                             match = re.search(r'(\d+)%', line)
                             if match:
-                                percent = match.group(1)
-                                self.progress_label.config(text=f"Progresso: {percent}%")
+                                percent = int(match.group(1))
+                                self.progressbar_geral['value'] = percent
+                                self.progress_label_geral.config(text=f"Progresso geral: {percent}%")
+                        
+                        # Progresso do subplot atual (barra azul)
+                        elif "σ=" in line:
+                            # Extrai o valor de sigma e a porcentagem
+                            match_sigma = re.search(r'σ=([\d.]+)', line)
+                            match_percent = re.search(r'(\d+)%', line)
+                            if match_sigma and match_percent:
+                                sigma = match_sigma.group(1)
+                                percent = int(match_percent.group(1))
+                                self.progressbar['value'] = percent
+                                self.progress_label.config(text=f"σ={sigma}: {percent}%")
                         
                         self.append_output(line)
                     
@@ -140,8 +166,10 @@ class App(tk.Tk):
                 self.btn_run.config(state="normal")
                 self.btn_stop.config(state="disabled")
                 
-                # Para e esconde a barra de progresso
-                self.progressbar.stop()
+                # Esconde as barras de progresso
+                self.progressbar_geral.pack_forget()
+                self.progress_label_geral.config(text="")
+                
                 self.progressbar.pack_forget()
                 self.progress_label.config(text="")
                 
@@ -161,8 +189,10 @@ class App(tk.Tk):
             self.process = None
             self.append_output("\nProcesso interrompido pelo usuário.\n")
         
-        # Para e esconde a barra de progresso
-        self.progressbar.stop()
+        # Esconde as barras de progresso
+        self.progressbar_geral.pack_forget()
+        self.progress_label_geral.config(text="")
+        
         self.progressbar.pack_forget()
         self.progress_label.config(text="")
         

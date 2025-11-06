@@ -23,6 +23,7 @@ numpy = "*"
 galois = "*"
 matplotlib = "*"
 tqdm = "*"
+scipy = "*"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "*"

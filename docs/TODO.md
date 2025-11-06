@@ -17,4 +17,5 @@ Chegar a um estado em que seja possível simular a distância (frequência) entr
 
 
 ## daqui 3 semanas
-- simular taxa de erro de bit (BER) do bpsk e qpsk e comparar com a teórica
+- comparar taxa de erro de bit (BER) teórica e simulada (bpsk e qpsk)
+- plots das fases dos processsos da modulação, geração da sequencia binaria, sequencia binaria antipodal (1 e -1), sequencia modulada (onda eletromagnética). Tudo para observar a variação da frenquência.

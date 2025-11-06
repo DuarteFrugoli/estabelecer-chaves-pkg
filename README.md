@@ -115,7 +115,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # 3. Instale dependências Python
-pip install numpy matplotlib galois pytest pytest-cov
+pip install numpy matplotlib galois scipy tqdm pytest pytest-cov
 
 # 4. Execute o programa
 python interfaces/basic/main.py
@@ -168,7 +168,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 
 # 3. Instale dependências Python
-pip install numpy matplotlib galois pytest pytest-cov
+pip install numpy matplotlib galois scipy tqdm pytest pytest-cov
 
 # 4. Execute o programa
 python interfaces/basic/main.py
@@ -218,7 +218,7 @@ python -m venv .venv
 .venv\Scripts\activate
 
 # 3. Instale dependências Python
-pip install numpy matplotlib galois pytest pytest-cov
+pip install numpy matplotlib galois scipy tqdm pytest pytest-cov
 
 # 4. Execute o programa
 python interfaces/basic/main.py
@@ -241,26 +241,66 @@ python interfaces/basic/main.py
 
 ### Interfaces Disponíveis
 
+⚠️ **IMPORTANTE**: Sempre execute os programas a partir da **raiz do projeto** com o ambiente virtual ativado.
+
 #### Modo Básico (Recomendado)
 Interface simplificada com parâmetros otimizados:
 
 ```bash
-# Interface CLI
-cd interfaces/basic && python main.py
+# 1. Navegue até a RAIZ do projeto
 
-# Interface Gráfica
-cd interfaces/basic && python gui.py
+# 2. Ative o ambiente virtual
+# Linux/macOS:
+source .venv/bin/activate
+# Windows:
+.venv\Scripts\activate
+
+# 3. Execute os programas (sempre da raiz do projeto)
+
+# Interface CLI (Terminal)
+python interfaces/basic/main.py
+
+# Interface Gráfica (GUI)
+python interfaces/basic/gui.py
 ```
 
 #### Modo Avançado (Em Desenvolvimento)
 Interface com parâmetros totalmente configuráveis:
 
 ```bash
+# 1. Navegue até a RAIZ do projeto
+cd estabelecer-chaves-pkg
+
+# 2. Ative o ambiente virtual
+# Linux/macOS:
+source .venv/bin/activate
+# Windows:
+.venv\Scripts\activate
+
+# 3. Execute os programas (sempre da raiz do projeto)
+
 # Interface CLI Avançada
-cd interfaces/advanced && python main_advanced.py
+python interfaces/advanced/main_advanced.py
 
 # Interface Gráfica Avançada  
-cd interfaces/advanced && python gui_advanced.py
+python interfaces/advanced/gui_advanced.py
+```
+
+**💡 Dica**: Se você receber erros como `ModuleNotFoundError` ou `Arquivo ou diretório inexistente`, certifique-se de que:
+1. Você está na **raiz do projeto** (pasta `estabelecer-chaves-pkg`), não em subpastas
+2. O ambiente virtual está ativado (você deve ver `(.venv)` no prompt do terminal)
+3. As dependências estão instaladas (`poetry install` ou use a instalação manual com pip)
+
+**Exemplo de erro comum**: 
+```bash
+# ❌ ERRADO - tentando ativar de dentro de uma subpasta
+cd interfaces/basic
+source .venv/bin/activate  # ERRO: .venv não está aqui!
+
+# ✅ CORRETO - sempre ative da raiz do projeto
+cd estabelecer-chaves-pkg
+source .venv/bin/activate
+python interfaces/basic/main.py
 ```
 
 ### Fluxo de Execução (Modo Básico)
