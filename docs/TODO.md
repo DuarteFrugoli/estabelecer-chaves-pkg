@@ -16,6 +16,5 @@ Chegar a um estado em que seja possível simular a distância (frequência) entr
 - escrever o começo do relatório
 
 
-## daqui 3 semanas
-- comparar taxa de erro de bit (BER) teórica e simulada (bpsk e qpsk)
+## Semana que vem
 - plots das fases dos processsos da modulação, geração da sequencia binaria, sequencia binaria antipodal (1 e -1), sequencia modulada (onda eletromagnética). Tudo para observar a variação da frenquência.
