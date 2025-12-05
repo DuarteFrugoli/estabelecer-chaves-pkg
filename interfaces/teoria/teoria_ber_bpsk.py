@@ -26,13 +26,13 @@ if __name__ == "__main__":
     num_testes = 100  # Número de testes por ponto SNR
     rayleigh_sigma = 1.0 / np.sqrt(2)  # σ normalizado: E[|h|²] = 1
     
-    print("⚙️  CONFIGURAÇÕES:")
+    print("CONFIGURACOES:")
     print(f"  • Range SNR: {snr_range[0]} a {snr_range[-1]} dB ({len(snr_range)} pontos)")
     print(f"  • Testes por SNR: {num_testes}")
     print(f"  • Bits por teste: 10.000")
     print(f"  • Canal Rayleigh σ: {rayleigh_sigma:.4f} (normalizado)")
     print(f"  • Total de bits simulados: {num_testes * 10000 * len(snr_range):,}")
-    print("\n⏳ Isso pode levar alguns minutos...\n")
+    print("\nIsso pode levar alguns minutos...\n")
     
     # Gera o gráfico
     fig, ax = plotar_teorico_vs_simulado_bpsk(
@@ -43,11 +43,11 @@ if __name__ == "__main__":
     )
     
     print("\n" + "="*70)
-    print("✓ SIMULAÇÃO CONCLUÍDA!")
+    print("SIMULACAO CONCLUIDA!")
     print("="*70)
-    print("\n✓ Mostrando gráfico na tela...")
+    print("\nMostrando grafico na tela...")
     print("  (Feche a janela para encerrar)")
-    print("="*70 + "\n")
+    print("="*70)
     
     # Mostra o gráfico
     plt.show()

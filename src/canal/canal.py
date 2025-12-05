@@ -16,8 +16,8 @@ def simular_canal_bpsk(ganho_canal, palavra_codigo, variancia_ruido, media_ruido
     # Converte para arrays NumPy para operação vetorizada
     ganho_array = np.array(ganho_canal)
     
-    # Mapeia bits {0,1} para símbolos BPSK {-1,+1}
-    simbolos_bpsk = 2 * np.array(palavra_codigo) - 1  # 0 -> -1, 1 -> +1
+    # Mapeia bits {0,1} para símbolos BPSK {+1,-1}
+    simbolos_bpsk = 1 - 2 * np.array(palavra_codigo)  # 0 -> +1, 1 -> -1
 
     # Calcula y = h*x + n de forma vetorizada com BPSK
     sinal_recebido_continuo = ganho_array * simbolos_bpsk + ruido
@@ -45,8 +45,11 @@ def simular_canal_qpsk(ganho_canal, palavra_codigo, variancia_ruido, media_ruido
     # Converte para arrays NumPy
     ganho_array = np.array(ganho_canal[:num_simbolos])
     
-    # Mapeia pares de bits para símbolos QPSK
-    # 00 -> -1-1j, 01 -> -1+1j, 10 -> +1-1j, 11 -> +1+1j
+    # Mapeia pares de bits para símbolos QPSK normalizados
+    # Para ter mesma energia que BPSK (Es = 1), dividimos por √2
+    # 00 -> (-1-1j)/√2, 01 -> (-1+1j)/√2, 10 -> (+1-1j)/√2, 11 -> (+1+1j)/√2
+    # Isso garante |s|² = (1² + 1²)/2 = 1 (mesma energia do BPSK)
+    normalizacao = 1 / np.sqrt(2)
     simbolos_qpsk = []
     for i in range(0, len(palavra_codigo_padded), 2):
         bit_i = palavra_codigo_padded[i]
@@ -54,7 +57,8 @@ def simular_canal_qpsk(ganho_canal, palavra_codigo, variancia_ruido, media_ruido
         # Mapeia bits para -1 ou +1
         val_i = 2 * bit_i - 1
         val_q = 2 * bit_q - 1
-        simbolos_qpsk.append(val_i + 1j * val_q)
+        # Normaliza para Es = 1
+        simbolos_qpsk.append((val_i + 1j * val_q) * normalizacao)
     
     simbolos_qpsk = np.array(simbolos_qpsk)
     

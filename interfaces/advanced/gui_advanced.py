@@ -38,7 +38,7 @@ class AdvancedApp(tk.Tk):
         scrollbar.pack(side="right", fill="y")
 
         # ===== SEÇÃO 1: PARÂMETROS BÁSICOS =====
-        self.create_section_header(scrollable_frame, "📊 PARÂMETROS BÁSICOS")
+        self.create_section_header(scrollable_frame, "PARÂMETROS BÁSICOS")
 
         # Quantidade de testes
         self.create_labeled_entry(scrollable_frame, "Quantidade de testes:", "100", "entry_testes")
@@ -52,7 +52,7 @@ class AdvancedApp(tk.Tk):
                                      ["BPSK", "QPSK"], "BPSK", "combo_modulacao")
 
         # ===== SEÇÃO 2: PARÂMETROS DO CANAL =====
-        self.create_section_header(scrollable_frame, "🌊 PARÂMETROS DO CANAL")
+        self.create_section_header(scrollable_frame, "PARÂMETROS DO CANAL")
 
         # Parâmetro Rayleigh (sigma)
         self.create_labeled_entry(scrollable_frame, "Parâmetro Rayleigh (σ):", 

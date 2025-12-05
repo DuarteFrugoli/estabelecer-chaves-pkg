@@ -1,0 +1,136 @@
+\section{Materials and Methods}
+\label{sec:metodos}
+
+Esta seção apresenta detalhadamente os métodos utilizados para a implementação,
+simulação e avaliação do sistema de geração de chaves em camada física.
+Descrevem-se o ambiente de desenvolvimento, a modelagem do canal, o processo de
+extração de aleatoriedade, os procedimentos de reconciliação e amplificação de
+privacidade, bem como os experimentos conduzidos para análise do desempenho.
+
+\subsection{Descrição Geral da Simulação}
+
+O objetivo da simulação é reproduzir matematicamente e computacionalmente um
+sistema de geração de chaves baseado na reciprocidade do canal em comunicações
+sem fio. O sistema modela dois nós legítimos, Alice e Bob, trocando sinais
+e obtendo estimativas do canal em momentos próximos o suficiente para
+garantir a reciprocidade. 
+
+A simulação contempla:
+
+\begin{itemize}
+    \item geração de amostras de canal Rayleigh complexas;
+    \item transmissão de bits através do canal com ruído \ac{AWGN};
+    \item modulação \ac{BPSK} ou \ac{QPSK} com detecção coerente;
+    \item uso de códigos \ac{BCH} para reconciliação;
+    \item uso de \ac{SHA}-256 para amplificação de privacidade;
+    \item cálculo de métricas de desempenho (\ac{KDR}, concordância).
+\end{itemize}
+
+O pipeline completo permite avaliar, de forma controlada, como alterações no
+cenário físico afetam a concordância das chaves e a segurança estatística do
+sistema.
+
+\subsection{Ambiente de Desenvolvimento}
+
+\subsubsection{Linguagem e Bibliotecas Utilizadas}
+
+As simulações foram implementadas integralmente em Python 3.11 devido à sua
+flexibilidade e à ampla disponibilidade de bibliotecas científicas. As
+principais dependências incluem:
+
+\begin{itemize}
+    \item \textbf{NumPy}: geração de números complexos, manipulação vetorial e operações matriciais;
+    \item \textbf{SciPy}: funções estatísticas e transformações auxiliares;
+    \item \textbf{Matplotlib}: geração de gráficos de desempenho;
+    \item \textbf{Galois}: implementação de códigos \ac{BCH} para reconciliação;
+    \item \textbf{hashlib}: implementação do \ac{SHA}-256 para amplificação de privacidade;
+    \item \textbf{tqdm}: barras de progresso para simulações longas.
+\end{itemize}
+
+Todas as simulações foram executadas em ambiente local, num computador com
+processador {}, garantindo execução consistente e
+reprodutível.
+
+\subsubsection{Parâmetros de Simulação}
+
+Os parâmetros controláveis do ambiente de simulação incluem:
+
+\begin{itemize}
+    \item número de bits transmitidos: tipicamente \(N = 127\) (comprimento do código \ac{BCH});
+    \item níveis de \ac{SNR}: \(\mathrm{SNR} \in [0, 30] \, \mathrm{dB}\);
+    \item parâmetro de escala Rayleigh: \(\sigma \in [0.5, 2.0]\);
+    \item código \ac{BCH}: parâmetros \((n,k,t)\), com \(n=127\), \(k=64\), \(t=10\);
+    \item tipo de modulação: \ac{BPSK} ou \ac{QPSK};
+    \item variância do ruído \ac{AWGN}: calculada a partir da \ac{SNR} desejada.
+\end{itemize}
+
+Esses parâmetros foram escolhidos de forma a representar condições realistas e
+cobrir uma ampla faixa de cenários físicos.
+
+\subsection{Estrutura do Código}
+
+\subsubsection{Módulos Principais}
+
+A implementação foi organizada em módulos independentes, visando clareza e
+modularidade:
+
+\begin{itemize}
+    \item \texttt{canal/canal.py} — simulação de canal Rayleigh com ruído \ac{AWGN} e modulação \ac{BPSK}/\ac{QPSK};
+    \item \texttt{canal/modulacao.py} — modulação temporal realista com frequência de portadora;
+    \item \texttt{codigos\_corretores/bch.py} — codificação e decodificação \ac{BCH};
+    \item \texttt{pilares/reconciliacao.py} — reconciliação de chaves usando code-offset;
+    \item \texttt{pilares/amplificacao\_privacidade.py} — aplicação do \ac{SHA}-256 para obtenção da chave final;
+    \item \texttt{visualizacao/plotkdr.py} — geração de gráficos de métricas e desempenho;
+    \item \texttt{util/binario\_util.py} — operações auxiliares com sequências binárias.
+\end{itemize}
+
+\subsubsection{Fluxo Geral de Execução}
+
+O pipeline da simulação segue:
+
+\begin{enumerate}
+    \item geração de sequência de bits aleatória para Alice;
+    \item geração do ganho de canal \(h \sim \mathcal{CN}(0,1)\) (Rayleigh);
+    \item transmissão de Alice para Bob: \(y_B = h \cdot x_A + n_B\);
+    \item transmissão de Bob para Alice: \(y_A = h \cdot x_B + n_A\) (reciprocidade);
+    \item demodulação e detecção dos bits recebidos;
+    \item reconciliação das sequências via \ac{BCH} usando code-offset;
+    \item amplificação de privacidade via \ac{SHA}-256;
+    \item cálculo das métricas (\ac{KDR} pré e pós-reconciliação, \ac{KDR} pós-amplificação).
+\end{enumerate}
+
+O fluxo permite avaliar precisamente o impacto da \ac{SNR}, distância e número de
+amostras sobre a qualidade das chaves.
+
+\subsection{Modelagem do Canal}
+
+\subsubsection{Canal Rayleigh}
+
+O canal é modelado como uma variável aleatória complexa:
+
+\begin{equation}
+h \sim \mathcal{CN}(0,1),
+\end{equation}
+
+resultando em módulo Rayleigh e fase uniforme. Esse modelo captura condições de
+multipercurso sem linha de visada (\ac{NLoS}), típico de ambientes internos.
+
+\subsubsection{Modelo de Ruído, Distância e Amostras}
+
+Cada nó observa:
+
+\begin{equation}
+y = h x + n,
+\end{equation}
+
+onde \(x\) é o piloto e \(n \sim \mathcal{CN}(0,\sigma^2)\) representa \ac{AWGN}.
+
+A influência da distância é incorporada por perda de percurso:
+
+\begin{equation}
+h_d = \frac{h}{d^\alpha},
+\end{equation}
+
+com \(\alpha \in [2,4]\) dependendo do ambiente.
+
+Batches de amostras são gerados para cada estimativa, simula
