@@ -1,49 +1,22 @@
 \section{Fundamentação Teórica}
 
-A segurança da informação em sistemas de comunicação tem sido tradicionalmente garantida por mecanismos de criptografia implementados nas camadas superiores da pilha de protocolos. Os pilares da confidencialidade, integridade, autenticidade, irretratabilidade e disponibilidade dependem, em geral, de algoritmos criptográficos robustos e de uma gestão eficiente de chaves simétricas ou assimétricas. Entretanto, o estabelecimento e a distribuição de chaves seguras permanecem como desafios centrais, especialmente em redes móveis altamente dinâmicas e em ambientes \ac{IoT} com recursos computacionais limitados.
+A segurança da informação em sistemas de comunicação tem sido tradicionalmente garantida por mecanismos de criptografia implementados nas camadas superiores da pilha de protocolos. Os pilares da confidencialidade, integridade, autenticidade, irretratabilidade e disponibilidade dependem, em geral, de algoritmos criptográficos robustos e de uma gestão eficiente de chaves simétricas ou assimétricas. Entretanto, o estabelecimento e a distribuição de chaves seguras permanecem como desafios centrais, especialmente em redes móveis altamente dinâmicas e em ambientes IoT com recursos computacionais limitados.
 
 \subsection{Criptografia Simétrica e Assimétrica}
 
-A criptografia moderna é baseada principalmente em dois tipos de chaves:
+A criptografia moderna é baseada principalmente em dois tipos de chaves. A criptografia assimétrica (ou de chave pública) utiliza um par de chaves matematicamente relacionadas — uma chave pública e uma chave privada — como ocorre nos algoritmos RSA, ECC e variantes de Diffie–Hellman. Embora ofereçam flexibilidade e segurança, esses métodos são computacionalmente custosos e, em muitos cenários, vulneráveis a ataques de computadores quânticos. Já a criptografia simétrica utiliza a mesma chave para cifrar e decifrar dados, como no caso do AES, sendo extremamente eficiente e amplamente usada em sistemas reais. No entanto, essa abordagem depende de que as partes envolvidas já possuam uma chave secreta compartilhada, o que nos leva ao problema da distribuição de chaves.
 
-\begin{itemize}
-    \item \textbf{Criptografia Assimétrica (chave pública):} utiliza um par de chaves matematicamente relacionadas — uma chave pública e uma chave privada. Algoritmos como \ac{RSA}, ECC e variantes de Diffie–Hellman pertencem a essa categoria. Embora ofereçam flexibilidade e segurança, são computacionalmente custosos e, em muitos casos, vulneráveis a ataques de computadores quânticos.
-    
-    \item \textbf{Criptografia Simétrica:} utiliza a mesma chave para cifrar e decifrar os dados. Algoritmos como \ac{AES} são extremamente eficientes e amplamente utilizados em sistemas reais. No entanto, essa abordagem depende que as partes envolvidas já possuam uma \textbf{chave secreta compartilhada}, o que nos leva ao problema de distribuição de chaves.
-\end{itemize}
-
-O sistema que desenvolvemos neste trabalho \textbf{é baseado em criptografia simétrica}. Ou seja, o objetivo da geração de chaves em camada física é justamente criar, de forma automática e segura, uma chave secreta que será posteriormente utilizada por algoritmos como \ac{AES}.
+O sistema que desenvolvemos neste trabalho é baseado em criptografia simétrica. Ou seja, o objetivo da geração de chaves em camada física é justamente criar, de forma automática e segura, uma chave secreta que será posteriormente utilizada por algoritmos como AES.
 
 \subsection{Alice, Bob e Eve: Modelo Clássico de Segurança}
 
-Para explicar cenários de segurança em comunicações, utiliza-se uma convenção simples:
-
-\begin{itemize}
-    \item \textbf{Alice} é o transmissor legítimo.
-    \item \textbf{Bob} é o receptor legítimo.
-    \item \textbf{Eve} (de \textit{eavesdropper}) é o atacante que tenta interceptar a comunicação.
-\end{itemize}
-
-Esses nomes não possuem significado técnico; são apenas uma forma padronizada de ilustrar interações. O objetivo é fazer com que \textbf{Alice e Bob cheguem a uma chave secreta idêntica}, enquanto Eve, por estar fora da região física de reciprocidade, \textbf{não consiga obter a mesma informação}.
+Para explicar cenários de segurança em comunicações, utiliza-se uma convenção simples: Alice é o transmissor legítimo, Bob é o receptor legítimo e Eve (de \textit{eavesdropper}) é a atacante que tenta interceptar a comunicação. Esses nomes não possuem significado técnico; são apenas uma forma padronizada de ilustrar interações. O objetivo é fazer com que Alice e Bob cheguem a uma chave secreta idêntica, enquanto Eve, por estar fora da região física de reciprocidade, não consiga obter a mesma informação.
 
 \subsection{O Canal Sem Fio e Suas Propriedades}
 
-Para entender a geração de chaves físicas, é necessário compreender como funciona a transmissão sem fio. Quando Alice transmite um sinal para Bob, esse sinal passa por um meio físico sujeito a fenômenos aleatórios como:
+Para entender a geração de chaves físicas, é necessário compreender como funciona a transmissão sem fio. Quando Alice transmite um sinal para Bob, esse sinal passa por um meio físico sujeito a fenômenos aleatórios como desvanecimento (\textit{fading}), que corresponde a oscilações naturais na potência do sinal causadas por múltiplos caminhos, reflexões e obstáculos; ruído térmico, proveniente de interferências aleatórias causadas pelo movimento de elétrons nos circuitos eletrônicos; e variação temporal, decorrente de mudanças no canal ao longo do tempo devido ao movimento dos usuários ou do ambiente.
 
-\begin{itemize}
-    \item \textbf{Desvanecimento (fading):} oscilações naturais na potência do sinal causadas por múltiplos caminhos, reflexões e obstáculos.
-    \item \textbf{Ruído térmico:} interferência aleatória causada pelo movimento de elétrons nos circuitos eletrônicos.
-    \item \textbf{Variação temporal:} o canal muda ao longo do tempo devido ao movimento dos usuários ou do ambiente.
-\end{itemize}
-
-Além disso, o canal sem fio exibe duas propriedades fundamentais para a geração de chaves:
-
-\begin{itemize}
-    \item \textbf{Reciprocidade:} dentro do tempo de coerência, o canal Alice–Bob é estatisticamente igual ao canal Bob–Alice.
-    \item \textbf{Decorrelação espacial:} pequenas mudanças na posição — tipicamente acima de \(\lambda/2\) — fazem com que o canal observado por Eve seja completamente diferente.
-\end{itemize}
-
-Essas características tornam possível gerar segredos compartilhados diretamente do canal sem fio, sem transmissão de chaves.
+Além disso, o canal sem fio exibe duas propriedades fundamentais para a geração de chaves. A primeira é a reciprocidade: dentro do tempo de coerência, o canal Alice–Bob é estatisticamente igual ao canal Bob–Alice. A segunda é a decorrelação espacial: pequenas mudanças na posição — tipicamente acima de \(\lambda/2\) — fazem com que o canal observado por Eve seja completamente diferente. Essas características tornam possível gerar segredos compartilhados diretamente do canal sem fio, sem transmissão explícita de chaves.
 
 \subsection{Processo de Geração de Chaves em Camada Física}
 
@@ -51,15 +24,13 @@ A geração de chaves em camada física ocorre por meio de quatro etapas princip
 
 \subsubsection{1. Amostragem do Canal}
 
-Alice transmite um sinal piloto (conhecido por Bob) e Bob estima o ganho do canal. Em seguida, Bob transmite outro sinal piloto e Alice estima o canal novamente.
-
-Devido à reciprocidade, ambas as estimativas são muito parecidas. O ganho do canal pode ser representado, por exemplo, como uma série temporal:
+Alice transmite um sinal piloto (conhecido por Bob) e Bob estima o ganho do canal. Em seguida, Bob transmite outro sinal piloto e Alice estima o canal novamente. Devido à reciprocidade, ambas as estimativas são muito parecidas. O ganho do canal pode ser representado, por exemplo, como uma série temporal:
 
 \[
 h(t) = h_\text{real}(t) + j h_\text{imag}(t)
 \]
 
-No nosso caso, utilizamos o \textbf{módulo do ganho} como fonte de aleatoriedade.
+No nosso caso, utilizamos o módulo do ganho como fonte de aleatoriedade.
 
 \subsubsection{2. Quantização}
 
@@ -76,27 +47,17 @@ K_A \quad \text{(chave inicial de Alice)} \\
 K_B \quad \text{(chave inicial de Bob)}
 \]
 
-Como há ruído e pequenas discrepâncias no canal, essas sequências não são perfeitamente iguais. Surge então a necessidade de reconciliá-las.
+Como há ruído e pequenas discrepâncias no canal, essas sequências não são perfeitamente iguais, surgindo então a necessidade de reconciliá-las.
 
 \subsubsection{3. Reconciliação de Chaves}
 
-A reconciliação tem como objetivo reduzir o \ac{KDR}, corrigindo os bits que diferem entre \(K_A\) e \(K_B\). Para isso, utiliza-se um código de correção de erros — neste trabalho, um \textbf{código \ac{BCH}}.
+A reconciliação tem como objetivo reduzir o \textit{Key Disagreement Rate} (KDR), corrigindo os bits que diferem entre \(K_A\) e \(K_B\). Para isso, utiliza-se um código de correção de erros — neste trabalho, um código BCH. A reconciliação funciona da seguinte forma: Bob escolhe uma sequência aleatória \(C\), chamada código. Ele combina \(C\) com sua chave inicial por meio de XOR ou soma módulo-2, produzindo a chamada síndrome pública. Essa síndrome é enviada pelo canal público para Alice. Como Alice possui \(K_A\), ela utiliza a síndrome e o decodificador BCH para recuperar \(C\). Uma vez que recupera \(C\), ela produz a mesma chave corrigida que Bob.
 
-A reconciliação funciona da seguinte forma:
-
-\begin{enumerate}
-    \item Bob escolhe uma sequência aleatória \(C\) chamada \textbf{código}.
-    \item Ele combina \(C\) com sua chave inicial por meio de \ac{XOR} ou soma módulo-2, produzindo a chamada \textbf{síndrome pública}.
-    \item Essa síndrome é enviada pelo canal público para Alice.
-    \item Como Alice possui \(K_A\), ela utiliza a síndrome e o decodificador \ac{BCH} para recuperar \(C\).
-    \item Recuperando \(C\), ela produz a mesma chave corrigida que Bob.
-\end{enumerate}
-
-O ponto crucial é que Eve, que não possui \(K_A\) nem \(K_B\), não consegue recuperar \(C\) apenas com a síndrome, pois ela exige conhecimento prévio da estrutura de erros entre as sequências legítimas.
+O ponto crucial é que Eve, que não possui \(K_A\) nem \(K_B\), não consegue recuperar \(C\) apenas com a síndrome, pois isso exigiria conhecimento prévio da estrutura de erros entre as sequências legítimas.
 
 \subsubsection{4. Amplificação de Privacidade}
 
-Mesmo após a reconciliação, a síndrome pública pode ter revelado pequenas quantidades de informação sobre a chave. Para remover qualquer possível vazamento, aplica-se uma função de hashing criptográfico, como \ac{SHA}-256, reduzindo a chave a uma versão final curta, porém completamente segura:
+Mesmo após a reconciliação, a síndrome pública pode ter revelado pequenas quantidades de informação sobre a chave. Para remover qualquer possível vazamento, aplica-se uma função de hashing criptográfico, como SHA-256, reduzindo a chave a uma versão final curta, porém completamente segura:
 
 \[
 K_\text{final} = \text{Hash}(C)
@@ -106,18 +67,8 @@ Esse processo garante que, mesmo com acesso às informações públicas trocadas
 
 \subsection{Key Disagreement Rate (KDR)}
 
-O \textit{Key Disagreement Rate} é a fração de bits diferentes entre \(K_A\) e \(K_B\). Ele representa uma métrica essencial para avaliar a viabilidade prática do método. Sabe-se que a proximidade física entre Alice e Bob reduz significativamente o KDR, enquanto o distanciamento tende a degradar a reciprocidade.
+O \textit{Key Disagreement Rate} é a proporção de bits diferentes entre \(K_A\) e \(K_B\). Ele representa uma métrica essencial para avaliar a viabilidade prática do método. Sabe-se que a proximidade física entre Alice e Bob reduz significativamente o KDR, enquanto o distanciamento tende a degradar a reciprocidade.
 
 \subsection{Resumo da Fundamentação}
 
-Com essas explicações, concluímos que a geração de chaves em camada física é fundamentada em:
-
-\begin{itemize}
-    \item propriedades estatísticas do canal sem fio (reciprocidade, decorrelação espacial e desvanecimento);
-    \item uso de quantização para extrair bits de entropia;
-    \item técnicas de reconciliação baseadas em códigos \ac{BCH} para corrigir discrepâncias;
-    \item amplificação de privacidade para garantir confidencialidade absoluta;
-    \item e métricas como o \ac{KDR} para avaliar a qualidade do método.
-\end{itemize}
-
-Esses elementos servem de base para o modelo de simulação implementado neste trabalho.
+Com essas explicações, concluímos que a geração de chaves em camada física é fundamentada em propriedades estatísticas do canal sem fio, como reciprocidade, decorrelação espacial e desvanecimento; no uso de quantização para extrair bits de entropia; em técnicas de reconciliação baseadas em códigos BCH para corrigir discrepâncias; na amplificação de privacidade para garantir confidencialidade absoluta; e em métricas como o KDR para avaliar a qualidade do método. Esses elementos servem de base para o modelo de simulação implementado neste trabalho.
