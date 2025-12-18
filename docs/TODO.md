@@ -28,3 +28,6 @@ Chegar a um estado em que seja possível simular a distância (frequência) entr
 - colocar imagens do código no tópico 4
 - imagens de resultados na 5 obviamente
 - prestar atenção na contextualização sempre, do porque aquilo é importante ser mencionado
+
+rodar a bateria completa de testes:
+poetry run python experimentos/executar_todos.py --modo completo

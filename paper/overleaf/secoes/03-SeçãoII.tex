@@ -1,74 +1,213 @@
-\section{Fundamentação Teórica}
+\section{Geração de Chaves Criptográficas em Camada Física: Fundamentos Teóricos}
 
-A segurança da informação em sistemas de comunicação tem sido tradicionalmente garantida por mecanismos de criptografia implementados nas camadas superiores da pilha de protocolos. Os pilares da confidencialidade, integridade, autenticidade, irretratabilidade e disponibilidade dependem, em geral, de algoritmos criptográficos robustos e de uma gestão eficiente de chaves simétricas ou assimétricas. Entretanto, o estabelecimento e a distribuição de chaves seguras permanecem como desafios centrais, especialmente em redes móveis altamente dinâmicas e em ambientes IoT com recursos computacionais limitados.
+A segurança da informação em sistemas de comunicação sem fio tem sido historicamente fundamentada no uso de protocolos de comunicação segura implementados nas camadas superiores da pilha de protocolos. Esses protocolos têm como objetivo garantir, total ou parcialmente, os pilares da comunicação segura, com destaque para a confidencialidade, integridade, autenticidade, irretratabilidade e disponibilidade. Atualmente, tais requisitos são atendidos predominantemente por meio de protocolos amplamente consolidados, como o \textit{Transport Layer Security} (TLS), que atua na camada de transporte \cite{rfc_tls}, e o \textit{Internet Protocol Security} (IPsec), implementado na camada de rede \cite{rfc_ipsec}. Esses protocolos utilizam algoritmos criptográficos e mecanismos formais de estabelecimento de chaves para prover comunicação segura entre entidades legítimas.
+
+Dentre esses pilares, a confidencialidade ocupa um papel central, uma vez que está diretamente relacionada à proteção do conteúdo transmitido contra interceptação e acesso não autorizado. Sua garantia depende, em geral, do uso combinado de algoritmos criptográficos simétricos e assimétricos, cujo funcionamento está intrinsecamente associado ao estabelecimento seguro de chaves criptográficas. Mecanismos tradicionais de troca de chaves, como o protocolo Diffie--Hellman e infraestruturas de chave pública, embora matematicamente robustos, impõem elevado custo computacional e dependência de entidades confiáveis \cite{diffie_hellman, stallings_crypto}. Essas limitações tornam-se particularmente relevantes em cenários com grande mobilidade, alta densidade de dispositivos e restrições energéticas, como redes móveis de próxima geração e ambientes de \ac{IoT} \cite{zeng_pkg_challenges}.
+
+Nesse contexto, torna-se necessário investigar abordagens complementares para o estabelecimento de chaves criptográficas que reduzam a dependência de camadas superiores e de infraestruturas complexas. A Segurança em Camada Física (\ac{PLS}) surge como uma alternativa promissora ao explorar propriedades intrínsecas do meio físico de propagação, tais como reciprocidade do canal, desvanecimento e ruído térmico, para a geração de segredos compartilhados \cite{bloch_wireless_security, zhou_pls_survey}. Trabalhos pioneiros demonstraram que tais características podem ser exploradas para extrair chaves criptográficas diretamente do canal sem fio, de forma independente de pressupostos computacionais \cite{mathur_pks}. Dessa forma, esta seção apresenta os fundamentos teóricos necessários para compreender o processo de \ac{PKG}, abordando os conceitos de criptografia simétrica e assimétrica, o modelo de sistema adotado, as propriedades do canal sem fio e as etapas envolvidas na geração, reconciliação e privacidade das chaves em camada física.
+
 
 \subsection{Criptografia Simétrica e Assimétrica}
 
-A criptografia moderna é baseada principalmente em dois tipos de chaves. A criptografia assimétrica (ou de chave pública) utiliza um par de chaves matematicamente relacionadas — uma chave pública e uma chave privada — como ocorre nos algoritmos RSA, ECC e variantes de Diffie–Hellman. Embora ofereçam flexibilidade e segurança, esses métodos são computacionalmente custosos e, em muitos cenários, vulneráveis a ataques de computadores quânticos. Já a criptografia simétrica utiliza a mesma chave para cifrar e decifrar dados, como no caso do AES, sendo extremamente eficiente e amplamente usada em sistemas reais. No entanto, essa abordagem depende de que as partes envolvidas já possuam uma chave secreta compartilhada, o que nos leva ao problema da distribuição de chaves.
+A criptografia é o principal mecanismo empregado para garantir a confidencialidade, integridade e autenticidade das informações transmitidas em sistemas de comunicação digitais. De forma geral, os esquemas criptográficos podem ser classificados em dois grandes paradigmas: criptografia simétrica e criptografia assimétrica. A distinção entre esses paradigmas está diretamente relacionada à forma como as chaves criptográficas são geradas, distribuídas e utilizadas pelas entidades legítimas do sistema.
 
-O sistema que desenvolvemos neste trabalho é baseado em criptografia simétrica. Ou seja, o objetivo da geração de chaves em camada física é justamente criar, de forma automática e segura, uma chave secreta que será posteriormente utilizada por algoritmos como AES.
+Na criptografia simétrica, uma única chave secreta é compartilhada entre o transmissor e o receptor, sendo utilizada tanto no processo de cifragem quanto no de decifragem da informação. Algoritmos clássicos dessa categoria incluem o \textit{Data Encryption Standard} (DES), seu sucessor \textit{Triple DES} (3DES), e, mais recentemente, o \textit{Advanced Encryption Standard} (AES), que se tornou o padrão amplamente adotado em sistemas modernos devido à sua elevada eficiência computacional e resistência criptográfica \cite{stallings_crypto}. A principal vantagem da criptografia simétrica reside no baixo custo computacional, o que a torna particularmente adequada para aplicações em tempo real e dispositivos com recursos limitados.
 
-\subsection{Alice, Bob e Eve: Modelo Clássico de Segurança}
+Entretanto, a segurança dos esquemas simétricos depende criticamente do compartilhamento prévio e seguro da chave secreta entre as partes envolvidas. Esse requisito introduz o chamado problema de distribuição de chaves, no qual se assume a existência de um canal seguro inicial ou de um mecanismo confiável para a troca da chave. Em redes abertas e descentralizadas, especialmente em ambientes sem fio, essa suposição nem sempre é válida, tornando a distribuição segura de chaves um desafio fundamental.
 
-Para explicar cenários de segurança em comunicações, utiliza-se uma convenção simples: Alice é o transmissor legítimo, Bob é o receptor legítimo e Eve (de \textit{eavesdropper}) é a atacante que tenta interceptar a comunicação. Esses nomes não possuem significado técnico; são apenas uma forma padronizada de ilustrar interações. O objetivo é fazer com que Alice e Bob cheguem a uma chave secreta idêntica, enquanto Eve, por estar fora da região física de reciprocidade, não consiga obter a mesma informação.
+A criptografia assimétrica, por sua vez, foi proposta com o objetivo de mitigar o problema de distribuição de chaves. Nesse paradigma, cada usuário possui um par de chaves matematicamente relacionadas: uma chave pública, que pode ser divulgada livremente, e uma chave privada, mantida em sigilo. Algoritmos como RSA e protocolos de troca de chaves baseados em Diffie--Hellman permitem que duas entidades estabeleçam um segredo compartilhado sem a necessidade de um canal previamente seguro \cite{diffie_hellman}. A segurança desses métodos está associada à dificuldade computacional de problemas matemáticos específicos, como a fatoração de grandes números inteiros ou o cálculo do logaritmo discreto.
+
+Apesar de resolverem o problema da distribuição inicial de chaves, os esquemas assimétricos apresentam desvantagens relevantes. Em particular, o custo computacional elevado torna sua aplicação direta em transmissões contínuas de dados pouco eficiente. Além disso, tais esquemas são suscetíveis a ataques do tipo intermediário (\textit{man-in-the-middle}) quando não combinados com mecanismos adicionais de autenticação. Na prática, essa autenticação é frequentemente implementada por meio de infraestruturas de chave pública (PKI), que dependem de autoridades certificadoras confiáveis e aumentam a complexidade e a dependência estrutural do sistema \cite{rfc_tls}.
+
+Em função dessas limitações, sistemas de comunicação modernos adotam uma abordagem híbrida, na qual algoritmos assimétricos são utilizados apenas nas fases iniciais de autenticação e estabelecimento de chaves, enquanto a proteção dos dados é realizada por meio de algoritmos simétricos. Dessa forma, observa-se que, embora a criptografia forneça mecanismos robustos para a proteção da informação, o processo de geração e compartilhamento seguro de chaves permanece como um dos principais gargalos dos sistemas criptográficos tradicionais.
+
+Essa constatação motiva a investigação de abordagens alternativas para o estabelecimento de chaves secretas, especialmente em ambientes sem fio. Nesse contexto, a geração de chaves em camada física surge como uma solução complementar, explorando propriedades aleatórias do canal de comunicação para permitir que entidades legítimas estabeleçam segredos compartilhados sem a necessidade de troca explícita de chaves criptográficas.
+
+
+\subsection{Alice, Bob e Eve: Modelo Geral de Segurança}
+
+A análise de mecanismos de segurança em sistemas de comunicação sem fio é tradicionalmente conduzida a partir de um modelo conceitual que envolve três entidades fundamentais, comumente denominadas Alice, Bob e Eve. Nesse modelo geral de segurança, Alice e Bob representam dispositivos legítimos pertencentes à rede, enquanto Eve representa um agente adversário passivo, cuja intenção é observar o meio de transmissão e extrair informações confidenciais sem interferir diretamente no processo de comunicação \cite{wyner_wiretap, bloch_wireless_security}.
+
+No contexto deste trabalho, esse modelo é aplicado a um cenário de comunicações móveis, no qual Alice e Bob não se comunicam diretamente entre si. Em vez disso, ambos recebem sinais transmitidos por uma estação rádio base ou ponto de acesso, que atua como fonte comum de excitação do canal sem fio. Essa arquitetura é característica de redes celulares modernas e sistemas de Internet das Coisas, nos quais múltiplos dispositivos compartilham a mesma infraestrutura de acesso \cite{zhang_pks_survey}.
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        box/.style={draw, thick, minimum width=2cm, minimum height=1cm, align=center},
+        arr/.style={-Latex, thick}
+    ]
+        % Nós (Caixas)
+        \node[box] (bs) {Base Station};
+        
+        \node[box, right=3cm of bs, yshift=1.5cm] (alice) {Alice};
+        \node[box, right=3cm of bs] (bob) {Bob};
+        \node[box, right=3cm of bs, yshift=-1.5cm] (eve) {Eve};
+
+        % Setas e Rótulos dos Canais
+        \draw[arr] (bs.east) -- (alice.west) node[midway, above] {$h_A$};
+        \draw[arr] (bs.east) -- (bob.west) node[midway, above] {$h_B$};
+        \draw[arr] (bs.east) -- (eve.west) node[midway, below] {$h_E$};
+
+        % Equações ao lado das caixas
+        \node[right=0.2cm of alice] {$y_A = h_A x + n_A$};
+        \node[right=0.2cm of bob]   {$y_B = h_B x + n_B$}; 
+        \node[right=0.2cm of eve]   {$y_E = h_E x + n_E$};
+    \end{tikzpicture}
+    \caption{Modelo geral de segurança considerado, no qual uma estação rádio base transmite sinais piloto para Alice e Bob por meio de canais sem fio estatisticamente correlacionados, enquanto um invasor (Eve) observa um canal decorrelacionado.}
+    \label{fig:modelo_sistema}
+\end{figure}
+
+A estação rádio base transmite sinais piloto conhecidos, que são recebidos por Alice e Bob por meio de canais sem fio distintos, porém estatisticamente correlacionados. Em virtude da proximidade espacial entre os dispositivos legítimos e das propriedades físicas do canal, as realizações observadas por Alice e Bob apresentam elevado grau de correlação dentro do tempo de coerência do canal. Cada dispositivo realiza, de forma independente, a sondagem do canal e obtém uma sequência de amostras que será posteriormente processada para a geração de chaves criptográficas baseadas em camada física \cite{mathur_pks, zhang_pks_survey}.
+
+O agente adversário Eve, por sua vez, encontra-se em uma posição espacial distinta e observa um canal sem fio estatisticamente decorrelacionado em relação aos canais legítimos. Como consequência, as amostras obtidas por Eve apresentam baixa correlação com aquelas observadas por Alice e Bob, o que dificulta significativamente a extração de uma chave criptográfica idêntica. Assume-se ainda que Eve possui acesso irrestrito ao canal público utilizado durante as etapas de reconciliação da informação, caracterizando um adversário passivo conforme o modelo clássico de segurança da informação \cite{maurer_secret_key}.
+
+Esse modelo geral estabelece o cenário necessário para a geração de chaves em camada física, conectando os conceitos criptográficos discutidos anteriormente às propriedades estatísticas do canal sem fio, que serão exploradas na subseção seguinte.
+
 
 \subsection{O Canal Sem Fio e Suas Propriedades}
 
-Para entender a geração de chaves físicas, é necessário compreender como funciona a transmissão sem fio. Quando Alice transmite um sinal para Bob, esse sinal passa por um meio físico sujeito a fenômenos aleatórios como desvanecimento (\textit{fading}), que corresponde a oscilações naturais na potência do sinal causadas por múltiplos caminhos, reflexões e obstáculos; ruído térmico, proveniente de interferências aleatórias causadas pelo movimento de elétrons nos circuitos eletrônicos; e variação temporal, decorrente de mudanças no canal ao longo do tempo devido ao movimento dos usuários ou do ambiente.
+A geração de chaves criptográficas em camada física fundamenta-se diretamente no comportamento estatístico do canal sem fio. Diferentemente de modelos clássicos de comunicação ponto a ponto, o sistema considerado neste trabalho assume que uma infraestrutura de rede sem fio transmite sinais que são recebidos de forma independente por Alice e Bob. Assim, os canais experimentados por cada dispositivo não são idênticos, mas apresentam correlação estatística devido à proximidade espacial e às condições semelhantes de propagação.
 
-Além disso, o canal sem fio exibe duas propriedades fundamentais para a geração de chaves. A primeira é a reciprocidade: dentro do tempo de coerência, o canal Alice–Bob é estatisticamente igual ao canal Bob–Alice. A segunda é a decorrelação espacial: pequenas mudanças na posição — tipicamente acima de \(\lambda/2\) — fazem com que o canal observado por Eve seja completamente diferente. Essas características tornam possível gerar segredos compartilhados diretamente do canal sem fio, sem transmissão explícita de chaves.
+O canal sem fio é modelado como um canal com desvanecimento aleatório, no qual o sinal transmitido sofre variações de amplitude e fase ao longo do tempo e da frequência. Essas variações decorrem da propagação multipercurso, na qual múltiplas réplicas do sinal chegam ao receptor após reflexões, difrações e espalhamentos causados por objetos presentes no ambiente. Como consequência, o sinal recebido pode ser descrito como a superposição ponderada dessas componentes, resultando em flutuações aleatórias conhecidas como desvanecimento (\textit{fading}) \cite{tse_viswanath}.
+
+\begin{figure}[htbp]
+    \centering
+    % O resizebox garante que o TikZ respeite a largura da coluna de texto
+    \resizebox{0.9\columnwidth}{!}{
+    \begin{tikzpicture}[
+        node distance=1.2cm and 2.2cm,
+        terminal/.style={rectangle, draw, thick, minimum width=2cm, minimum height=0.8cm, fill=white},
+        cloud/.style={draw, ellipse, fill=gray!10, minimum height=2em, font=\scriptsize}
+    ]
+        % Componentes (Posicionamento relativo para ser mais compacto)
+        \node[terminal] (BS) {Base Station};
+        \node[terminal, right=3.5cm of BS, yshift=1.2cm] (Alice) {Alice};
+        \node[terminal, below=0.6cm of Alice] (Bob) {Bob};
+        \node[terminal, below=1.2cm of Bob] (Eve) {Eve};
+        
+        % Obstáculos (Objetos Espalhadores)
+        \node[cloud] (obs1) at (2.2, 1.8) {Objeto};
+        \node[cloud] (obs2) at (2.8, -1.2) {Objeto};
+
+        % Canais Alice (Multipercurso)
+        \draw[->, dashed, blue!40] (BS.east) -- (obs1);
+        \draw[->, dashed, blue!40] (obs1) -- (Alice.west);
+        \draw[->, thick, blue] (BS.east) -- (Alice.west) node[midway, above, sloped] {$h_A$};
+        
+        % Canais Bob
+        \draw[->, thick, blue!80!black] (BS.east) -- (Bob.west) node[midway, fill=white, inner sep=1pt, font=\small] {$h_B$};
+        
+        % Canais Eve
+        \draw[->, thick, red!70] (BS.east) -- (eve.west) node[midway, below, sloped] {$h_E$};
+        \draw[->, dashed, red!30] (BS.east) -- (obs2);
+        \draw[->, dashed, red!30] (obs2) -- (Eve.west);
+
+        % Indicações de distância (Ajustadas para não "fugir" para a direita)
+        \draw[<->, >=Stealth] ([xshift=0.2cm]Alice.east) -- ([xshift=0.2cm]Bob.east) 
+            node[midway, right, font=\scriptsize] {$d < \lambda/2$};
+            
+        \draw[<->, >=Stealth] ([xshift=0.2cm]Bob.east) -- ([xshift=0.2cm]Eve.east) 
+            node[midway, right, font=\scriptsize] {$d \gg \lambda/2$};
+
+    \end{tikzpicture}
+    }
+    \caption{Cenário de propagação evidenciando o multipercurso e a correlação espacial entre os terminais legítimos.}
+    \label{fig:cenario_propagacao}
+\end{figure}
+
+No contexto deste trabalho, considera-se um canal de desvanecimento plano e lento, adequado a cenários nos quais a largura de banda do sinal é menor que a largura de banda de coerência do canal, e o tempo de observação é inferior ao tempo de coerência. Nessa condição, o canal pode ser representado por um coeficiente complexo $h$, que modela simultaneamente os efeitos de atenuação e rotação de fase. Em ambientes sem linha de visada dominante, esse coeficiente é comumente modelado como uma variável aleatória complexa circularmente simétrica, cuja envoltória segue uma distribuição de Rayleigh \cite{goldsmith_wireless}.
+
+Matematicamente, o sinal recebido por um dispositivo legítimo pode ser expresso como
+\[
+y = h x + n,
+\]
+em que $x$ representa o sinal transmitido pela infraestrutura de rede, $h$ é o coeficiente de desvanecimento do canal sem fio, e $n$ corresponde ao ruído aditivo no receptor, usualmente modelado como ruído branco Gaussiano. Observa-se que o ruído não é uma propriedade do canal de propagação, mas sim do processo de recepção, estando associado a limitações físicas dos circuitos eletrônicos e interferências internas ao receptor \cite{proakis_digital}.
+
+Como Alice e Bob recebem sinais provenientes da mesma infraestrutura e encontram-se em posições espacialmente próximas, os coeficientes de canal observados por ambos apresentam correlação estatística significativa. Essa correlação é a principal fonte de entropia compartilhada explorada no processo de geração de chaves em camada física. Em contrapartida, um invasor localizado a uma distância superior a uma fração do comprimento de onda observa um canal estatisticamente distinto, em função da rápida decorrelação espacial do desvanecimento sem fio \cite{mathur_pks, bloch_wireless_security}.
+
+A decorrelação espacial do canal implica que pequenas variações na posição do receptor resultam em coeficientes de desvanecimento praticamente independentes. Dessa forma, mesmo que o invasor tenha pleno conhecimento do modelo de sistema e acesso às informações trocadas em canais públicos, as observações realizadas por ele não fornecem informação relevante sobre as sequências de canal obtidas por Alice e Bob.
+
+Essas propriedades — desvanecimento aleatório, correlação estatística entre canais legítimos e decorrelação espacial em relação ao invasor — constituem a base física que viabiliza a extração de informação secreta diretamente do meio de propagação. Na subseção seguinte, descreve-se como essas observações do canal são utilizadas no processo sistemático de geração de chaves criptográficas em camada física.
+
 
 \subsection{Processo de Geração de Chaves em Camada Física}
 
-A geração de chaves em camada física ocorre por meio de quatro etapas principais: amostragem, quantização, reconciliação e amplificação de privacidade. A seguir, descrevemos cada etapa de maneira detalhada.
+O processo de geração de chaves criptográficas em camada física fundamenta-se na exploração sistemática das propriedades aleatórias e recíprocas do canal sem fio, conforme descrito na subseção anterior. Diferentemente dos mecanismos criptográficos tradicionais, nos quais a segurança depende da dificuldade computacional de certos problemas matemáticos, a abordagem em camada física baseia-se na assimetria de observação do canal entre usuários legítimos e um invasor.
 
-\subsubsection{1. Amostragem do Canal}
+De forma geral, o processo pode ser decomposto em quatro etapas fundamentais: sondagem e amostragem do canal, quantização das observações, reconciliação da informação e amplificação de privacidade. Essas etapas visam transformar estimativas analógicas e ruidosas do canal em uma chave binária compartilhada, estatisticamente idêntica entre Alice e Bob e praticamente desconhecida por um invasor \cite{mathur_pks, bloch_wireless_security}.
 
-Alice transmite um sinal piloto (conhecido por Bob) e Bob estima o ganho do canal. Em seguida, Bob transmite outro sinal piloto e Alice estima o canal novamente. Devido à reciprocidade, ambas as estimativas são muito parecidas. O ganho do canal pode ser representado, por exemplo, como uma série temporal:
+\begin{figure}[!t]
+\centering
+\includegraphics[width=0.85\linewidth]{figuras/ProcessoGer.png}
+\caption{Etapas fundamentais do processo de geração de chaves}
+\label{fig:Processo_Geração}
+\end{figure}
 
+\subsubsection{Sondagem e Amostragem do Canal}
+
+Na etapa de sondagem e amostragem do canal, Alice e Bob realizam estimativas independentes dos parâmetros do canal sem fio a partir de sinais transmitidos pela infraestrutura de rede. Considerando um modelo de canal de desvanecimento plano e lento, o sinal recebido por cada dispositivo pode ser expresso como
 \[
-h(t) = h_\text{real}(t) + j h_\text{imag}(t)
+y_i = h_i x + n_i, \quad i \in \{A, B\},
 \]
+em que $x$ representa o sinal transmitido, $h_i$ é o coeficiente complexo do canal observado pelo dispositivo $i$, e $n_i$ corresponde ao ruído aditivo no receptor.
 
-No nosso caso, utilizamos o módulo do ganho como fonte de aleatoriedade.
-
-\subsubsection{2. Quantização}
-
-Para transformar as amostras contínuas do canal em bits, é necessário aplicar um procedimento de quantização. Isso significa decidir, com base em limites específicos, se cada amostra será representada como:
-
+Em sistemas operando em modo \textit{Time Division Duplexing} (TDD), assume-se que o canal satisfaz a propriedade de reciprocidade, de modo que
 \[
-0 \quad \text{ou} \quad 1
+h_A \approx h_B,
 \]
+desde que as estimativas sejam realizadas dentro do tempo de coerência do canal. Na prática, essa igualdade é aproximada, pois ruídos e imperfeições de hardware introduzem pequenas discrepâncias entre as estimativas realizadas por Alice e Bob.
 
-Esse processo gera duas sequências binárias:
+As amostras do canal são coletadas ao longo do tempo, resultando em sequências
+\begin{equation}
+    \mathbf{h}_A = \{h_A(1), h_A(2), \dots, h_A(N)\},
+\end{equation}
+\begin{equation}
+    \mathbf{h}_B = \{h_B(1), h_B(2), \dots, h_B(N)\},
+\end{equation}
+as quais apresentam alta correlação estatística. Em contrapartida, um invasor observa coeficientes de canal $\mathbf{h}_E$ estatisticamente independentes, devido à decorrelação espacial do desvanecimento \cite{mathur_pks}.
 
+\subsubsection{Quantização}
+
+As estimativas do canal obtidas na fase anterior assumem valores contínuos e, portanto, devem ser convertidas em sequências discretas de bits por meio de um processo de quantização. Seja $z_i(k)$ uma métrica escalar extraída do canal, como a magnitude $|h_i(k)|$ ou a potência do sinal recebido. A quantização pode ser representada genericamente por
 \[
-K_A \quad \text{(chave inicial de Alice)} \\
-K_B \quad \text{(chave inicial de Bob)}
+b_i(k) = Q(z_i(k)),
 \]
+em que $Q(\cdot)$ denota a função de quantização, responsável por mapear valores contínuos em símbolos binários.
 
-Como há ruído e pequenas discrepâncias no canal, essas sequências não são perfeitamente iguais, surgindo então a necessidade de reconciliá-las.
-
-\subsubsection{3. Reconciliação de Chaves}
-
-A reconciliação tem como objetivo reduzir o \textit{Key Disagreement Rate} (KDR), corrigindo os bits que diferem entre \(K_A\) e \(K_B\). Para isso, utiliza-se um código de correção de erros — neste trabalho, um código BCH. A reconciliação funciona da seguinte forma: Bob escolhe uma sequência aleatória \(C\), chamada código. Ele combina \(C\) com sua chave inicial por meio de XOR ou soma módulo-2, produzindo a chamada síndrome pública. Essa síndrome é enviada pelo canal público para Alice. Como Alice possui \(K_A\), ela utiliza a síndrome e o decodificador BCH para recuperar \(C\). Uma vez que recupera \(C\), ela produz a mesma chave corrigida que Bob.
-
-O ponto crucial é que Eve, que não possui \(K_A\) nem \(K_B\), não consegue recuperar \(C\) apenas com a síndrome, pois isso exigiria conhecimento prévio da estrutura de erros entre as sequências legítimas.
-
-\subsubsection{4. Amplificação de Privacidade}
-
-Mesmo após a reconciliação, a síndrome pública pode ter revelado pequenas quantidades de informação sobre a chave. Para remover qualquer possível vazamento, aplica-se uma função de hashing criptográfico, como SHA-256, reduzindo a chave a uma versão final curta, porém completamente segura:
-
+Um exemplo simples é a quantização por limiar, definida como
 \[
-K_\text{final} = \text{Hash}(C)
+b_i(k) =
+\begin{cases}
+1, & z_i(k) \geq \tau, \\
+0, & z_i(k) < \tau,
+\end{cases}
 \]
+em que $\tau$ é um limiar previamente definido. Estratégias mais sofisticadas utilizam múltiplos níveis de quantização, buscando aumentar a taxa de geração de bits à custa de maior sensibilidade ao ruído \cite{bloch_wireless_security}.
 
-Esse processo garante que, mesmo com acesso às informações públicas trocadas durante a reconciliação, Eve não obtenha vantagem alguma.
+Devido às diferenças entre $z_A(k)$ e $z_B(k)$, as sequências binárias resultantes
+\[
+\mathbf{b}_A \neq \mathbf{b}_B
+\]
+podem apresentar erros, tornando necessária uma etapa adicional para correção dessas discrepâncias.
 
-\subsection{Key Disagreement Rate (KDR)}
+\subsubsection{Reconciliação da Informação}
 
-O \textit{Key Disagreement Rate} é a proporção de bits diferentes entre \(K_A\) e \(K_B\). Ele representa uma métrica essencial para avaliar a viabilidade prática do método. Sabe-se que a proximidade física entre Alice e Bob reduz significativamente o KDR, enquanto o distanciamento tende a degradar a reciprocidade.
+A reconciliação da informação tem como objetivo eliminar as divergências entre as sequências binárias obtidas por Alice e Bob, garantindo que ambas coincidam ao final do processo. Essa etapa é realizada por meio da troca de mensagens auxiliares em um canal público, assumido como completamente acessível ao invasor.
 
-\subsection{Resumo da Fundamentação}
+Formalmente, considera-se que Alice possui uma sequência $\mathbf{b}_A$ e Bob possui uma sequência correlacionada $\mathbf{b}_B$, podendo-se modelar a relação entre elas como um canal binário com erro. Técnicas de correção de erros são então empregadas para permitir que Bob estime $\mathbf{b}_A$ a partir de $\mathbf{b}_B$ e das informações públicas trocadas.
 
-Com essas explicações, concluímos que a geração de chaves em camada física é fundamentada em propriedades estatísticas do canal sem fio, como reciprocidade, decorrelação espacial e desvanecimento; no uso de quantização para extrair bits de entropia; em técnicas de reconciliação baseadas em códigos BCH para corrigir discrepâncias; na amplificação de privacidade para garantir confidencialidade absoluta; e em métricas como o KDR para avaliar a qualidade do método. Esses elementos servem de base para o modelo de simulação implementado neste trabalho.
+Códigos de correção de erros, como códigos de bloco ou códigos LDPC, são amplamente utilizados nessa fase \cite{proakis_digital}. Embora eficaz, a reconciliação inevitavelmente provoca vazamento parcial de informação para o invasor, uma vez que os dados auxiliares são transmitidos em claro \cite{maurer_secret_key}.
+
+\subsubsection{Amplificação de Privacidade}
+
+A amplificação de privacidade visa neutralizar qualquer informação que o invasor possa ter obtido durante as etapas anteriores, especialmente na reconciliação da informação. Para isso, Alice e Bob aplicam uma função hash criptograficamente segura às sequências reconciliadas, produzindo uma chave final de menor comprimento.
+
+Seja $\mathbf{k}$ a sequência binária comum após a reconciliação. A chave final é obtida como
+\[
+\mathbf{s} = H(\mathbf{k}),
+\]
+em que $H(\cdot)$ representa uma função hash criptograficamente segura pertencente a uma família de funções universais. Essa operação reduz a correlação entre a chave final e as observações do invasor, aumentando significativamente o nível de segurança da chave gerada \cite{bloch_wireless_security}.
+
+Ao final desse processo, Alice e Bob compartilham uma chave secreta cuja segurança está fundamentada nas propriedades físicas do canal sem fio, podendo utilizá-la em algoritmos criptográficos simétricos convencionais.
+
+

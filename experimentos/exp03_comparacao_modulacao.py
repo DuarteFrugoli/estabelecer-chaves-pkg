@@ -1,0 +1,190 @@
+"""
+Experimento 3: Comparação BPSK vs QPSK
+Testa o impacto do tipo de modulação no KDR
+"""
+
+import sys
+import os
+import numpy as np
+import random
+from tqdm import tqdm
+
+sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+from src.codigos_corretores.bch import gerar_tabela_codigos_bch, get_tamanho_bits_informacao
+from src.canal.canal import extrair_kdr
+from experimentos.util_experimentos import (
+    salvar_resultado_json,
+    salvar_resultado_csv,
+    criar_grafico_comparativo_kdr,
+    imprimir_sumario_resultados,
+    salvar_grafico
+)
+
+
+def experimento_comparacao_modulacao(
+    tamanho_cadeia_bits=127,
+    quantidade_de_testes=1000,
+    rayleigh_param=1.0/np.sqrt(2),
+    correlacao_canal=0.9,
+    snr_db_range=None
+):
+    """
+    Experimento: Comparação entre BPSK e QPSK
+    
+    Args:
+        tamanho_cadeia_bits: Tamanho do código BCH
+        quantidade_de_testes: Número de testes Monte Carlo
+        rayleigh_param: Parâmetro σ do Rayleigh
+        correlacao_canal: Coeficiente de correlação ρ
+        snr_db_range: Array com valores de SNR (se None, usa padrão)
+    """
+    
+    print("\n" + "="*70)
+    print("EXPERIMENTO 3: COMPARAÇÃO BPSK vs QPSK")
+    print("="*70)
+    print(f"Tamanho código BCH: {tamanho_cadeia_bits}")
+    print(f"Quantidade de testes: {quantidade_de_testes}")
+    print(f"Parâmetro Rayleigh: {rayleigh_param:.6f}")
+    print(f"Correlação canal: {correlacao_canal}")
+    print("="*70 + "\n")
+    
+    # Configuração
+    potencia_sinal = 1.0
+    media_ruido = 0.0
+    
+    if snr_db_range is None:
+        snr_db_range = np.linspace(-10, 30, 18)
+    
+    snr_linear_range = 10 ** (snr_db_range / 10)
+    variancias_ruido = potencia_sinal / (2 * snr_linear_range)
+    
+    # Prepara palavra código
+    random.seed(42)
+    palavra_codigo = [random.randint(0, 1) for _ in range(tamanho_cadeia_bits)]
+    tamanho_bits_informacao = get_tamanho_bits_informacao(tamanho_cadeia_bits)
+    bch_codigo = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao)
+    
+    # Coleta dados para cada modulação
+    dados_modulacoes = {}
+    
+    for modulacao in ['bpsk', 'qpsk']:
+        print(f"\n--- Testando {modulacao.upper()} ---")
+        
+        kdr_rates = []
+        kdr_pos_rates = []
+        kdr_amplificacao_rates = []
+        
+        for variancia in tqdm(variancias_ruido,
+                             desc=f"  {modulacao.upper()}",
+                             colour="cyan"):
+            kdr, kdr_pos, kdr_amp = extrair_kdr(
+                palavra_codigo,
+                rayleigh_param,
+                tamanho_cadeia_bits,
+                quantidade_de_testes,
+                variancia,
+                media_ruido,
+                bch_codigo,
+                correlacao_canal,
+                usar_amplificacao=True,
+                modulacao=modulacao
+            )
+            
+            kdr_rates.append(kdr)
+            kdr_pos_rates.append(kdr_pos)
+            kdr_amplificacao_rates.append(kdr_amp)
+        
+        dados_modulacoes[modulacao] = {
+            'kdr_rates': kdr_rates,
+            'kdr_pos_rates': kdr_pos_rates,
+            'kdr_amplificacao_rates': kdr_amplificacao_rates
+        }
+    
+    # Prepara resultados
+    dados = {
+        'parametros': {
+            'tamanho_cadeia_bits': tamanho_cadeia_bits,
+            'quantidade_de_testes': quantidade_de_testes,
+            'rayleigh_param': rayleigh_param,
+            'correlacao_canal': correlacao_canal
+        },
+        'snr_db': snr_db_range.tolist(),
+        'resultados': {
+            'bpsk': dados_modulacoes['bpsk'],
+            'qpsk': dados_modulacoes['qpsk']
+        }
+    }
+    
+    # Salva JSON
+    salvar_resultado_json(dados, "exp03_comparacao_modulacao",
+                         descricao="Comparação entre BPSK e QPSK")
+    
+    # Salva CSV
+    csv_dados = []
+    for i, snr in enumerate(snr_db_range):
+        csv_dados.append({
+            'SNR_dB': f"{snr:.2f}",
+            'BPSK_antes': f"{dados_modulacoes['bpsk']['kdr_rates'][i]:.4f}",
+            'BPSK_pos_rec': f"{dados_modulacoes['bpsk']['kdr_pos_rates'][i]:.4f}",
+            'BPSK_pos_amp': f"{dados_modulacoes['bpsk']['kdr_amplificacao_rates'][i]:.4f}",
+            'QPSK_antes': f"{dados_modulacoes['qpsk']['kdr_rates'][i]:.4f}",
+            'QPSK_pos_rec': f"{dados_modulacoes['qpsk']['kdr_pos_rates'][i]:.4f}",
+            'QPSK_pos_amp': f"{dados_modulacoes['qpsk']['kdr_amplificacao_rates'][i]:.4f}"
+        })
+    
+    salvar_resultado_csv(csv_dados, "exp03_comparacao_modulacao",
+                        ['SNR_dB', 'BPSK_antes', 'BPSK_pos_rec', 'BPSK_pos_amp',
+                         'QPSK_antes', 'QPSK_pos_rec', 'QPSK_pos_amp'])
+    
+    # Cria gráfico comparativo
+    import matplotlib.pyplot as plt
+    
+    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig.suptitle(f'Comparação BPSK vs QPSK\n(σ={rayleigh_param:.4f}, ρ={correlacao_canal})',
+                fontsize=14, fontweight='bold')
+    
+    titulos = ['KDR Antes da Reconciliação', 'KDR Pós Reconciliação', 'KDR Pós Amplificação']
+    metricas = ['kdr_rates', 'kdr_pos_rates', 'kdr_amplificacao_rates']
+    
+    for i, (ax, titulo, metrica) in enumerate(zip(axes, titulos, metricas)):
+        ax.plot(snr_db_range, dados_modulacoes['bpsk'][metrica],
+               marker='o', linestyle='-', linewidth=2, color='blue',
+               label='BPSK')
+        
+        ax.plot(snr_db_range, dados_modulacoes['qpsk'][metrica],
+               marker='s', linestyle='--', linewidth=2, color='red',
+               label='QPSK')
+        
+        ax.set_xlabel('SNR (dB)')
+        ax.set_ylabel('KDR (%)')
+        ax.set_title(titulo)
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+    
+    plt.tight_layout()
+    salvar_grafico(fig, "exp03_comparacao_modulacao")
+    plt.close()
+    
+    # Sumário
+    for modulacao in ['bpsk', 'qpsk']:
+        print(f"\n--- Resultados para {modulacao.upper()} ---")
+        imprimir_sumario_resultados({
+            'KDR_antes': dados_modulacoes[modulacao]['kdr_rates'],
+            'KDR_pos_reconciliacao': dados_modulacoes[modulacao]['kdr_pos_rates'],
+            'KDR_pos_amplificacao': dados_modulacoes[modulacao]['kdr_amplificacao_rates']
+        })
+    
+    print("\n✓ Experimento 3 concluído com sucesso!\n")
+    
+    return dados
+
+
+if __name__ == "__main__":
+    # Executa experimento com parâmetros padrão
+    resultados = experimento_comparacao_modulacao(
+        tamanho_cadeia_bits=127,
+        quantidade_de_testes=1000,
+        rayleigh_param=1.0/np.sqrt(2),
+        correlacao_canal=0.9
+    )
