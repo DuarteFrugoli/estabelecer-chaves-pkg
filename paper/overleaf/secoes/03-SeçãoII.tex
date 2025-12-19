@@ -34,7 +34,7 @@ No contexto deste trabalho, esse modelo é aplicado a um cenário de comunicaç�
     \centering
     \begin{tikzpicture}[
         box/.style={draw, thick, minimum width=2cm, minimum height=1cm, align=center},
-        arr/.style={-Latex, thick}
+        arr/.style={->, thick}
     ]
         % Nós (Caixas)
         \node[box] (bs) {Base Station};
@@ -73,7 +73,7 @@ O canal sem fio é modelado como um canal com desvanecimento aleatório, no qual
 \begin{figure}[htbp]
     \centering
     % O resizebox garante que o TikZ respeite a largura da coluna de texto
-    \resizebox{0.9\columnwidth}{!}{
+    \resizebox{0.9\columnwidth}{!}{%
     \begin{tikzpicture}[
         node distance=1.2cm and 2.2cm,
         terminal/.style={rectangle, draw, thick, minimum width=2cm, minimum height=0.8cm, fill=white},
@@ -98,18 +98,18 @@ O canal sem fio é modelado como um canal com desvanecimento aleatório, no qual
         \draw[->, thick, blue!80!black] (BS.east) -- (Bob.west) node[midway, fill=white, inner sep=1pt, font=\small] {$h_B$};
         
         % Canais Eve
-        \draw[->, thick, red!70] (BS.east) -- (eve.west) node[midway, below, sloped] {$h_E$};
+        \draw[->, thick, red!70] (BS.east) -- (Eve.west) node[midway, below, sloped] {$h_E$};
         \draw[->, dashed, red!30] (BS.east) -- (obs2);
         \draw[->, dashed, red!30] (obs2) -- (Eve.west);
 
-        % Indicações de distância (Ajustadas para não "fugir" para a direita)
-        \draw[<->, >=Stealth] ([xshift=0.2cm]Alice.east) -- ([xshift=0.2cm]Bob.east) 
+        % Indicações de distância
+        \draw[<->, thick] ([xshift=0.2cm]Alice.east) -- ([xshift=0.2cm]Bob.east) 
             node[midway, right, font=\scriptsize] {$d < \lambda/2$};
             
-        \draw[<->, >=Stealth] ([xshift=0.2cm]Bob.east) -- ([xshift=0.2cm]Eve.east) 
+        \draw[<->, thick] ([xshift=0.2cm]Bob.east) -- ([xshift=0.2cm]Eve.east) 
             node[midway, right, font=\scriptsize] {$d \gg \lambda/2$};
 
-    \end{tikzpicture}
+    \end{tikzpicture}%
     }
     \caption{Cenário de propagação evidenciando o multipercurso e a correlação espacial entre os terminais legítimos.}
     \label{fig:cenario_propagacao}
