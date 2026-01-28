@@ -9,7 +9,7 @@ class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Simulador de Estabelecimento de Chaves")
-        self.geometry("720x500")
+        self.geometry("720x700")
         self.configure(bg="#1e1e1e")
 
         self.process = None
@@ -38,8 +38,45 @@ class App(tk.Tk):
         self.combo_modulacao.set("BPSK")
         self.combo_modulacao.pack(fill="x", pady=(0, 10))
 
+        # Perfil de dispositivo IoT
+        tk.Label(frame, text="Perfil de dispositivo IoT:", fg="white", bg="#1e1e1e", anchor="w").pack(fill="x")
+        self.combo_dispositivo = ttk.Combobox(
+            frame, 
+            values=[
+                "1. Pessoa Andando (v=5 km/h, fc=2.4 GHz)",
+                "2. Sensor Estático (v=0 km/h)",
+                "3. Veículo Urbano (v=60 km/h, fc=5.9 GHz)",
+                "4. Drone (v=30 km/h, fc=2.4 GHz)",
+                "5. NB-IoT (v=3 km/h, fc=900 MHz)",
+                "6. Configuração Manual"
+            ], 
+            state="readonly"
+        )
+        self.combo_dispositivo.set("1. Pessoa Andando (v=5 km/h, fc=2.4 GHz)")
+        self.combo_dispositivo.bind("<<ComboboxSelected>>", self.on_dispositivo_change)
+        self.combo_dispositivo.pack(fill="x", pady=(0, 10))
+
+        # Campos de configuração manual (sempre visíveis, mas inicialmente desabilitados)
+        self.label_erro = tk.Label(frame, text="Erro de estimativa (0.0-1.0):", fg="#888888", bg="#1e1e1e", anchor="w")
+        self.label_erro.pack(fill="x")
+        self.entry_erro = tk.Entry(frame, state="disabled")
+        self.entry_erro.insert(0, "0.10")
+        self.entry_erro.pack(fill="x", pady=(0, 5))
+        
+        self.label_vel = tk.Label(frame, text="Velocidade (km/h):", fg="#888888", bg="#1e1e1e", anchor="w")
+        self.label_vel.pack(fill="x")
+        self.entry_velocidade = tk.Entry(frame, state="disabled")
+        self.entry_velocidade.insert(0, "5.0")
+        self.entry_velocidade.pack(fill="x", pady=(0, 5))
+        
+        self.label_guard = tk.Label(frame, text="Guard band (múltiplos de σ):", fg="#888888", bg="#1e1e1e", anchor="w")
+        self.label_guard.pack(fill="x")
+        self.entry_guard = tk.Entry(frame, state="disabled")
+        self.entry_guard.insert(0, "0.5")
+        self.entry_guard.pack(fill="x", pady=(0, 10))
+
         # Amplificação de privacidade sempre habilitada
-        tk.Label(frame, text="Amplificação de privacidade (SHA-256): HABILITADA", fg="#00ff00", bg="#1e1e1e", anchor="w").pack(fill="x", pady=(0, 10))
+        tk.Label(frame, text="Amplificação de privacidade (SHA-256): HABILITADA", fg="#00ff00", bg="#1e1e1e", anchor="w").pack(fill="x", pady=(10, 10))
 
         # Barra de progresso geral
         self.progress_frame_geral = tk.Frame(frame, bg="#1e1e1e")
@@ -74,6 +111,26 @@ class App(tk.Tk):
         self.output = scrolledtext.ScrolledText(self, wrap=tk.WORD, bg="#252526", fg="#d4d4d4", insertbackground="white")
         self.output.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
+    def on_dispositivo_change(self, event):
+        """Habilita/desabilita campos de configuração manual"""
+        dispositivo_selecionado = self.combo_dispositivo.get()
+        if dispositivo_selecionado.startswith("6."):
+            # Habilita os campos e muda cor das labels para laranja
+            self.entry_erro.config(state="normal")
+            self.entry_velocidade.config(state="normal")
+            self.entry_guard.config(state="normal")
+            self.label_erro.config(fg="#ffaa00")
+            self.label_vel.config(fg="#ffaa00")
+            self.label_guard.config(fg="#ffaa00")
+        else:
+            # Desabilita os campos e muda cor das labels para cinza
+            self.entry_erro.config(state="disabled")
+            self.entry_velocidade.config(state="disabled")
+            self.entry_guard.config(state="disabled")
+            self.label_erro.config(fg="#888888")
+            self.label_vel.config(fg="#888888")
+            self.label_guard.config(fg="#888888")
+
     def run_script(self):
         if self.process is not None:
             messagebox.showwarning("Aviso", "O processo já está em execução.")
@@ -90,6 +147,37 @@ class App(tk.Tk):
         modulacao_tipo = self.combo_modulacao.get()
         modulacao_input = "1" if modulacao_tipo == "BPSK" else "2"
 
+        # Determina o perfil de dispositivo selecionado (extrai apenas o número)
+        dispositivo_selecionado = self.combo_dispositivo.get()
+        dispositivo_input = dispositivo_selecionado.split(".")[0]  # Extrai "1", "2", etc.
+
+        # Monta o input base (quantidade, bits, modulação, dispositivo)
+        user_input = f"{quantidade}\n{bits}\n{modulacao_input}\n{dispositivo_input}\n"
+
+        # Se for configuração manual (opção 6), adiciona os parâmetros manualmente
+        if dispositivo_input == "6":
+            try:
+                erro = float(self.entry_erro.get())
+                velocidade = float(self.entry_velocidade.get())
+                guard = float(self.entry_guard.get())
+                
+                # Valida valores
+                if not (0.0 <= erro <= 1.0):
+                    messagebox.showerror("Erro", "Erro de estimativa deve estar entre 0.0 e 1.0")
+                    return
+                if velocidade < 0:
+                    messagebox.showerror("Erro", "Velocidade não pode ser negativa")
+                    return
+                if not (0.0 <= guard <= 2.0):
+                    messagebox.showerror("Erro", "Guard band deve estar entre 0.0 e 2.0")
+                    return
+                    
+                # Adiciona parâmetros ao input
+                user_input += f"{erro}\n{velocidade}\n{guard}\n"
+            except ValueError:
+                messagebox.showerror("Erro", "Valores de configuração manual inválidos")
+                return
+
         amplificacao = 's'  # Amplificação sempre habilitada
 
         self.output.delete("1.0", tk.END)
@@ -104,8 +192,8 @@ class App(tk.Tk):
         self.progressbar.pack(fill="x", pady=(5, 0))
         self.progressbar['value'] = 0
 
-        # Monta o input simulado (com escolha de modulação)
-        user_input = f"{quantidade}\n{bits}\n{modulacao_input}\n"
+        # Monta o input simulado (quantidade, bits, modulação, dispositivo)
+        user_input = f"{quantidade}\n{bits}\n{modulacao_input}\n{dispositivo_input}\n"
 
         # Caminho do main.py
         script_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "main.py")

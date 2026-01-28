@@ -21,7 +21,9 @@ def salvar_resultado_json(dados, nome_experimento, descricao=""):
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{nome_experimento}_{timestamp}.json"
-    filepath = os.path.join("resultados", "dados", filename)
+    # Caminho relativo ao diretório raiz do projeto
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    filepath = os.path.join(base_dir, "resultados", "dados", filename)
     
     resultado_completo = {
         "experimento": nome_experimento,
@@ -49,7 +51,9 @@ def salvar_resultado_csv(dados, nome_experimento, colunas):
     """
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{nome_experimento}_{timestamp}.csv"
-    filepath = os.path.join("resultados", "dados", filename)
+    # Caminho relativo ao diretório raiz do projeto
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    filepath = os.path.join(base_dir, "resultados", "dados", filename)
     
     with open(filepath, 'w', newline='', encoding='utf-8') as f:
         writer = csv.DictWriter(f, fieldnames=colunas)
@@ -75,7 +79,9 @@ def salvar_grafico(fig, nome_experimento, nome_grafico=""):
     else:
         filename = f"{nome_experimento}_{timestamp}.png"
     
-    filepath = os.path.join("resultados", "graficos", filename)
+    # Caminho relativo ao diretório raiz do projeto
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    filepath = os.path.join(base_dir, "resultados", "figuras", filename)
     fig.savefig(filepath, dpi=300, bbox_inches='tight')
     print(f"✓ Gráfico salvo em: {filepath}")
     return filepath

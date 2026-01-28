@@ -1,0 +1,681 @@
+TOTAL DE PÁGINAS: 6
+
+
+================================================================================
+PÁGINA 1
+================================================================================
+
+ Wireless Channel Key Generation for Multi -User 
+Access Scenarios  
+Xiaowei Yuan    
+ School of Cyber Science and 
+Engineering, Southeast 
+University  
+ Nanjing, China  
+ xwyuan@seu.edu.cn  Yu Jiang  
+ School of Cyber Science and 
+Engineering, Southeast 
+University  
+Purpl e Mountain 
+Laboratories  
+ Nanjing, China  
+  jiangyu@seu.edu.cn   Aiqun Hu  
+ School of Cyber Science and 
+Engineering, Southeast 
+University  
+ Purple Mountain 
+Laboratories  
+ Nanjing, China  
+ aqhu@seu.edu.cn  Cheng Guo  
+ School of Education Science, 
+Nanjing Normal Univ ersity  
+Nanjing, China  
+guochengxueliang@163.com
+Abstract—Channel state information  (CSI)-based channel 
+key generation technology has been widely studied in recent 
+years, but it lacks the application in multi -user access scenarios, 
+and the commonly used CS I extraction tools are not easy to 
+generalize to Internet of Things (IoT)  scenarios. The emerging 
+ESP CSI tool  overcomes the limitations of traditional tools, but 
+no one has used it for key generation related research. We 
+transformed ESP CSI tool , proposed  a numbered CSI extraction 
+tool for key generation in multi -user access scenarios. Then, we 
+conceived a corresponding key generation scheme based on this 
+tool. Experimental results show that CSI data with high 
+reciprocity can be obtained in different scena rios, and can 
+generate keys with low key disagreement rate  (KDR), high 
+randomness, and anti -eavesdropping.  
+Keywords —CSI extraction , key generation , physical layer 
+security , channel reciprocity . 
+I. INTRODUCTION  
+According to Statista's prediction [1], more than 75 billion 
+IoT connected devices will be used by 2025, but the data 
+interacting between IoT devices is highly vulnerable to 
+eavesdropping and malicious attacks due to the broadcast 
+nature of wireless media and the openness of the network.  The 
+theory and algorithm based on cryptography are the general 
+technology to ensure the security of wireless communication 
+at present, and the symmetric key mechanism with low 
+complexity is commonly used in the IoT [2]. Its security 
+depends on computational complexity, but the development of 
+quantum computing will pose a threat to its security [3]. On 
+the other hand, the symmetric key mechanism requires a 
+trusted third party to complete  the key distribution, and the 
+workload of key management and distribution will face 
+challenges when the user scale increases.  
+To break through the limitations of symmetric key 
+encryption schemes, physical layer security methods can be 
+used to exchange key s between nodes [4], such as wireless 
+channel key generation techniques. It takes advantage of 
+unpredictable channel characteristics to generate keys, its 
+security is derived from information theory [5]. There is no 
+need for a third party to manage and distribute keys, so it has 
+been widely researched and applied in recent years. According 
+to the location of both communication parties, it can be 
+classified as channel reciprocity -based and proximity -based 
+schemes [6], where the latter requires the communication 
+parties to be very close (e.g.20 cm). Channel characteristics 
+commonly used in key generation based on channel 
+reciprocity include Received Signal Strength (RSS) [7], 
+Channel Impulse Response (CIR) [8], Channel State 
+Information (CSI) [9], etc. RSS is easier than CSI to be obtaine d, but a richer information state provided by CSI can  
+improve key generation efficiency and increase key capacity.  
+Commonly used tools for extracting CSI include Linux  
+802.11n CSI tool based on Intel 5300 Network Interface Card 
+(NIC) [10], Atheros CSI tool based on the Atheros li ne of 
+NICs [11] and Nexmon CSI tool based on Broadcom and 
+Cypress Wi -Fi chips [12]. These tools are difficult and 
+expensive to deploy, can’t work independently and even 
+require hardware modification s. The emerging ESP32 -based 
+CSI extraction tool [13] overcomes the above problems, but 
+no one has used it for key generation research. On the other 
+hand, the current research on CSI -based channel key 
+generation methods is mostl y aimed at  point-to-point 
+communication, and the scenario of multiple station s (STA) 
+accessing the same access point (AP) needs to be explored.  
+ In this paper, the goal is to implement a CSI tool that is 
+suitable for multi -user access scenarios and can mee t the 
+requirements of key generation, and implements a key 
+generation scheme for multi -user access scenarios based on 
+this tool. Then each user can generate almost simultaneously 
+a separate key with the AP. First, we analyze the stability of 
+the data obtai ned by ESP CSI tool . Then, we propose a 
+numbered CSI tool based on ESP CSI tool , and test its 
+extraction ability. Next, we design a key generation scheme in 
+a multi -user access scenario, using KDR, randomness, and 
+anti-eavesdropping as performance indicators. Besides, 
+indoor scenarios with different line -of-sight and non -line-of-
+sight, static and dynamic scenarios are set up, and the 
+numbered CSI tool is used to complete channel probing, 
+conduct reciprocity testing . Then we use the obtained CSI to 
+simulate key generation. Finally, the experimental results 
+show that the numbered CSI tool can be used in the scenario 
+of 1 AP and 3 STA s, and the obtained key has a low KDR, 
+good randomness, and can resist passive eavesdropping.  
+ Section II compar es existing CSI extraction tools and 
+introducing their application in key generation .  Section III 
+introduces the evolution indicators , describes principles of the 
+numbered CSI Tool  and key generation scheme in detail. 
+Section IV shows the te st results and analysis. Finally, Section 
+V concludes the paper.  
+II. RELATED WOR K 
+Obtaining CSI data with high reciprocity is the first step in 
+key generation. There are four main CSI extraction tools 
+currently used, Linux  802.11n CSI tool, Atheros CSI tool, 
+Nexmon CSI extraction tool and ESP CSI tool . The Linux  
+802.11n CSI tool can perform CSI extraction on the Intel Wi -
+Fi Link 5300 wireless card. The maximum bandwidth 2022 IEEE/CIC International Conference on Communications in China (ICCC)
+978-1-6654-8480-0/22/$31.00 ©2022 IEEE 1792022 IEEE/CIC International Conference on Communications in China (ICCC) | 978-1-6654-8480-0/22/$31.00 ©2022 IEEE | DOI: 10.1109/ICCC55456.2022.9880811
+Authorized licensed use limited to: Instituto Nacional De Telecomunicações (INATEL). Downloaded on July 02,2024 at 12:22:08 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+================================================================================
+PÁGINA 2
+================================================================================
+
+supported is 40MHz, and the CSI information of 30 effective 
+sub-carriers can be collected, a nd the resolution of the real part 
+and the imaginary part of the data are 8 bits.  W. Xi and X . Li 
+et al. used this tool to realize the point -to-point key generation  
+[14]. H. Liu , C. Zhang et al . used the tool to obtain CSI for 
+validating the performance of  the quantization algorithm [15].  
+Atheros CSI tool can perform CSI extraction on each 
+subcarrier on 20 and 40 MHz channels . It can collect CSI 
+information of at least 56 valid subcarriers . All resolutions are 
+10 bits. L. Wang, H. An  et al . used it to impl ement key 
+generation in smart home scenarios  [16]. However, the biggest 
+limitation of these two tools is that they rely on specific  NIC 
+and can ’t work independently from the computer. The 
+deployment is difficult and the cost is  high, so they are not 
+suitable for promotion and use in multi -user scenarios.  
+In order to break through the limitation that it is difficult 
+to obtain CSI on commercial equipment and the limitation that 
+the first two CSI extraction tools are not flexible a nd difficult 
+to promote, the Nexmon CSI extraction tool was developed. 
+Its advantage is that it can support up to 80 MHz bandwidth in 
+both 2.4 GHz  and 5 GHz frequency bands, can collect CSI 
+information of 242 sub -carriers. Besides, its data resolution 
+real and imaginary parts are 14 bits, which be able to give  
+more fine -grained channel information  so that the key 
+generation rate  can be increase d. C. Li, Y. Jiang  et al. verifi ed 
+that the obtained data has extremely high reciprocity and 
+meets the key generati on requirements on the Raspberry Pi  
+[17] . But it only supports devices with Broadcom and Cypress 
+chipsets such as Raspberry Pi 3B+, Raspberry Pi 4B and 
+Nexus smartphones. Moreover, it works by the user making 
+changes to the fi rmware of the device, thus potentially 
+damaging the hardware. Therefore, this tool is also not 
+suitable for general multi -user scenarios.  
+ESP CSI tool  does not need to change the firmware, it can 
+work independently and can be ported to user -developed 
+progr ams. It also allows users to connect the ESP32 equipped 
+with the tool to a general smartphone, so that the smartphone 
+can access the CSI  directly , and can collect the information of 
+64 sub -carriers . The resolution of the real part and imaginary 
+part of the  data are 8 bits, which is comparable to other tools  
+[13]. This tool leverages the highly extensible Espressif IoT 
+development framework, so it has the potential to be 
+transform ed. No one has verified the validity and feasibili ty of 
+using it to generate keys . 
+III. MATERIALS AND METHOD S 
+A. Reciprocity  Coefficient  
+In order to meet the needs of generating usable keys at long 
+distances, the key generation scheme in this paper is based on 
+channel reciprocity.  Both communicating parties can obtain 
+highly similar  channel characteristics within the coherence 
+time because of channel reciprocity . However, t he worse the 
+channel reciprocity, the higher the KDR . Then, b oth users 
+need to reconciliat e more times, and this process will raise the 
+risk o f information leakage. C. Zenger, H. Vogt  et al.   used the 
+Pearson  correlation  coefficient to studied the risk of passive 
+eavesdropping  [18].  Inspired by  this, w e decided to use the 
+correlation coefficient 
+( ) ,AP STACSI CSI to measure the 
+reciprocity between the channel measurements of AP and 
+STA . Defined reciprocity coefficient  as follows :  
+( )
+( )( )
+( )( )1
+0
+1122
+00,
+i i i i
+i i i iAP STA
+N
+AP AP STA STA
+i
+NN
+AP AP STA STA
+iiCSI CSI
+CSI CSI CSI CSI
+CSI CSI CSI CSI
+−
+=
+−−
+==−−
+=
+−−
+  (1) 
+iAPCSI
+and
+iSTACSI indicates CSI  of i-th subcarrier  of the AP 
+and the STA  respectively.  The Pearson correlation coefficient 
+describes a linear correlation, so the closer  
+( ) ,AP STACSI CSI  
+is to  1, the higher the reciprocity.  We also defined
+( ) ,AP STACSI CSI
+,
+( )i,AP STACSI CSI represent s 
+( ) ,AP STACSI CSI
+ of the i-th experiment . In order to make 
+the results general and easy to calculate, for at least 1000 
+rounds of  channel probing experiments  10 results were 
+sampled at intervals of 100 round s, and the mean value was 
+taken. Mathematically,
+100in= and n is an integer between 
+1 and 10 . 
+( )( ) ,
+,=10AP STA i i
+AP STACSI CSI
+CSI CSI
+
+ (2) 
+B. Key Evaluation Metric s 
+Consistency, randomness, and anti -eavesdropping of keys 
+determine the effectiveness of a key generation scheme. In this 
+paper, KDR, random ness, and anti -eavesdropping are selected 
+as evaluation indicators . 
+1) KDR 
+KDR is defined as the ratio of the total key value different 
+bits corresponding to the same key bits of both parties to the 
+total key length, and its calculation formula is as follows:  
+ 
+( ) ( )
+KS i AK i K i
+KDRl−
+=  (3) 
+In the above formula, 
+()AKi  and 
+()SKi  represent the 
+key value corre sponding to the i -th key bit of the AP and STA 
+respectively, and 
+Kl is the total length of the key.  Define the 
+average  KDR of an AP and a STA in a certain scenario as : 
+ 
+i=10i KDR
+KDR  (4) 
+i KDR
+ represents the 
+KDR  of the i -th group original key . 
+Similar to the calculation of  
+( ) ,AP STACSI CSI  ,
+100in=
+and n is an integer between 1 and 10 . 
+2) Randomness  
+We use a randomness test from the National Institute of 
+Standards and Technology (NIST)  to check whether the 
+generated key meets the requirements of randomness. The 
+principle is to compare the degree of deviation of th e test 
+sequence from the ideal random sequence, and obtain the P -
+value under the corresponding index .  P-value  represent s the 
+probability that the randomness of the ideal sequence is less 
+than that of the test  sequence . When P -value is greater than 
+0.01, i t meets the requirements of randomness through a 
+certain test.  
+3) Anti-eavesdropping  2022 IEEE/CIC International Conference on Communications in China (ICCC)
+180Authorized licensed use limited to: Instituto Nacional De Telecomunicações (INATEL). Downloaded on July 02,2024 at 12:22:08 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+================================================================================
+PÁGINA 3
+================================================================================
+
+It is necessary to check whether the eavesdropper  (Eve)  
+can eavesdrop on the highly correlated channel characteristics 
+when the distance between the AP and the STA is more t han 
+half a wavelength.  
+C. Serial Numbered CSI Tool  
+1) Hardware Foundation  
+This tool is based on the lightweight development board 
+ESP32, which supports three working modes: station  (STA)  
+only mode, AP only mode and station/AP coexistence mode. 
+ESP32 allows acce ss to up to 10 STA s in AP mode. Steven M. 
+Hernandez et al. implement CSI extraction tool ESP CSI tool  
+[13], but it only test for point -to-point communication 
+scenarios. After testing , we find that  CSI can be acquired 
+when 3 users accessing the same AP.  
+2) Tool Model 
+Serial Numbered CSI Tool is based on ESP CSI tool . The 
+model object includes 1 AP and 3 STAs. The core idea is that 
+at the beginning of each round of channel probing, the STA 
+sends a probing request packet to the AP. T he data content is 
+a serial number used to mark the number of rounds of channel 
+probing . In particular, it is divided into 2 models. Model A: 
+different STAs occupy the same port and use the same packet 
+sending rate. Model B: STA s occupy different ports and use 
+different packet rates. AP receives packet  from STA  and gets 
+the serial number , output s the CSI generated by this round of 
+channel probing and marked with this number . Then AP sends 
+a response data packet to STA. After receiving the data packet, 
+the ST A calculates CSI and outputs it with the same serial  
+number, then starts the next round of channel probing . 
+D. Key Generation Scheme  
+This scheme is based on the channel key generation 
+framework of point -to-point communication, and the specific 
+links are adjus ted. Privacy amplification and key verification 
+links are not discussed  in this paper . The overall structure of 
+the program is as follows:  
+1) Channel Probing  The processing capability and resources of the AP for a 
+period of time are limited, so it cannot res pond to all key 
+generation requests at the same time . We use the core idea of 
+group  polling. Firstly, the AP sets the upper limit of the 
+number of devices in a single group according to its own 
+processing capability . After receiving the channel probing  
+data packets sent by STA s, AP divides multiple devices 
+according to the group capacity. Between groups and between 
+devices, according to the priority (whether it has been 
+authenticated, the importance of data transmission) and the 
+arrival time of the dat a packets, each group is polled in turn to 
+send responses to each STA  in the group, so that the STA  can 
+also obtain  CSI. 
+2) Quantization  
+Commonly used quantization algorithms include  single -
+threshold quantization with median selection, double -
+threshold quanti zation with selected mean and variance, and 
+Block-Gray quantization. In this scheme, the Block-Gray   
+method with general requirements for reciprocity and better 
+comprehensive performance is adopted. The  processing 
+process of quantization is as follows: th e CSI magnitude 
+value s of the obtained 52 effective subcarriers are arranged 
+from small to large, and then equally divided into 4 data 
+blocks . Each data block is labeled in sequence, and the labels              
+(a) Static sight distance 1 m  (SS1)                     (b) Static non -line-of-sight distance of 1 m  (SNS1)                (c) Dynamic line of sight 1 m  (DS1)  
+         
+(d) Static sight distance 3 m (SS3)                    (e) Static non -line-of-sight distance of 3 m (SNS3)                (f) Dynamic line of sight 3 m (DS3)  
+Fig. 1.  Schematic diagram of the experimental scene  
+ 
+APSTA1
+STA2
+STA31m
+1m1m
+APSTA1
+STA2
+STA31m
+1m1m
+APSTA1
+STA2
+STA31m
+1m1m
+APSTA1
+STA2
+STA33m
+3m3m
+APSTA1
+STA2
+STA33m
+3m3m
+APSTA1
+STA2
+STA33m
+3m
+3m
+ 
+Fig. 2.  Data stability  
+2022 IEEE/CIC International Conference on Communications in China (ICCC)
+181Authorized licensed use limited to: Instituto Nacional De Telecomunicações (INATEL). Downloaded on July 02,2024 at 12:22:08 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+================================================================================
+PÁGINA 4
+================================================================================
+
+of the elements in the data block are consistent with the block 
+to which they belong.  Finally , each data element is quantized 
+into a two -bit 0,1 sequence using Gray coding according to the 
+original subcarrier CSI distribution order . 
+TABLE I.  EXTRACTION ABILITY STATISTIC S 
+PSR DLSN  TND  AVD ER PLR 
+100 2845 136 12 8.824%  99.578%  
+50 2591 218 15 6.881%  99.421%  
+25 346 2730  118 4.322%  95.678%  
+15 1075 1136 480 42.254%  55.349%  
+7 845 862 844 97.912%  0.118%  
+TABLE II.  RECIPROCITY  COEFFICIENT STATISTICS  
+Scenes  
+( ) ,AP STACSI CSI 
+AP-
+STA1 AP-
+STA2 AP-
+STA3 Mean 
+SS1 0.993  0.994  0.992  0.993  
+SNS1  0.986  0.988  0.976  0.983  
+SS3 0.992  0.975  0.990  0.986  
+SNS3  0.969  0.992  0.988  0.983  
+DS1 0.977  0.991  0.960  0.976  
+DS3 0.965  0.953  0.976  0.965  
+ 
+3) Information Reconciliation  
+Key agreement is usually implemented using Error 
+Correction Codes (ECCs),  and the BCH error correction code 
+is used in this paper. For Alice and Bob, both communicating 
+parties, the usual working mechanism is that Alice randomly 
+selects a codeword c from the ECC code set, and then XOR c 
+with her own key
+AK  to get the secret information 
+s  and send 
+it to Bob, namely:
+cA sK= . Assuming that Bob receives 
+s
+without error, then 
+BBc s K= .If the Hamming 
+distances of 
+Bc and 
+c  are within the error correction range, 
+then Bob can decrypt 
+Bc to obtain
+c  , and then calculate  
+=sBKc
+. Finally, Bob  can get the same key as Alice . In 
+order to avoid too many consecutive 0 or 1 sequences in the 
+key, the consistent key can be  re-encoded according to the 
+encoding rules agreed by both users . 
+IV. RESULTS & DISCUSSION  
+A rectangular space of 5 m ×  4 m is selected for the 
+experimental site, w ith tables and chairs around the room. In 
+order to verify the effectiveness of the numbered CSI 
+extraction tool in different scenarios, this paper takes the static 
+environment and the dynamic environment as the two major 
+test directions . Considering the di stance between AP and 
+STAs in actual use, and being blocked by walls, scenarios with 
+different distances between line -of-sight and non -line-of-sight 
+are set. The scene settings are shown in the  Fig. 1. In the static 
+environment, the equipment and person in  the environment 
+should be kept relatively static as much as possible. The 
+dynamic environment is set so that an experimenter walks 
+back and forth in a figure -8 shape at a normal pace during the 
+entire channel detection process.  A. Extraction Ability Test  
+Firstly, we tested the stability of the data obtained by ESP 
+CSI tool .   It can be seen from the  Fig.2  that the distribution of 
+channel measurement values obtained by 10 channel probing 
+experiments  in a very short period of time is relatively 
+scattered, so it  is impossible to use any group of CSI in a short 
+period of time or perform cluster analysis on multiple groups 
+of data  to represent this period of time , and perform 
+subsequent key generation operations.  
+Afterwards, we tested the pro cessing capability of the 
+numbered CSI extraction tool , using 1 AP and 1 STA to 
+observe the extracted CSI data with different packet sending 
+rates. Define the following indicators:  
+• Packet sending rate (PSR): the number of probe 
+packets STA per second  sta tion sends . 
+• Data last serial number (DLSN): the last marked 
+sequence number in the obtained data.  
+• Total number of data (TND): refers to the number of 
+data  finally obtained by the AP . 
+• Actual valid data (AVD): refers to the data that can be 
+used for quantiz ation .  
+• Effective rate (ER): equal to the ratio of  AVD to TND . 
+• Packet loss rate (PLR): equal to 1 -AVD/DLSN.  
+According to Table  1, we decides to set the packet sending 
+rate of the STA to 7 packet s per second, so as to meet the 
+requirement that the CSI data  of the AP and the STA can be 
+distinguished by serial number, and the reciprocity test and 
+subsequent key generation can be performed.  
+B. Data Reciprocity Test 
+The experimental equipment is 4 ESP32 development 
+boards (1 working mode is AP, and the remaining 3  working 
+modes are STA) and a laptop  for exporting data and 
+simulating to generate keys. The working channel is selected 
+to be 13 with the smallest channel interference at the time of 
+the experiment to avoid channel competition.  
+Firstly, the CSI extraction  tool model A was tested, that is, 
+different STAs use the same port and the packet transmission 
+rate is 7 packets/s . Then the CSI extraction tool model B was 
+tested: using different ports, configure their packet 
+transmission rates to 3,5,7 packets/s respec tively.  As shown in 
+Fig.3 , for the same test scenario  SS1: from Model A  to Model 
+B, the average of 
+( ) ,AP STACSI CSI increased from 0.9756  to 
+0.9930, so the subsequent experiments are based on model B.  
+  
+Fig. 3.  Comparison of reciprocity between models A and B  
+2022 IEEE/CIC International Conference on Communications in China (ICCC)
+182Authorized licensed use limited to: Instituto Nacional De Telecomunicações (INATEL). Downloaded on July 02,2024 at 12:22:08 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+================================================================================
+PÁGINA 5
+================================================================================
+
+TABLE III.  NIST  RANDOMNESS  TEST P -VALUE STATISTICS UND ER DIFFERENT  SCENARIO S 
+ AP-STA1  AP-STA2  AP-STA3  
+SSS1  SNS1  SSS3  SNS3  SSS1  SNS1  SSS3  SNS3  SSS1  SNS1  SSS3  SNS3  
+Frequency  Test  0.658  0.950  0.899  0.527  1.000  0.487  0.899  0.206  0.704  0.704  0.088  0.448  
+Frequency Test  within a Block  0.979  0.966  0.994  0.981  0.995  0.984  0.999  0.943  0.990  0.999  0.769  0.989  
+Runs Test  0.653  0.376  1.000  0.201  0.704  0.988  0.950  0.810  0.804  0.804  0.777  0.437  
+Cumulative Sums Test  0.995  0.999  0.999  0.766  1.000  0.795  1.000  0.389  0.982  0.958  0.175  0.766  
+0.972  0.995  1.000  0.766  1.000  0.823  1.000  0.389  0.958  0.999  0.133  0.850  
+Approximate Entropy Test  0.152  0.118  0.142  0.993  0.019  0.035  0.827  0.058  0.067  0.168  0.976  0.750  
+Serial Test  0.844  0.674  0.992  0.368  0.931  0.785  0.984  0.446  0.901  0.901  0.231  0.562  
+0.704  0.376  1.000  0.206  0.704  1.000  0.899  0.899  0.800  0.800  0.899  0.448  
+According to Table  2, we find that the barrier of the wall 
+slightly weakens the  similarity  of the obtained CSI. This is due 
+to the reflection, scattering of the signal in the process of 
+transmission through the wall. We also find that the dual 
+effects of distance and moving obstacles reduce the similarity 
+of the obtained data.  In order to ensure the universality and 
+stability o f the results, the average value of is taken as the 
+result of the reciprocity test in this experimental scenario. All 
+in all, the increase of the distance, the barrier of the wall, and 
+the moving obstacles will make the reciprocity worse, but the 
+( ) ,AP STACSI CSI
+ of each AP -STA combination in the six 
+scenarios exceeds 0.95. The mean values of the three sets of 
+data in different scenarios all exceed  0.96. It means providing 
+a good basis for quantization into a consensus key.  
+C. KDR  
+The CSI magnitude  obtained in the above six scenarios are 
+quantized. And a set of CSI magnitude  values obtained by 
+each device contains information of 52 subcarriers, which can 
+be quantized into a 104 -bit original key.  
+Comparing Fig.4 and Table 2 , it can be seen that the b etter 
+the reciprocity, the lower  KDR . Taking the average value of 
+( , 1)AP STA KDR
+,
+( , 2)AP STA KDR ,
+( , 3)AP STA KDR  to obtain the average  
+KDR  in a certain scenario.  Compare the average KDR of  
+different scenarios , as shown by  the red broken line  the lowest 
+is 4.07% when the static sight distance is 1 meter, and the 
+highest is 10.61% when the dynamic sight distance is 3 meters. The original  KDR  obtained by this method is low, which will 
+reduce the workload of  information recon ciliation.  After 
+information reconciliation , a consensus key can be generated, 
+as shown in the Fig.6. 
+D. Randomness of  Keys 
+We choose the key sequence agreed by both parties after 
+information reconciliation for the test. For 10 sets of keys 
+between AP and ST A, splicing them to obtain a sequence to 
+be tested with a length of 10 00 bits.  Considering the capacity 
+requirements of the data to be tested in the NIST randomness 
+test, only 6 test items were selected in this experiment. The 
+key is checked for randomness , and the results are shown in 
+Table  3. It can be seen that the keys generated in the four 
+scenarios can pass the randomness test.  
+E. Passive Eavesdropping  
+In order to verify the security of the key,  3 ESP32s are 
+selected as AP, STA, and Eve  respectively. AP and STA have 
+a line -of-sight distance of about 1 m, and the E ve is about 30 
+cm away from the STA, which is more than half a wavelength.  
+As Fig.5 shows  that the data of AP and STA are highly similar 
+and have excellent reciprocity,
+( ) ,= 0.94180AP STACSI CSI  
+However, the CSI generated by the packets monitored by the 
+Eve is very different from them,
+( )=0.55953 ,Eve STACSI CSI .   
+Fig. 4.  
+KDR  comparison  of different scenario s 
+ 
+Fig. 5.  Comparison of CSI magnitude  values of AP,STA and Eve  
+2022 IEEE/CIC International Conference on Communications in China (ICCC)
+183Authorized licensed use limited to: Instituto Nacional De Telecomunicações (INATEL). Downloaded on July 02,2024 at 12:22:08 UTC from IEEE Xplore.  Restrictions apply. 
+
+
+================================================================================
+PÁGINA 6
+================================================================================
+
+If  Eve pretends to be an AP and wants to negotiate with the 
+STA to generate a key, the reciprocity requirement cannot be 
+passed, and t he number of inconsistent bits is too large.  
+V. CONCLUSIONS  
+In this work , we transform ESP CSI tool  and propose a 
+numbered CSI extraction tool based on ESP32 for key 
+generation in multi -user access scenarios. We f ind that 
+reciprocity decreases with increasing  distance, wall blocking, 
+and moving obstacles. The tool has limited processing 
+capability  and needs to be improved to meet the increasing 
+numbers of users. We also propose a key generation scheme 
+for multi -user access scenarios based on this tool, simulat ing 
+different usage scenarios with 1 AP and a group capacity of 3 
+STAs . Finally,  keys with low KDR , randomness requirements, 
+and anti -eavesdropping in different scenarios  are obtained . 
+However, they are generally time -variant and need to be 
+further improve d in the privacy amplification process.  
+ACKNOWLEDGMENT  
+This work is supported in part by Jiangsu key R&D plan 
+BE2019109, the National Natural Science Foundation of 
+China under Grant 61941115 ，62001106, Natural Science 
+Foundation of Jiangsu Province under Grant BK20160692, 
+BK20200350, BK20200352, Jiangsu Provinc ial Key 
+Laboratory of Network and Information Security No. 
+BM2003201, Project of State Key Laboratory of Mobile 
+Communication, Southeast University No. 2020B05 and the 
+Purple Mountain Laboratories for Network and 
+Communication Security.  
+REFERENCES  
+ 
+[1] IHS Sta tista. 2018. Internet of things (iot) connected devices installed 
+base worldwide from 2015 to 2025 (in billions). 
+https://www.statista.com/statistics/47126 4/iot-number -of-connected -
+devices -worldwide/  
+[2] J. Granjal, E. Monteiro and J. Sá  Silva, "Security for the Internet of 
+Things: A Survey of Existing Protocols and Open Research Issues," in 
+IEEE Communications Surveys & Tutorials , vol. 17, no. 3, pp. 1294 -
+1312 , thirdquarter 2015.  
+[3] C. Cheng, R. Lu, A. Petzoldt and T. Takagi, "Securing the Internet of 
+Things in a Quantum World," in IEEE Communications Magazine , vol. 
+55, no. 2, pp. 116 -120, February 2017.  [4] N. Aldaghri and H. Mahdavifar, "Physical Layer Secret Key 
+Generation in Static Environments," in IEEE Transactions on 
+Information Forensics and Security , vol. 15, pp. 2692 -2705, 2020 . 
+[5] Sanenga, Abraham et al. “An Overview of Key Technologies in 
+Physical Layer Security.” in Entropy (Basel, Switzerland) vol. 22,11 
+1261. 6 Nov. 2020 . 
+[6] W.Xu ,J .Zhang,  S .Huang, C . Luo, & W .Li, Key Generation for 
+Internet of Things.  ACM Computing Surveys , vol.54,no.1,pp. 1-
+37.2022  
+[7] T.Ohira.(2005). Secret key generation exploiting antenna beam 
+steering and wave propagation reciprocity. In:  
+European Microwave Conference. Paris. pp. 4.  
+[8] S. Mathur, W. Trappe, N. Mandayam, C. Ye, and A. Reznik, “Radio 
+telepathy: Extracting a secret key from an unauthenticated wireless 
+channel,” in Proc. ACM Int. Conf. Mobile Comput. Netw. , San 
+Francisco, CA, USA.  pp. 128 –139,2008.  
+[9] Y. Liu, S. C. Draper and A. M. Sayeed, "Exploiting Channel Diversity 
+in Secret Key Generation From Multipath Fading Randomness," in 
+IEEE Transactions on Information Forensics and Security , vol. 7, no. 
+5, pp. 1484 -1497, Oct. 2012.  
+[10]  D.Halp erin, W .Hu ,  A .Sheth, &D. Wetherall, Tool release: gathering 
+802.11n traces with channel state information . ACM SIGCOMM 
+Computer Communication Review , vol.41.no.1, pp.53-53. (2011).  
+[11] Y. Xie, Z. Li and M. Li, "Precise Power Delay Profiling with 
+Commodity W i-Fi," in IEEE Transactions on Mobile Computing, vol. 
+18, no. 6, pp. 1342 -1355, 1 June 2019 . 
+[12] F.Gringoli ,  M .Schulz , J .Link  ,M. Hollick . (2019). Free Your CSI: A 
+Channel State Information Extraction Platform For Modern Wi -Fi 
+Chipsets. In  The 13th Internat ional Workshop . New York. pp. 21 –28. 
+[13] S. M. Hernandez and E. Bulut, "Lightweight and Standalone IoT Based 
+WiFi Sensing for Active Repositioning and Mobility," 2020 IEEE 21st 
+International Symposium on "A World of Wireless, Mobile and 
+Multimedia Networks " (W oWMoM), 2020, pp. 277 -286. 
+[14] Wei Xi et al., "KEEP: Fast secret key extraction protocol for D2D 
+communication," 2014 IEEE 22nd International Symposium of Quality 
+of Service (IWQoS), 2014, pp. 350 -359. 
+[15] H. Liu, C. Zhang, H. Fei, W. Hu and D. Guo, "Feedback -based Channel 
+Gain Complement and Cluster -based Quantization for Physical Layer 
+Key Generation," 2020 Asian Hardware Oriented Security and Trust 
+Symposium (AsianHOST) , 2020, pp. 1 -6. 
+[16] L. Wang, H. An, H. Zhu and W. Liu, "MobiKey: Mobility -Based Secret 
+Key Genera tion in Smart Home," in IEEE Internet of Things Journal, 
+vol. 7, no. 8, pp. 7590 -7600, Aug. 2020 . 
+[17] C. Li, Y. Jiang and A. Hu, "CSI Measurement and Reciprocity 
+Evaluation Method Based on Embedded Platform," 2021 IEEE 94th 
+Vehicular Technology Conference (VTC 2021 -Fall), 2021, pp. 1 -6. 
+[18] C. Zenger, H. Vogt, J. Zimmer, A. Sezgin and C. Paar, "The Passive 
+Eavesdropper Affects My Channel: Secret -Key Rates under Real -
+World Conditions," 2016 IEEE Globecom Workshops (GC Wkshps) , 
+2016, pp. 1 -6.
+  
+Fig. 6.  Key after information reconciliation  
+2022 IEEE/CIC International Conference on Communications in China (ICCC)
+184Authorized licensed use limited to: Instituto Nacional De Telecomunicações (INATEL). Downloaded on July 02,2024 at 12:22:08 UTC from IEEE Xplore.  Restrictions apply. 
+

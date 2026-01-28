@@ -30,7 +30,40 @@ class TestSimularCanal:
         variancia_ruido = 0.1
         media_ruido = 0.0
         
+        # Testa com parâmetros padrão (modo ideal)
         resultado = simular_canal(ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk')
+        
+        assert len(resultado) == len(palavra_codigo)
+        assert all(bit in {0, 1} for bit in resultado)
+    
+    def test_simular_canal_com_estimacao_imperfeita(self):
+        """Testa simulação com estimação imperfeita do canal"""
+        ganho_canal = [1.0, 1.0, 1.0, 1.0]
+        ganho_estimado = [1.1, 0.9, 1.05, 0.95]  # 10% de erro
+        palavra_codigo = [1, 0, 1, 0]
+        variancia_ruido = 0.1
+        media_ruido = 0.0
+        
+        resultado = simular_canal(
+            ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk',
+            ganho_estimado=ganho_estimado, guard_band_sigma=0.0
+        )
+        
+        assert len(resultado) == len(palavra_codigo)
+        assert all(bit in {0, 1} for bit in resultado)
+    
+    def test_simular_canal_com_guard_band(self):
+        """Testa simulação com guard band adaptativo"""
+        ganho_canal = [1.0, 1.0, 1.0, 1.0]
+        ganho_estimado = [1.0, 1.0, 1.0, 1.0]
+        palavra_codigo = [1, 0, 1, 0]
+        variancia_ruido = 0.1
+        media_ruido = 0.0
+        
+        resultado = simular_canal(
+            ganho_canal, palavra_codigo, variancia_ruido, media_ruido, 'bpsk',
+            ganho_estimado=ganho_estimado, guard_band_sigma=0.5
+        )
         
         assert len(resultado) == len(palavra_codigo)
         assert all(bit in {0, 1} for bit in resultado)
@@ -219,7 +252,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         assert isinstance(kdr, float)
@@ -242,7 +277,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=True,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         assert isinstance(kdr, float)
@@ -264,7 +301,9 @@ class TestExtrairKDR:
             self.tabela_codigos,
             correlacao_canal=1.0,  # Canais idênticos
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Sem ruído e canais idênticos, KDR deve ser muito baixo
@@ -283,7 +322,9 @@ class TestExtrairKDR:
             self.tabela_codigos,
             correlacao_canal=0.95,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         kdr_baixa, _ = extrair_kdr(
@@ -296,7 +337,9 @@ class TestExtrairKDR:
             self.tabela_codigos,
             correlacao_canal=0.1,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Alta correlação = canais mais similares = MENOR discordância = MENOR KDR
@@ -315,7 +358,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Parâmetro maior = canal mais forte
@@ -328,7 +373,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Canal mais forte pode ter menor KDR (melhor SNR)
@@ -346,7 +393,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         assert isinstance(kdr, float)
@@ -369,7 +418,9 @@ class TestExtrairKDR:
             self.media_ruido,
             tabela_maior,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         assert isinstance(kdr, float)
@@ -389,7 +440,9 @@ class TestExtrairKDR:
             self.tabela_codigos,
             correlacao_canal=0.0,  # Canais independentes
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Com canais independentes, KDR deve ser mais alto
@@ -408,7 +461,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=False,
-            modulacao='qpsk'
+            modulacao='qpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         assert isinstance(kdr, float)
@@ -427,7 +482,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=True,
-            modulacao='qpsk'
+            modulacao='qpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         assert isinstance(kdr, float)
@@ -452,7 +509,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         np.random.seed(100)
@@ -467,7 +526,9 @@ class TestExtrairKDR:
             self.media_ruido,
             self.tabela_codigos,
             usar_amplificacao=False,
-            modulacao='qpsk'
+            modulacao='qpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Ambos devem ser valores válidos
@@ -504,7 +565,9 @@ class TestExtrairKDRIntegration:
             tabela_codigos,
             correlacao_canal=0.8,
             usar_amplificacao=True,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Sem amplificação
@@ -518,7 +581,9 @@ class TestExtrairKDRIntegration:
             tabela_codigos,
             correlacao_canal=0.8,
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         # Verifica estrutura dos resultados
@@ -550,7 +615,9 @@ class TestExtrairKDRIntegration:
             0.0,
             gerar_tabela_codigos_bch(7, 4),
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         np.random.seed(456)
@@ -565,10 +632,55 @@ class TestExtrairKDRIntegration:
             0.0,
             gerar_tabela_codigos_bch(7, 4),
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         assert resultado1 == resultado2
+
+
+class TestGanhoCanal:
+    """Testes para funções de geração de ganho de canal"""
+    
+    def test_gerar_ganho_canal_perfeito(self):
+        """Testa geração de ganho com estimação perfeita"""
+        from src.canal.canal import gerar_ganho_canal_rayleigh
+        
+        ganho_real, ganho_estimado = gerar_ganho_canal_rayleigh(1.0, 10, erro_estimativa=0.0)
+        
+        assert len(ganho_real) == 10
+        assert len(ganho_estimado) == 10
+        assert np.allclose(ganho_real, ganho_estimado)  # Devem ser iguais
+    
+    def test_gerar_ganho_canal_com_erro(self):
+        """Testa geração de ganho com estimação imperfeita"""
+        from src.canal.canal import gerar_ganho_canal_rayleigh
+        
+        ganho_real, ganho_estimado = gerar_ganho_canal_rayleigh(1.0, 100, erro_estimativa=0.15)
+        
+        assert len(ganho_real) == 100
+        assert len(ganho_estimado) == 100
+        assert not np.allclose(ganho_real, ganho_estimado)  # Devem ser diferentes
+        
+        # Erro relativo médio deve ser aproximadamente 15%
+        erro_relativo = np.abs(ganho_real - ganho_estimado) / ganho_real
+        assert np.mean(erro_relativo) < 0.3  # Margem de tolerância
+    
+    def test_aplicar_correlacao_temporal(self):
+        """Testa aplicação de correlação temporal"""
+        from src.canal.canal import aplicar_correlacao_temporal
+        
+        ganho_alice = np.array([1.0, 1.5, 0.8, 1.2, 0.9])
+        
+        # Correlação alta (quase idênticos)
+        ganho_bob_alta = aplicar_correlacao_temporal(ganho_alice, 1.0, correlacao=0.99)
+        assert len(ganho_bob_alta) == len(ganho_alice)
+        assert np.corrcoef(ganho_alice, ganho_bob_alta)[0, 1] > 0.8
+        
+        # Correlação baixa (mais independentes)
+        ganho_bob_baixa = aplicar_correlacao_temporal(ganho_alice, 1.0, correlacao=0.1)
+        assert len(ganho_bob_baixa) == len(ganho_alice)
 
 
 class TestExtrairKDRPerformance:
@@ -589,7 +701,9 @@ class TestExtrairKDRPerformance:
             0.0,
             gerar_tabela_codigos_bch(7, 4),
             usar_amplificacao=False,
-            modulacao='bpsk'
+            modulacao='bpsk',
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         end = time.time()
@@ -611,7 +725,9 @@ class TestExtrairKDRPerformance:
                 0.0,
                 gerar_tabela_codigos_bch(7, 4),
                 usar_amplificacao=False,
-                modulacao='bpsk'
+                modulacao='bpsk',
+                erro_estimativa=0.0,
+                guard_band_sigma=0.0
             )
             
             assert len(resultado) == 2

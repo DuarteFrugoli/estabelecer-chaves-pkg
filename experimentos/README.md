@@ -12,11 +12,13 @@ experimentos/
 ├── exp03_comparacao_modulacao.py # Experimento 3: BPSK vs QPSK
 ├── exp04_variacao_correlacao.py  # Experimento 4: Variação da correlação ρ
 ├── exp05_variacao_bch.py         # Experimento 5: Diferentes códigos BCH
+├── exp07_perfis_dispositivos.py  # Experimento 7: Perfis IoT (velocidade)
+├── exp08_variacao_distancia.py   # Experimento 8: Variação de distância 🆕
 └── executar_todos.py             # Script master que roda todos
 
 resultados/
 ├── dados/                         # JSON e CSV dos resultados
-└── graficos/                      # Gráficos PNG de alta resolução
+└── figuras/                       # Gráficos PNG de alta resolução
 ```
 
 ## 🚀 Como Executar

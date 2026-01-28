@@ -1,76 +1,43 @@
 \section{Implementação e Detalhes de Simulação}
 \label{sec:metodos}
 
-Esta seção apresenta detalhadamente os métodos utilizados para a implementação,
-simulação e avaliação do sistema de geração de chaves em camada física.
-Descrevem-se o ambiente de desenvolvimento, a modelagem do canal, o processo de
-extração de aleatoriedade, os procedimentos de reconciliação e amplificação de
-privacidade, bem como os experimentos conduzidos para análise do desempenho.
+Esta seção apresenta detalhadamente os métodos utilizados para a implementação, simulação e avaliação do sistema de geração de chaves em camada física.
+Descrevem-se o ambiente de desenvolvimento, a modelagem do canal, o processo de extração de aleatoriedade, os procedimentos de reconciliação e amplificação de privacidade, bem como os experimentos conduzidos para análise do desempenho.
 
 \subsection{Descrição Geral da Simulação}
 
-O objetivo da simulação é reproduzir matematicamente e computacionalmente um
-sistema de geração de chaves baseado na reciprocidade do canal em comunicações
-sem fio. O sistema modela dois nós legítimos, Alice e Bob, trocando sinais
-e obtendo estimativas do canal em momentos próximos o suficiente para
+O objetivo da simulação é reproduzir matematicamente e computacionalmente um sistema de geração de chaves baseado na reciprocidade do canal em comunicações sem fio. O sistema modela dois nós legítimos, Alice e Bob, trocando sinais e obtendo estimativas do canal em momentos próximos o suficiente para
 garantir a reciprocidade. 
 
-A simulação contempla a geração de amostras de canal Rayleigh complexas, a
-transmissão de bits através do canal com ruído \ac{AWGN}, a aplicação de
-modulação \ac{BPSK} ou \ac{QPSK} com detecção coerente, o uso de códigos \ac{BCH}
-para reconciliação, o uso de \ac{SHA}-256 para amplificação de privacidade, e o
+A simulação contempla a geração de amostras de canal Rayleigh complexas, a transmissão de bits através do canal com ruído \ac{AWGN}, a aplicação de modulação \ac{BPSK} ou \ac{QPSK} com detecção coerente, o uso de códigos \ac{BCH} para reconciliação, o uso de \ac{SHA}-256 para amplificação de privacidade, e o
 cálculo de métricas de desempenho como \ac{KDR} e taxa de concordância.
 
-O pipeline completo permite avaliar, de forma controlada, como alterações no
-cenário físico afetam a concordância das chaves e a segurança estatística do
-sistema.
+O pipeline completo permite avaliar, de forma controlada, como alterações no cenário físico afetam a concordância das chaves e a segurança estatística do sistema.
 
 \subsection{Ambiente de Desenvolvimento}
 
 \subsubsection{Linguagem e Bibliotecas Utilizadas}
 
-As simulações foram implementadas integralmente em Python 3.11 devido à sua
-flexibilidade e à ampla disponibilidade de bibliotecas científicas. As
-principais dependências incluem \textbf{NumPy} para geração de números complexos
-e operações matriciais, \textbf{SciPy} para funções estatísticas e transformações
-auxiliares, \textbf{Matplotlib} para geração de gráficos de desempenho,
-\textbf{Galois} para implementação de códigos \ac{BCH} utilizados na reconciliação,
-\textbf{hashlib} para implementação do \ac{SHA}-256 aplicado na amplificação de
-privacidade, e \textbf{tqdm} para exibição de barras de progresso durante
-simulações longas.
+As simulações foram implementadas integralmente em Python 3.11 devido à sua flexibilidade e à ampla disponibilidade de bibliotecas científicas. As principais dependências incluem \textbf{NumPy} para geração de números complexos e operações matriciais, \textbf{SciPy} para funções estatísticas e transformações auxiliares, \textbf{Matplotlib} para geração de gráficos de desempenho, \textbf{Galois} para implementação de códigos \ac{BCH} utilizados na reconciliação, \textbf{hashlib} para implementação do \ac{SHA}-256 aplicado na amplificação de
+privacidade, e \textbf{tqdm} para exibição de barras de progresso durante simulações longas.
 
-Todas as simulações foram executadas em ambiente local, num computador com
-processador Intel Core i7 de 11ª geração, garantindo execução consistente e
-reprodutível. O gerenciamento de dependências foi realizado utilizando Poetry,
-ferramenta moderna para controle de ambientes virtuais Python.
+Todas as simulações foram executadas em ambiente local, num computador com processador Intel Core i7 de 11ª geração, garantindo execução consistente e reprodutível. O gerenciamento de dependências foi realizado utilizando Poetry, ferramenta moderna para controle de ambientes virtuais Python.
 
 \subsubsection{Parâmetros de Simulação}
 
-Os parâmetros controláveis do ambiente de simulação incluem o número de bits
-transmitidos, tipicamente \(N = 127\) correspondente ao comprimento do código
-\ac{BCH}, os níveis de \ac{SNR} variando no intervalo \(\mathrm{SNR} \in [0, 30]
-\, \mathrm{dB}\), o parâmetro de escala Rayleigh \(\sigma \in [0.5, 2.0]\), os
-parâmetros do código \ac{BCH} \((n,k,t)\) com \(n=127\), \(k=64\) e \(t=10\), o
-tipo de modulação (\ac{BPSK} ou \ac{QPSK}), e a variância do ruído \ac{AWGN}
-calculada a partir da \ac{SNR} desejada.
+Os parâmetros controláveis do ambiente de simulação incluem o número de bits transmitidos, tipicamente \(N = 127\) correspondente ao comprimento do código \ac{BCH}, os níveis de \ac{SNR} variando no intervalo \(\mathrm{SNR} \in [0, 30]
+\, \mathrm{dB}\), o parâmetro de escala Rayleigh \(\sigma \in [0.5, 2.0]\), os parâmetros do código \ac{BCH} \((n,k,t)\) com \(n=127\), \(k=64\) e \(t=10\), o tipo de modulação (\ac{BPSK} ou \ac{QPSK}), e a variância do ruído \ac{AWGN} calculada a partir da \ac{SNR} desejada.
 
-Esses parâmetros foram escolhidos de forma a representar condições realistas e
-cobrir uma ampla faixa de cenários físicos.
+Esses parâmetros foram escolhidos de forma a representar condições realistas e cobrir uma ampla faixa de cenários físicos.
 
 \subsection{Estrutura do Código}
 
 \subsubsection{Módulos Principais}
 
-A implementação foi organizada em módulos independentes visando clareza e
-modularidade. O módulo \texttt{canal/canal.py} implementa a simulação de canal
-Rayleigh com ruído \ac{AWGN} e modulação \ac{BPSK}/\ac{QPSK}, enquanto
-\texttt{canal/modulacao.py} realiza modulação temporal realista com frequência de
-portadora. O módulo \texttt{codigos\_corretores/bch.py} provê codificação e
-decodificação \ac{BCH}, e \texttt{pilares/reconciliacao.py} implementa a
-reconciliação de chaves usando o protocolo \textit{code-offset}. A aplicação do
+A implementação foi organizada em módulos independentes visando clareza e modularidade. O módulo \texttt{canal/canal.py} implementa a simulação de canal Rayleigh com ruído \ac{AWGN} e modulação \ac{BPSK}/\ac{QPSK}, enquanto \texttt{canal/modulacao.py} realiza modulação temporal realista com frequência de portadora. O módulo \texttt{codigos\_corretores/bch.py} provê codificação e
+decodificação \ac{BCH}, e \texttt{pilares/reconciliacao.py} implementa a reconciliação de chaves usando o protocolo \textit{code-offset}. A aplicação do
 \ac{SHA}-256 para obtenção da chave final é realizada em
-\texttt{pilares/amplificacao\_privacidade.py}, a geração de gráficos de métricas
-e desempenho é feita por \texttt{visualizacao/plotkdr.py}, e operações auxiliares
+\texttt{pilares/amplificacao\_privacidade.py}, a geração de gráficos de métricas e desempenho é feita por \texttt{visualizacao/plotkdr.py}, e operações auxiliares
 com sequências binárias são providas por \texttt{util/binario\_util.py}.
 
 \subsubsection{Fluxo Geral de Execução}
@@ -88,8 +55,7 @@ O pipeline da simulação segue:
     \item cálculo das métricas (\ac{KDR} pré e pós-reconciliação, \ac{KDR} pós-amplificação).
 \end{enumerate}
 
-O fluxo permite avaliar precisamente o impacto da \ac{SNR}, distância e número de
-amostras sobre a qualidade das chaves.
+O fluxo permite avaliar precisamente o impacto da \ac{SNR}, distância e número de amostras sobre a qualidade das chaves.
 
 \subsection{Modelagem do Canal}
 
@@ -101,8 +67,7 @@ O canal é modelado como uma variável aleatória complexa:
 h \sim \mathcal{CN}(0,1),
 \end{equation}
 
-resultando em módulo Rayleigh e fase uniforme. Esse modelo captura condições de
-multipercurso sem linha de visada (\ac{NLoS}), típico de ambientes internos.
+resultando em módulo Rayleigh e fase uniforme. Esse modelo captura condições de multipercurso sem linha de visada (\ac{NLoS}), típico de ambientes internos.
 
 \subsubsection{Modelo de Ruído, Distância e Amostras}
 
@@ -122,16 +87,11 @@ h_d = \frac{h}{d^\alpha},
 
 com \(\alpha \in [2,4]\) dependendo do ambiente.
 
-Batches de amostras são gerados para cada estimativa, simulando múltiplas
-realizações do canal e permitindo análise estatística do desempenho. A
-correlação entre os canais observados por Alice e Bob é controlada pelo
-parâmetro \(\rho \in [0,1]\), sendo \(\rho = 0.9\) o valor típico utilizado
-neste trabalho, representando alta reciprocidade.
+Batches de amostras são gerados para cada estimativa, simulando múltiplas realizações do canal e permitindo análise estatística do desempenho. A correlação entre os canais observados por Alice e Bob é controlada pelo parâmetro \(\rho \in [0,1]\), sendo \(\rho = 0.9\) o valor típico utilizado neste trabalho, representando alta reciprocidade.
 
 \subsection{Protocolo de Reconciliação Code-Offset}
 
-A reconciliação de chaves neste trabalho é implementada utilizando o protocolo
-\textit{code-offset}, que combina segurança da informação com correção de erros.
+A reconciliação de chaves neste trabalho é implementada utilizando o protocolo \textit{code-offset}, que combina segurança da informação com correção de erros.
 O protocolo opera da seguinte forma:
 
 \begin{enumerate}
@@ -143,33 +103,21 @@ O protocolo opera da seguinte forma:
     \item Alice calcula a chave reconciliada \(\mathbf{k}_A = \mathbf{s} \oplus \hat{\mathbf{c}}\), que coincide com \(\mathbf{b}_B\) de Bob.
 \end{enumerate}
 
-O código \ac{BCH}(127,64,10) foi escolhido por oferecer bom compromisso entre taxa
-de código (\(R = k/n \approx 0.5\)) e capacidade de correção de até 10 erros.
-Esse código é adequado para cenários de \ac{SNR} moderada, típicos em comunicações
-\ac{IoT} \cite{proakis_digital}.
+O código \ac{BCH}(127,64,10) foi escolhido por oferecer bom compromisso entre taxa de código (\(R = k/n \approx 0.5\)) e capacidade de correção de até 10 erros.
+Esse código é adequado para cenários de \ac{SNR} moderada, típicos em comunicações \ac{IoT} \cite{proakis_digital}.
 
 \subsection{Métricas de Avaliação}
 
-Para avaliar o desempenho do sistema, utiliza-se principalmente a métrica
-\ac{KDR}, definida como a taxa de discordância de bits entre as chaves geradas
-por Alice e Bob:
+Para avaliar o desempenho do sistema, utiliza-se principalmente a métrica \ac{KDR}, definida como a taxa de discordância de bits entre as chaves geradas por Alice e Bob:
 
 \begin{equation}
 \text{KDR} = \frac{\text{número de bits diferentes}}{\text{número total de bits}} \times 100\%.
 \end{equation}
 
-O \ac{KDR} é calculado em três momentos distintos: o \textbf{KDR pré-reconciliação}
-representa a discordância entre \(\mathbf{b}_A\) e \(\mathbf{b}_B\) imediatamente
-após a quantização, o \textbf{KDR pós-reconciliação} mede a discordância após a
-aplicação do protocolo \textit{code-offset}, e o \textbf{KDR pós-amplificação}
-quantifica a discordância após a aplicação do \ac{SHA}-256, devendo assumir
-apenas os valores 0\% ou 100\% devido à natureza determinística da função hash.
+O \ac{KDR} é calculado em três momentos distintos: o \textbf{KDR pré-reconciliação} representa a discordância entre \(\mathbf{b}_A\) e \(\mathbf{b}_B\) imediatamente
+após a quantização, o \textbf{KDR pós-reconciliação} mede a discordância após a aplicação do protocolo \textit{code-offset}, e o \textbf{KDR pós-amplificação} quantifica a discordância após a aplicação do \ac{SHA}-256, devendo assumir apenas os valores 0\% ou 100\% devido à natureza determinística da função hash.
 
-Idealmente, espera-se que o \ac{KDR} pré-reconciliação seja reduzido a 0\% após
-a reconciliação, desde que a capacidade de correção do código \ac{BCH} não seja
-excedida. Além do \ac{KDR}, avalia-se também o tempo de execução das simulações
-para verificar a viabilidade computacional do sistema em dispositivos com recursos
-limitados.
+Idealmente, espera-se que o \ac{KDR} pré-reconciliação seja reduzido a 0\% após a reconciliação, desde que a capacidade de correção do código \ac{BCH} não seja excedida. Além do \ac{KDR}, avalia-se também o tempo de execução das simulações para verificar a viabilidade computacional do sistema em dispositivos com recursos limitados.
 
 \subsection{Experimentos Realizados}
 

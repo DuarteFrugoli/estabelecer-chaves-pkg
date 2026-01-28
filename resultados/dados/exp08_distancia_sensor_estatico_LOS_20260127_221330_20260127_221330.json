@@ -1,0 +1,68 @@
+{
+  "experimento": "exp08_distancia_sensor_estatico_LOS_20260127_221330",
+  "descricao": "{'experimento': 'exp08_variacao_distancia', 'perfil_dispositivo': 'sensor_estatico', 'tipo_canal': 'LOS', 'velocidade_kmh': 0.0, 'frequencia_ghz': 0.868, 'correlacao_temporal': 1.0, 'tempo_coerencia_ms': 'infinito', 'freq_doppler_hz': 0.0, 'erro_estimativa': 0.08, 'guard_band_sigma': 0.7, 'potencia_tx_dbm': 14, 'distancias_m': [1, 2, 3, 5, 10, 20, 50, 100], 'tamanho_cadeia_bits': 127, 'quantidade_testes': 1000, 'rayleigh_param': np.float64(0.7071067811865475), 'modulacao': 'bpsk', 'atraso_medicao_ms': 1.0, 'timestamp': '20260127_221330'}",
+  "timestamp": "20260127_221330",
+  "data_hora": "2026-01-27 22:13:30",
+  "dados": {
+    "distancia_m": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20,
+      50,
+      100
+    ],
+    "snr_db": [
+      76.81930553983035,
+      70.79870562655073,
+      67.2768804454371,
+      62.83990545310998,
+      56.81930553983035,
+      50.79870562655073,
+      42.83990545310998,
+      36.81930553983035
+    ],
+    "path_loss_db": [
+      31.170394503529835,
+      37.19099441680946,
+      40.71281959792309,
+      45.14979459025021,
+      51.170394503529835,
+      57.19099441680946,
+      65.14979459025021,
+      71.17039450352983
+    ],
+    "kdr_antes": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0031496062992125984,
+      0.007874015748031496
+    ],
+    "kdr_pos_reconciliacao": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "kdr_pos_amplificacao": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  }
+}

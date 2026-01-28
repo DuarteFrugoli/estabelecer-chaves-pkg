@@ -15,6 +15,11 @@ from experimentos.exp02_variacao_sigma import experimento_variacao_sigma
 from experimentos.exp03_comparacao_modulacao import experimento_comparacao_modulacao
 from experimentos.exp04_variacao_correlacao import experimento_variacao_correlacao
 from experimentos.exp05_variacao_bch import experimento_variacao_bch
+from experimentos.exp07_perfis_dispositivos import experimento_perfis_dispositivos
+from experimentos.exp08_variacao_distancia import (
+    experimento_variacao_distancia,
+    cenarios_artigo_referencia
+)
 
 
 def executar_bateria_completa():
@@ -117,6 +122,38 @@ def executar_bateria_completa():
     except Exception as e:
         print(f"✗ Erro no Experimento 5: {e}")
     
+    # ========== EXPERIMENTO 7: PERFIS DE DISPOSITIVOS ==========
+    print("\n" + "#"*70)
+    print("# EXPERIMENTO 7: PERFIS DE DISPOSITIVOS IoT")
+    print("#"*70 + "\n")
+    
+    try:
+        exp07 = experimento_perfis_dispositivos(
+            tamanho_cadeia_bits=127,
+            quantidade_de_testes=1000,
+            rayleigh_param=1.0/np.sqrt(2),
+            modulacao='bpsk',
+            snr_min=-5,
+            snr_max=25,
+            snr_pontos=16,
+            atraso_medicao_ms=1.0
+        )
+        print("✓ Experimento 7 concluído!")
+    except Exception as e:
+        print(f"✗ Erro no Experimento 7: {e}")
+    
+    # ========== EXPERIMENTO 8: VARIAÇÃO DE DISTÂNCIA ==========
+    print("\n" + "#"*70)
+    print("# EXPERIMENTO 8: VARIAÇÃO DE DISTÂNCIA (ARTIGO)")
+    print("#"*70 + "\n")
+    
+    try:
+        # Cenários do artigo de referência (SS1, SNS1, DS1, SS3, SNS3, DS3)
+        exp08 = cenarios_artigo_referencia()
+        print("✓ Experimento 8 concluído!")
+    except Exception as e:
+        print(f"✗ Erro no Experimento 8: {e}")
+    
     # ========== FINALIZAÇÃO ==========
     fim_total = datetime.now()
     duracao = fim_total - inicio_total
@@ -130,7 +167,7 @@ def executar_bateria_completa():
     print("="*70)
     print("\n✓ Todos os resultados foram salvos em:")
     print("  - resultados/dados/ (JSON e CSV)")
-    print("  - resultados/graficos/ (PNG)")
+    print("  - resultados/figuras/ (PNG)")
     print("\nVocê pode usar esses dados para escrever o artigo!")
     print("="*70 + "\n")
 

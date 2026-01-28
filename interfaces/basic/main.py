@@ -23,6 +23,11 @@ from src.codigos_corretores.bch import *
 from src.canal.canal import *
 from src.visualizacao.plotkdr import plot_kdr
 from src.util.util import *
+from src.util.config_dispositivos import (
+    obter_parametros_dispositivo,
+    calcular_parametros_canal,
+    listar_dispositivos
+)
 
 potencia_sinal = 1.0 # potência do sinal (Es = 1 para BPSK)
 # Parâmetros Rayleigh (sigma): 
@@ -57,6 +62,66 @@ opcao_modulacao = solicita_entrada("Digite 1 para BPSK ou 2 para QPSK: ", int, l
 modulacao = 'bpsk' if opcao_modulacao == 1 else 'qpsk'
 print(f"\nModulação selecionada: {modulacao.upper()}")
 
+# Configuração de parâmetros realistas do dispositivo
+print("\n" + "="*70)
+print("CONFIGURAÇÃO DE PARÂMETROS REALISTAS")
+print("="*70)
+print("\nPerfis de dispositivos IoT disponíveis:")
+dispositivos = listar_dispositivos()
+for idx, (nome, descricao) in enumerate(dispositivos.items(), 1):
+    print(f"{idx} - {nome}: {descricao}")
+print(f"{len(dispositivos) + 1} - Configuração manual (genérico)")
+
+opcao_dispositivo = solicita_entrada(
+    f"\nEscolha um perfil (1-{len(dispositivos) + 1}): ", 
+    int, 
+    lambda v: 1 <= v <= len(dispositivos) + 1
+)
+
+if opcao_dispositivo <= len(dispositivos):
+    # Usa perfil pré-definido
+    nome_dispositivo = list(dispositivos.keys())[opcao_dispositivo - 1]
+    config_dispositivo = obter_parametros_dispositivo(nome_dispositivo)
+    print(f"\nPerfil selecionado: {nome_dispositivo}")
+    print(f"Descrição: {config_dispositivo['descricao']}")
+else:
+    # Configuração manual
+    print("\nConfiguração manual dos parâmetros:")
+    config_dispositivo = obter_parametros_dispositivo(None)
+    
+    config_dispositivo['erro_estimativa_canal'] = solicita_entrada(
+        "Erro de estimativa do canal (0.0-1.0, ex: 0.10 para 10%): ", 
+        float, 
+        lambda v: 0.0 <= v <= 1.0
+    )
+    config_dispositivo['velocidade_max_kmh'] = solicita_entrada(
+        "Velocidade máxima em km/h (ex: 5.0 para pessoa andando): ", 
+        float, 
+        lambda v: v >= 0.0
+    )
+    config_dispositivo['guard_band_sigma'] = solicita_entrada(
+        "Parâmetro de limiar adaptativo (0.0-1.0, ex: 0.5): ", 
+        float, 
+        lambda v: 0.0 <= v <= 1.5
+    )
+
+# Calcula parâmetros derivados do canal
+print("\nCalculando parâmetros do canal...")
+atraso_medicao_ms = 1.0  # Tempo entre medições de Alice e Bob
+parametros_canal = calcular_parametros_canal(config_dispositivo, atraso_medicao_ms)
+
+print(f"\nParâmetros calculados:")
+print(f"  Tempo de coerência: {parametros_canal['tempo_coerencia_s']*1000:.2f} ms")
+print(f"  Frequência Doppler: {parametros_canal['freq_doppler_hz']:.2f} Hz")
+print(f"  Correlação temporal: {parametros_canal['correlacao_temporal']:.4f}")
+print(f"  Erro de estimativa: {config_dispositivo['erro_estimativa_canal']*100:.1f}%")
+print(f"  Guard band sigma: {config_dispositivo['guard_band_sigma']:.2f}")
+
+# Usa correlação temporal calculada
+correlacao_canal = parametros_canal['correlacao_temporal']
+erro_estimativa = config_dispositivo['erro_estimativa_canal']
+guard_band_sigma = config_dispositivo['guard_band_sigma']
+
 # Amplificação de privacidade sempre habilitada
 usar_amplificacao = True
 print("Amplificação de privacidade habilitada - Chaves finais terão 256 bits")
@@ -81,8 +146,11 @@ print("="*70)
 print(f"Modulação: {modulacao.upper()}")
 print(f"Quantidade de testes por configuração: {quantidade_de_testes}")
 print(f"Tamanho da cadeia de bits: {tamanho_cadeia_bits}")
-print(f"Parâmetros Rayleigh (σ): {rayleigh_params}")
+print(f"Parâmetros Rayleigh (sigma): {rayleigh_params}")
 print(f"Níveis de SNR: {len(variancias_ruido)} valores de {snr_db_range[0]} a {snr_db_range[-1]} dB")
+print(f"Correlação temporal: {correlacao_canal:.4f}")
+print(f"Erro de estimativa: {erro_estimativa*100:.1f}%")
+print(f"Guard band sigma: {guard_band_sigma:.2f}")
 print(f"Total de simulações: {len(rayleigh_params)} × {len(variancias_ruido)} = {len(rayleigh_params) * len(variancias_ruido)}")
 print("="*70 + "\n")
 
@@ -102,7 +170,9 @@ for rayleigh_param in tqdm(rayleigh_params, desc="Progresso geral", unit="σ", c
             bch_codigo,
             correlacao_canal,
             usar_amplificacao=True,
-            modulacao=modulacao
+            modulacao=modulacao,
+            erro_estimativa=erro_estimativa,
+            guard_band_sigma=guard_band_sigma
         )
         kdr_rates.append(kdr)
         kdr_pos_rates.append(kdr_pos_reconciliacao)
@@ -116,7 +186,7 @@ for rayleigh_param in tqdm(rayleigh_params, desc="Progresso geral", unit="σ", c
     }
 
 print("\n" + "="*70)
-print("✓ SIMULAÇÃO CONCLUÍDA COM SUCESSO!")
+print("SIMULACAO CONCLUIDA COM SUCESSO!")
 print("="*70)
 
 # Plota todos os sigmas em um único gráfico

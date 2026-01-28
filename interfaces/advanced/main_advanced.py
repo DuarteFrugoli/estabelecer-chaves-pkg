@@ -50,6 +50,8 @@ print("="*70)
 
 rayleigh_param = solicita_entrada(f"Parâmetro Rayleigh (σ) [padrão: {1.0/np.sqrt(2):.6f}]: ", float, lambda v: v > 0)
 correlacao_canal = solicita_entrada("Correlação do canal (ρ) [padrão: 0.9]: ", float, lambda v: 0 <= v <= 1)
+erro_estimativa = solicita_entrada("Erro de estimação do canal (desvio padrão) [padrão: 0.0]: ", float, lambda v: v >= 0)
+guard_band_sigma = solicita_entrada("Guard band adaptativo (múltiplos de σ) [padrão: 0.0]: ", float, lambda v: v >= 0)
 
 # Parâmetros de SNR
 print("\n" + "="*70)
@@ -98,6 +100,8 @@ print(f"Quantidade de testes: {quantidade_de_testes}")
 print(f"Tamanho da cadeia de bits: {tamanho_cadeia_bits}")
 print(f"Parâmetro Rayleigh (σ): {rayleigh_param:.6f}")
 print(f"Correlação do canal (ρ): {correlacao_canal:.2f}")
+print(f"Erro de estimação: {erro_estimativa:.2f}")
+print(f"Guard band: {guard_band_sigma:.2f}σ")
 print(f"SNR: {snr_min} a {snr_max} dB ({snr_pontos} pontos)")
 print(f"Potência do sinal: {potencia_sinal}")
 print(f"Amplificação: {'SIM' if usar_amplificacao else 'NÃO'}")
@@ -119,7 +123,9 @@ for i, variancia in enumerate(tqdm(variancias_ruido, desc="Progresso", unit="SNR
         bch_codigo,
         correlacao_canal,
         usar_amplificacao=usar_amplificacao,
-        modulacao=modulacao
+        modulacao=modulacao,
+        erro_estimativa=erro_estimativa,
+        guard_band_sigma=guard_band_sigma
     )
     kdr_rates.append(kdr)
     kdr_pos_rates.append(kdr_pos_reconciliacao)

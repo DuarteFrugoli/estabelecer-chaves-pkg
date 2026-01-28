@@ -92,7 +92,9 @@ def experimento_variacao_snr(
             bch_codigo,
             correlacao_canal,
             usar_amplificacao=True,
-            modulacao=modulacao
+            modulacao=modulacao,
+            erro_estimativa=0.0,
+            guard_band_sigma=0.0
         )
         
         kdr_rates.append(kdr)
