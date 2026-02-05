@@ -1,5 +1,5 @@
 """
-Experimento 7: Perfis de Dispositivos IoT
+Experimento 5: Perfis de Dispositivos IoT
 Testa o desempenho de PKG para diferentes perfis de dispositivos
 """
 
@@ -12,6 +12,9 @@ from datetime import datetime
 
 # Adiciona o diretório raiz ao path
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
+
+# Caminho base do projeto (raiz)
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 from src.codigos_corretores.bch import gerar_tabela_codigos_bch, get_tamanho_bits_informacao
 from src.canal.canal import extrair_kdr
@@ -99,10 +102,10 @@ def experimento_perfis_dispositivos(
         print(f"   - Velocidade: {config['velocidade_max_kmh']} km/h")
         print(f"   - Frequência: {config['frequencia_portadora_hz']/1e9:.2f} GHz")
         print(f"   - Erro estimação: {config['erro_estimativa_canal']*100:.1f}%")
-        print(f"   - Guard band: {config['guard_band_sigma']}σ")
+        print(f"   - Guard band: {config['guard_band_sigma']} sigma")
         print(f"   - Tc: {params_canal['tempo_coerencia_s']*1000:.2f} ms")
         print(f"   - fD: {params_canal['freq_doppler_hz']:.2f} Hz")
-        print(f"   - ρ: {params_canal['correlacao_temporal']:.4f}")
+        print(f"   - rho: {params_canal['correlacao_temporal']:.4f}")
     
     print("\n" + "="*80)
     print("Iniciando testes...")
@@ -124,16 +127,15 @@ def experimento_perfis_dispositivos(
         correlacao_temporal = params_canal['correlacao_temporal']
         
         print(f"Parâmetros da simulação:")
-        print(f"  - Correlação temporal (ρ): {correlacao_temporal:.4f}")
+        print(f"  - Correlação temporal (rho): {correlacao_temporal:.4f}")
         print(f"  - Erro de estimação: {erro_estimativa*100:.1f}%")
-        print(f"  - Guard band: {guard_band_sigma}σ")
+        print(f"  - Guard band: {guard_band_sigma} sigma")
         print(f"  - Tempo coerência: {params_canal['tempo_coerencia_s']*1000:.2f} ms")
         print()
         
         # Coleta dados para este perfil
+        ber_rates = []
         kdr_rates = []
-        kdr_pos_rates = []
-        kdr_amplificacao_rates = []
         
         for i, (snr_db, variancia) in enumerate(tqdm(
             zip(snr_db_range, variancias_ruido),
@@ -141,7 +143,7 @@ def experimento_perfis_dispositivos(
             desc=f"SNR {perfil_nome}",
             colour="cyan"
         )):
-            kdr, kdr_pos, kdr_amp = extrair_kdr(
+            ber, kdr = extrair_kdr(
                 palavra_codigo,
                 rayleigh_param,
                 tamanho_cadeia_bits,
@@ -150,34 +152,33 @@ def experimento_perfis_dispositivos(
                 media_ruido,
                 bch_codigo,
                 correlacao_temporal,  # Usa correlação calculada do perfil
-                usar_amplificacao=True,
+                usar_amplificacao=False,
                 modulacao=modulacao,
                 erro_estimativa=erro_estimativa,  # Usa erro do perfil
                 guard_band_sigma=guard_band_sigma  # Usa guard band do perfil
             )
             
+            ber_rates.append(ber)
             kdr_rates.append(kdr)
-            kdr_pos_rates.append(kdr_pos)
-            kdr_amplificacao_rates.append(kdr_amp)
         
         # Armazena resultados
         resultados_perfis[perfil_nome] = {
             'config': config,
             'params_canal': params_canal,
             'snr_db': snr_db_range.tolist(),
-            'kdr_antes': kdr_rates,
-            'kdr_pos_reconciliacao': kdr_pos_rates,
-            'kdr_pos_amplificacao': kdr_amplificacao_rates,
+            'ber_rates': ber_rates,
+            'kdr_rates': kdr_rates,
         }
         
         # Encontra SNR mínimo para KDR < 1%
         snr_min_viavel = None
-        for snr, kdr in zip(snr_db_range, kdr_pos_rates):
+        for snr, kdr in zip(snr_db_range, kdr_rates):
             if kdr < 0.01:  # 1%
                 snr_min_viavel = snr
                 break
         
         print(f"\nResumo {perfil_nome}:")
+        print(f"  - BER inicial (SNR={snr_db_range[0]:.1f}dB): {ber_rates[0]*100:.2f}%")
         print(f"  - KDR inicial (SNR={snr_db_range[0]:.1f}dB): {kdr_rates[0]*100:.2f}%")
         print(f"  - KDR final (SNR={snr_db_range[-1]:.1f}dB): {kdr_rates[-1]*100:.2f}%")
         if snr_min_viavel:
@@ -199,20 +200,18 @@ def experimento_perfis_dispositivos(
         'freq_doppler_hz': [],
         'correlacao_temporal': [],
         'snr_db': [],
-        'kdr_antes': [],
-        'kdr_pos_reconciliacao': [],
-        'kdr_pos_amplificacao': [],
+        'ber': [],
+        'kdr': [],
     }
     
     for perfil_nome, resultado in resultados_perfis.items():
         config = resultado['config']
         params = resultado['params_canal']
         
-        for snr, kdr_antes, kdr_pos, kdr_amp in zip(
+        for snr, ber, kdr in zip(
             resultado['snr_db'],
-            resultado['kdr_antes'],
-            resultado['kdr_pos_reconciliacao'],
-            resultado['kdr_pos_amplificacao']
+            resultado['ber_rates'],
+            resultado['kdr_rates']
         ):
             csv_data['perfil'].append(perfil_nome)
             csv_data['velocidade_kmh'].append(config['velocidade_max_kmh'])
@@ -223,9 +222,8 @@ def experimento_perfis_dispositivos(
             csv_data['freq_doppler_hz'].append(params['freq_doppler_hz'])
             csv_data['correlacao_temporal'].append(params['correlacao_temporal'])
             csv_data['snr_db'].append(snr)
-            csv_data['kdr_antes'].append(kdr_antes)
-            csv_data['kdr_pos_reconciliacao'].append(kdr_pos)
-            csv_data['kdr_pos_amplificacao'].append(kdr_amp)
+            csv_data['ber'].append(ber)
+            csv_data['kdr'].append(kdr)
     
     # Salva CSV
     colunas_csv = list(csv_data.keys())
@@ -235,13 +233,13 @@ def experimento_perfis_dispositivos(
     ]
     salvar_resultado_csv(
         dados_csv,
-        f"exp07_perfis_dispositivos_{timestamp}",
+        f"exp05_perfis_dispositivos_{timestamp}",
         colunas_csv
     )
     
     # Prepara dados para JSON
     json_data = {
-        'experimento': 'exp07_perfis_dispositivos',
+        'experimento': 'exp05_perfis_dispositivos',
         'timestamp': timestamp,
         'configuracao': {
             'tamanho_cadeia_bits': tamanho_cadeia_bits,
@@ -258,7 +256,7 @@ def experimento_perfis_dispositivos(
     # Salva JSON
     salvar_resultado_json(
         json_data,
-        f"exp07_perfis_dispositivos_{timestamp}"
+        f"exp05_perfis_dispositivos_{timestamp}"
     )
     
     # Cria gráfico comparativo
@@ -271,14 +269,14 @@ def experimento_perfis_dispositivos(
     for perfil_nome, resultado in resultados_perfis.items():
         dados_grafico[perfil_nome] = {
             'snr_db': resultado['snr_db'],
-            'kdr_antes': resultado['kdr_antes'],
-            'kdr_pos': resultado['kdr_pos_reconciliacao'],
-            'kdr_amp': resultado['kdr_pos_amplificacao'],
+            'ber_rates': resultado['ber_rates'],
+            'kdr_rates': resultado['kdr_rates'],
         }
     
     criar_grafico_perfis_dispositivos(
         dados_grafico,
-        f"exp07_perfis_dispositivos_{timestamp}"
+        f"exp05_perfis_dispositivos_{timestamp}",
+        base_dir
     )
     
     # Imprime sumário
@@ -286,7 +284,7 @@ def experimento_perfis_dispositivos(
     print("SUMÁRIO DOS RESULTADOS")
     print("="*80 + "\n")
     
-    print(f"{'Perfil':<20} {'SNR Min (dB)':<15} {'ρ':<10} {'Erro (%)':<10} {'GB (σ)':<10}")
+    print(f"{'Perfil':<20} {'SNR Min (dB)':<15} {'rho':<10} {'Erro (%)':<10} {'GB (sigma)':<10}")
     print("-" * 80)
     
     for perfil_nome, resultado in resultados_perfis.items():
@@ -295,7 +293,7 @@ def experimento_perfis_dispositivos(
         
         # Encontra SNR mínimo
         snr_min_viavel = "N/A"
-        for snr, kdr in zip(resultado['snr_db'], resultado['kdr_pos_reconciliacao']):
+        for snr, kdr in zip(resultado['snr_db'], resultado['kdr_rates']):
             if kdr < 0.01:
                 snr_min_viavel = f"{snr:.1f}"
                 break
@@ -309,27 +307,28 @@ def experimento_perfis_dispositivos(
     print("EXPERIMENTO CONCLUÍDO!")
     print("="*80)
     print(f"Resultados salvos com timestamp: {timestamp}")
-    print(f"  - CSV: resultados/dados/exp07_perfis_dispositivos_{timestamp}.csv")
-    print(f"  - JSON: resultados/dados/exp07_perfis_dispositivos_{timestamp}.json")
-    print(f"  - Gráfico: resultados/figuras/exp07_perfis_dispositivos_{timestamp}.png")
+    print(f"  - CSV: resultados/dados/exp05_perfis_dispositivos_{timestamp}.csv")
+    print(f"  - JSON: resultados/dados/exp05_perfis_dispositivos_{timestamp}.json")
+    print(f"  - Gráfico: resultados/figuras/exp05_perfis_dispositivos_{timestamp}.png")
     print("="*80 + "\n")
     
     return resultados_perfis
 
 
-def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo):
+def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
     """
     Cria gráfico comparativo dos perfis de dispositivos.
     
     Args:
         dados_grafico: Dict com dados de cada perfil
         nome_arquivo: Nome base para salvar o arquivo
+        base_dir: Diretório raiz do projeto
     """
     import matplotlib.pyplot as plt
     
     # Configurações do gráfico
     plt.style.use('seaborn-v0_8-darkgrid')
-    fig, axes = plt.subplots(1, 3, figsize=(20, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     
     # Cores para cada perfil
     cores = {
@@ -349,11 +348,11 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo):
         'nb_iot': 'NB-IoT (10 km/h)'
     }
     
-    # Plot 1: KDR antes da reconciliação
+    # Plot 1: BER (antes da reconciliação)
     for perfil, dados in dados_grafico.items():
         axes[0].plot(
             dados['snr_db'],
-            [k * 100 for k in dados['kdr_antes']],
+            [b * 100 for b in dados['ber_rates']],
             marker='o',
             linewidth=2,
             label=labels[perfil],
@@ -361,17 +360,17 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo):
         )
     
     axes[0].set_xlabel('SNR (dB)', fontsize=12)
-    axes[0].set_ylabel('KDR (%)', fontsize=12)
-    axes[0].set_title('KDR Antes da Reconciliação', fontsize=14, fontweight='bold')
+    axes[0].set_ylabel('BER (%)', fontsize=12)
+    axes[0].set_title('BER Antes da Reconciliação', fontsize=14, fontweight='bold')
     axes[0].legend(loc='upper right', fontsize=10)
     axes[0].grid(True, alpha=0.3)
     axes[0].set_ylim([0, 50])
     
-    # Plot 2: KDR após reconciliação
+    # Plot 2: KDR (após reconciliação BCH)
     for perfil, dados in dados_grafico.items():
         axes[1].plot(
             dados['snr_db'],
-            [k * 100 for k in dados['kdr_pos']],
+            [k * 100 for k in dados['kdr_rates']],
             marker='s',
             linewidth=2,
             label=labels[perfil],
@@ -386,29 +385,12 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo):
     axes[1].axhline(y=1.0, color='r', linestyle='--', linewidth=1, label='Limiar 1%')
     axes[1].set_ylim([0, 20])
     
-    # Plot 3: KDR após amplificação
-    for perfil, dados in dados_grafico.items():
-        axes[2].plot(
-            dados['snr_db'],
-            [k * 100 for k in dados['kdr_amp']],
-            marker='^',
-            linewidth=2,
-            label=labels[perfil],
-            color=cores[perfil]
-        )
-    
-    axes[2].set_xlabel('SNR (dB)', fontsize=12)
-    axes[2].set_ylabel('KDR (%)', fontsize=12)
-    axes[2].set_title('KDR Após Amplificação (SHA-256)', fontsize=14, fontweight='bold')
-    axes[2].legend(loc='upper right', fontsize=10)
-    axes[2].grid(True, alpha=0.3)
-    axes[2].set_ylim([0, 5])
-    
     plt.tight_layout()
     
-    # Salva figura
-    os.makedirs('resultados/figuras', exist_ok=True)
-    caminho = f'resultados/figuras/{nome_arquivo}.png'
+    # Salva figura com caminho absoluto
+    dir_figuras = os.path.join(base_dir, 'resultados', 'figuras')
+    os.makedirs(dir_figuras, exist_ok=True)
+    caminho = os.path.join(dir_figuras, f'{nome_arquivo}.png')
     plt.savefig(caminho, dpi=300, bbox_inches='tight')
     print(f"Gráfico salvo: {caminho}")
     plt.close()

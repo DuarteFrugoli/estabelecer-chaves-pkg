@@ -1,5 +1,5 @@
 """
-Experimento 3: Comparação BPSK vs QPSK
+Experimento 2: Comparação BPSK vs QPSK
 Testa o impacto do tipo de modulação no KDR
 """
 
@@ -41,7 +41,7 @@ def experimento_comparacao_modulacao(
     """
     
     print("\n" + "="*70)
-    print("EXPERIMENTO 3: COMPARAÇÃO BPSK vs QPSK")
+    print("EXPERIMENTO 2: COMPARAÇÃO BPSK vs QPSK")
     print("="*70)
     print(f"Tamanho código BCH: {tamanho_cadeia_bits}")
     print(f"Quantidade de testes: {quantidade_de_testes}")
@@ -116,7 +116,7 @@ def experimento_comparacao_modulacao(
     }
     
     # Salva JSON
-    salvar_resultado_json(dados, "exp03_comparacao_modulacao",
+    salvar_resultado_json(dados, "exp02_comparacao_modulacao",
                          descricao="Comparação entre BPSK e QPSK")
     
     # Salva CSV
@@ -124,57 +124,53 @@ def experimento_comparacao_modulacao(
     for i, snr in enumerate(snr_db_range):
         csv_dados.append({
             'SNR_dB': f"{snr:.2f}",
-            'BPSK_antes': f"{dados_modulacoes['bpsk']['kdr_rates'][i]:.4f}",
-            'BPSK_pos_rec': f"{dados_modulacoes['bpsk']['kdr_pos_rates'][i]:.4f}",
-            'BPSK_pos_amp': f"{dados_modulacoes['bpsk']['kdr_amplificacao_rates'][i]:.4f}",
-            'QPSK_antes': f"{dados_modulacoes['qpsk']['kdr_rates'][i]:.4f}",
-            'QPSK_pos_rec': f"{dados_modulacoes['qpsk']['kdr_pos_rates'][i]:.4f}",
-            'QPSK_pos_amp': f"{dados_modulacoes['qpsk']['kdr_amplificacao_rates'][i]:.4f}"
+            'BPSK_BER': f"{dados_modulacoes['bpsk']['ber_rates'][i]:.4f}",
+            'BPSK_KDR': f"{dados_modulacoes['bpsk']['kdr_rates'][i]:.4f}",
+            'QPSK_BER': f"{dados_modulacoes['qpsk']['ber_rates'][i]:.4f}",
+            'QPSK_KDR': f"{dados_modulacoes['qpsk']['kdr_rates'][i]:.4f}"
         })
     
-    salvar_resultado_csv(csv_dados, "exp03_comparacao_modulacao",
-                        ['SNR_dB', 'BPSK_antes', 'BPSK_pos_rec', 'BPSK_pos_amp',
-                         'QPSK_antes', 'QPSK_pos_rec', 'QPSK_pos_amp'])
+    salvar_resultado_csv(csv_dados, "exp02_comparacao_modulacao",
+                        ['SNR_dB', 'BPSK_BER', 'BPSK_KDR', 'QPSK_BER', 'QPSK_KDR'])
     
     # Cria gráfico comparativo
     import matplotlib.pyplot as plt
     
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle(f'Comparação BPSK vs QPSK\n(σ={rayleigh_param:.4f}, ρ={correlacao_canal})',
                 fontsize=14, fontweight='bold')
     
-    titulos = ['KDR Antes da Reconciliação', 'KDR Pós Reconciliação', 'KDR Pós Amplificação']
-    metricas = ['kdr_rates', 'kdr_pos_rates', 'kdr_amplificacao_rates']
+    titulos = ['BER Antes da Reconciliação', 'KDR Após Reconciliação BCH']
+    metricas = ['ber_rates', 'kdr_rates']
     
     for i, (ax, titulo, metrica) in enumerate(zip(axes, titulos, metricas)):
-        ax.plot(snr_db_range, dados_modulacoes['bpsk'][metrica],
+        ax.plot(snr_db_range, [x*100 for x in dados_modulacoes['bpsk'][metrica]],
                marker='o', linestyle='-', linewidth=2, color='blue',
                label='BPSK')
         
-        ax.plot(snr_db_range, dados_modulacoes['qpsk'][metrica],
+        ax.plot(snr_db_range, [x*100 for x in dados_modulacoes['qpsk'][metrica]],
                marker='s', linestyle='--', linewidth=2, color='red',
                label='QPSK')
         
         ax.set_xlabel('SNR (dB)')
-        ax.set_ylabel('KDR (%)')
+        ax.set_ylabel('BER/KDR (%)')
         ax.set_title(titulo)
         ax.grid(True, alpha=0.3)
         ax.legend()
     
     plt.tight_layout()
-    salvar_grafico(fig, "exp03_comparacao_modulacao")
+    salvar_grafico(fig, "exp02_comparacao_modulacao")
     plt.close()
     
     # Sumário
     for modulacao in ['bpsk', 'qpsk']:
         print(f"\n--- Resultados para {modulacao.upper()} ---")
         imprimir_sumario_resultados({
-            'KDR_antes': dados_modulacoes[modulacao]['kdr_rates'],
-            'KDR_pos_reconciliacao': dados_modulacoes[modulacao]['kdr_pos_rates'],
-            'KDR_pos_amplificacao': dados_modulacoes[modulacao]['kdr_amplificacao_rates']
+            'BER': dados_modulacoes[modulacao]['ber_rates'],
+            'KDR': dados_modulacoes[modulacao]['kdr_rates']
         })
     
-    print("\n✓ Experimento 3 concluído com sucesso!\n")
+    print("\n[OK] Experimento 2 concluído com sucesso!\n")
     
     return dados
 

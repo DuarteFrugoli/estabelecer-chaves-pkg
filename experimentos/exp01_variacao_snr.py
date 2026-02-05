@@ -72,9 +72,8 @@ def experimento_variacao_snr(
     bch_codigo = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao)
     
     # Coleta dados
+    ber_rates = []
     kdr_rates = []
-    kdr_pos_rates = []
-    kdr_amplificacao_rates = []
     
     for i, (snr_db, variancia) in enumerate(tqdm(
         zip(snr_db_range, variancias_ruido),
@@ -126,50 +125,37 @@ def experimento_variacao_snr(
     for i, snr in enumerate(snr_db_range):
         csv_dados.append({
             'SNR_dB': f"{snr:.2f}",
-            'KDR_antes': f"{kdr_rates[i]:.4f}",
-            'KDR_pos_rec': f"{kdr_pos_rates[i]:.4f}",
-            'KDR_pos_amp': f"{kdr_amplificacao_rates[i]:.4f}"
+            'BER': f"{ber_rates[i]:.4f}",
+            'KDR': f"{kdr_rates[i]:.4f}"
         })
     
     salvar_resultado_csv(csv_dados, "exp01_variacao_snr",
-                        ['SNR_dB', 'KDR_antes', 'KDR_pos_rec', 'KDR_pos_amp'])
+                        ['SNR_dB', 'BER', 'KDR'])
     
-    # Cria gráfico
-    import matplotlib.pyplot as plt
+    # Cria gráfico usando util_experimentos
+    dados_variacoes = {
+        'Padrão': {
+            'ber_rates': ber_rates,
+            'kdr_rates': kdr_rates
+        }
+    }
     
-    fig, ax = plt.subplots(1, 1, figsize=(10, 6))
-    
-    ax.plot(snr_db_range, kdr_rates, 
-           marker='o', linestyle='-', linewidth=2, color='red',
-           label='KDR antes da reconciliação')
-    
-    ax.plot(snr_db_range, kdr_pos_rates,
-           marker='s', linestyle='-', linewidth=2, color='blue',
-           label='KDR pós reconciliação')
-    
-    ax.plot(snr_db_range, kdr_amplificacao_rates,
-           marker='^', linestyle='-', linewidth=2, color='green',
-           label='KDR pós amplificação (SHA-256)')
-    
-    ax.set_xlabel('SNR (dB)', fontsize=12)
-    ax.set_ylabel('Key Disagreement Rate (%)', fontsize=12)
-    ax.set_title(f'Impacto da SNR no KDR\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})', 
-                fontsize=14, fontweight='bold')
-    ax.grid(True, alpha=0.3)
-    ax.legend(fontsize=10)
-    
-    from experimentos.util_experimentos import salvar_grafico
-    salvar_grafico(fig, "exp01_variacao_snr")
-    plt.close()
+    from experimentos.util_experimentos import criar_grafico_comparativo_kdr
+    criar_grafico_comparativo_kdr(
+        snr_db=snr_db_range,
+        dados_variacoes=dados_variacoes,
+        titulo=f"Impacto da SNR no BER/KDR (σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})",
+        xlabel="SNR (dB)",
+        nome_arquivo="exp01_variacao_snr"
+    )
     
     # Sumário
     imprimir_sumario_resultados({
-        'KDR_antes': kdr_rates,
-        'KDR_pos_reconciliacao': kdr_pos_rates,
-        'KDR_pos_amplificacao': kdr_amplificacao_rates
+        'BER': ber_rates,
+        'KDR': kdr_rates
     })
     
-    print("\n✓ Experimento 1 concluído com sucesso!\n")
+    print("\n[OK] Experimento 1 concluído com sucesso!\n")
     
     return dados
 

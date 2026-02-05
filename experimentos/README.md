@@ -7,19 +7,26 @@ Este diretório contém os scripts para executar experimentos sistemáticos que 
 ```
 experimentos/
 ├── util_experimentos.py          # Utilitários para salvar resultados
-├── exp01_variacao_snr.py         # Experimento 1: Variação de SNR
-├── exp02_variacao_sigma.py       # Experimento 2: Variação do parâmetro Rayleigh σ
-├── exp03_comparacao_modulacao.py # Experimento 3: BPSK vs QPSK
-├── exp04_variacao_correlacao.py  # Experimento 4: Variação da correlação ρ
-├── exp05_variacao_bch.py         # Experimento 5: Diferentes códigos BCH
-├── exp07_perfis_dispositivos.py  # Experimento 7: Perfis IoT (velocidade)
-├── exp08_variacao_distancia.py   # Experimento 8: Variação de distância 🆕
+├── exp01_variacao_snr.py         # ✅ Experimento 1: Variação de SNR
+├── exp02_comparacao_modulacao.py # ✅ Experimento 2: BPSK vs QPSK
+├── exp03_variacao_bch.py         # ✅ Experimento 3: Diferentes códigos BCH
+├── exp04_analise_complexidade.py # ✅ Experimento 4: Complexidade computacional
+├── exp05_perfis_dispositivos.py  # ✅ Experimento 5: Perfis IoT (aplicação prática)
+├── exp06_analise_eve.py          # ✅ Experimento 6: Segurança contra Eve
+├── exp07_impacto_guard_band.py   # ✅ Experimento 7: Trade-off guard-band (NOVO!)
 └── executar_todos.py             # Script master que roda todos
 
 resultados/
 ├── dados/                         # JSON e CSV dos resultados
 └── figuras/                       # Gráficos PNG de alta resolução
 ```
+
+**EXPERIMENTOS ESSENCIAIS PARA O ARTIGO:**
+1. **exp01** - KDR vs SNR (fundamental)
+2. **exp04** - Complexidade (viabilidade IoT)
+3. **exp05** - Perfis dispositivos (aplicação prática)
+4. **exp06** - Segurança Eve (validação PKG)
+5. **exp07** - Guard-band (DIFERENCIAL do sistema!)
 
 ## 🚀 Como Executar
 
@@ -31,17 +38,23 @@ Execute cada experimento separadamente:
 # Experimento 1: Variação de SNR
 python experimentos/exp01_variacao_snr.py
 
-# Experimento 2: Variação de Sigma
-python experimentos/exp02_variacao_sigma.py
+# Experimento 2: Comparação Modulação
+python experimentos/exp02_comparacao_modulacao.py
 
-# Experimento 3: Comparação Modulação
-python experimentos/exp03_comparacao_modulacao.py
+# Experimento 3: Variação de BCH
+python experimentos/exp03_variacao_bch.py
 
-# Experimento 4: Variação de Correlação
-python experimentos/exp04_variacao_correlacao.py
+# Experimento 4: Análise de Complexidade
+python experimentos/exp04_analise_complexidade.py
 
-# Experimento 5: Variação de BCH (mais demorado)
-python experimentos/exp05_variacao_bch.py
+# Experimento 5: Perfis de Dispositivos
+python experimentos/exp05_perfis_dispositivos.py
+
+# Experimento 6: Análise de Segurança (Eve)
+python experimentos/exp06_analise_eve.py
+
+# Experimento 7: Impacto Guard-Band (NOVO!)
+python experimentos/exp07_impacto_guard_band.py
 ```
 
 ### Opção 2: Bateria Rápida (Recomendado para teste)

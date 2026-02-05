@@ -1,5 +1,5 @@
 """
-Experimento 5: Variação do Código BCH
+Experimento 3: Variação do Código BCH
 Testa o impacto do tamanho e capacidade de correção do BCH no KDR
 """
 
@@ -43,7 +43,7 @@ def experimento_variacao_bch(
     """
     
     print("\n" + "="*70)
-    print("EXPERIMENTO 5: VARIAÇÃO DO CÓDIGO BCH")
+    print("EXPERIMENTO 3: VARIAÇÃO DO CÓDIGO BCH")
     print("="*70)
     print(f"Códigos BCH a testar: {codigos_bch}")
     print(f"Quantidade de testes: {quantidade_de_testes}")
@@ -124,7 +124,7 @@ def experimento_variacao_bch(
     }
     
     # Salva JSON
-    salvar_resultado_json(dados, "exp05_variacao_bch",
+    salvar_resultado_json(dados, "exp03_variacao_bch",
                          descricao="Análise do impacto do código BCH no KDR")
     
     # Salva CSV
@@ -132,50 +132,49 @@ def experimento_variacao_bch(
     for i, snr in enumerate(snr_db_range):
         linha = {'SNR_dB': f"{snr:.2f}"}
         for codigo_str in dados_todos_codigos.keys():
-            linha[f'{codigo_str}_antes'] = f"{dados_todos_codigos[codigo_str]['kdr_rates'][i]:.4f}"
-            linha[f'{codigo_str}_pos'] = f"{dados_todos_codigos[codigo_str]['kdr_pos_rates'][i]:.4f}"
+            linha[f'{codigo_str}_BER'] = f"{dados_todos_codigos[codigo_str]['ber_rates'][i]:.4f}"
+            linha[f'{codigo_str}_KDR'] = f"{dados_todos_codigos[codigo_str]['kdr_rates'][i]:.4f}"
         csv_dados.append(linha)
     
-    colunas = ['SNR_dB'] + [f'{c}_{tipo}' for c in dados_todos_codigos.keys() for tipo in ['antes', 'pos']]
-    salvar_resultado_csv(csv_dados, "exp05_variacao_bch", colunas)
+    colunas = ['SNR_dB'] + [f'{c}_{tipo}' for c in dados_todos_codigos.keys() for tipo in ['BER', 'KDR']]
+    salvar_resultado_csv(csv_dados, "exp03_variacao_bch", colunas)
     
     # Cria gráfico comparativo
     import matplotlib.pyplot as plt
     
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-    fig.suptitle(f'Impacto do Código BCH no KDR\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})',
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    fig.suptitle(f'Impacto do Código BCH no BER/KDR\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})',
                 fontsize=14, fontweight='bold')
     
     cores = plt.cm.tab10(np.linspace(0, 1, len(dados_todos_codigos)))
-    titulos = ['KDR Antes da Reconciliação', 'KDR Pós Reconciliação', 'KDR Pós Amplificação']
-    metricas = ['kdr_rates', 'kdr_pos_rates', 'kdr_amplificacao_rates']
+    titulos = ['BER Antes da Reconciliação', 'KDR Após Reconciliação BCH']
+    metricas = ['ber_rates', 'kdr_rates']
     
     for i, (ax, titulo, metrica) in enumerate(zip(axes, titulos, metricas)):
         for j, (codigo_str, dados_codigo) in enumerate(dados_todos_codigos.items()):
-            ax.plot(snr_db_range, dados_codigo[metrica],
+            ax.plot(snr_db_range, [x*100 for x in dados_codigo[metrica]],
                    marker='o', linestyle='-', linewidth=2,
                    color=cores[j], label=f"{codigo_str} (t={dados_codigo['t']})")
         
         ax.set_xlabel('SNR (dB)')
-        ax.set_ylabel('KDR (%)')
+        ax.set_ylabel('BER/KDR (%)')
         ax.set_title(titulo)
         ax.grid(True, alpha=0.3)
         ax.legend()
     
     plt.tight_layout()
-    salvar_grafico(fig, "exp05_variacao_bch")
+    salvar_grafico(fig, "exp03_variacao_bch")
     plt.close()
     
     # Sumário por código
     for codigo_str, dados_codigo in dados_todos_codigos.items():
         print(f"\n--- Resultados para {codigo_str} (t={dados_codigo['t']}) ---")
         imprimir_sumario_resultados({
-            'KDR_antes': dados_codigo['kdr_rates'],
-            'KDR_pos_reconciliacao': dados_codigo['kdr_pos_rates'],
-            'KDR_pos_amplificacao': dados_codigo['kdr_amplificacao_rates']
+            'BER': dados_codigo['ber_rates'],
+            'KDR': dados_codigo['kdr_rates']
         })
     
-    print("\n✓ Experimento 5 concluído com sucesso!\n")
+    print("\n[OK] Experimento 3 concluído com sucesso!\n")
     
     return dados
 

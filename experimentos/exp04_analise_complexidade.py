@@ -1,5 +1,5 @@
 """
-Experimento 6: Análise de Complexidade Computacional
+Experimento 4: Análise de Complexidade Computacional
 Mede o tempo de execução real dos códigos BCH para discussão de viabilidade
 """
 
@@ -98,7 +98,7 @@ def experimento_analise_complexidade(
     """
     
     print("\n" + "="*70)
-    print("EXPERIMENTO 6: ANÁLISE DE COMPLEXIDADE COMPUTACIONAL")
+    print("EXPERIMENTO 4: ANÁLISE DE COMPLEXIDADE COMPUTACIONAL")
     print("="*70)
     print(f"Códigos BCH: {codigos_bch}")
     print(f"Repetições por código: {repeticoes}")
@@ -136,7 +136,7 @@ def experimento_analise_complexidade(
     }
     
     # Salva JSON
-    salvar_resultado_json(dados, "exp06_analise_complexidade",
+    salvar_resultado_json(dados, "exp04_analise_complexidade",
                          descricao="Análise de tempo de execução dos códigos BCH")
     
     # Salva CSV
@@ -154,7 +154,7 @@ def experimento_analise_complexidade(
             'Total_ms': f"{info['tempos']['total_media']:.6f}"
         })
     
-    salvar_resultado_csv(csv_dados, "exp06_analise_complexidade",
+    salvar_resultado_csv(csv_dados, "exp04_analise_complexidade",
                         ['Codigo', 'n', 'k', 't', 'Taxa', 'Encode_ms', 
                          'Decode_limpo_ms', 'Decode_erros_ms', 'Total_ms'])
     
@@ -201,7 +201,7 @@ def experimento_analise_complexidade(
     plt.tight_layout()
     
     from experimentos.util_experimentos import salvar_grafico
-    salvar_grafico(fig, "exp06_analise_complexidade")
+    salvar_grafico(fig, "exp04_analise_complexidade")
     plt.close()
     
     # Análise de viabilidade
@@ -219,13 +219,13 @@ def experimento_analise_complexidade(
         print(f"  Tempo total: {tempo_total:.3f} ms")
         
         if tempo_total < limite_iot_basico:
-            print(f"  ✅ Viável para IoT básico (< {limite_iot_basico} ms)")
+            print(f"  [OK] Viavel para IoT basico (< {limite_iot_basico} ms)")
         elif tempo_total < limite_iot_industrial:
-            print(f"  ⚠️ Viável para IoT industrial (< {limite_iot_industrial} ms)")
+            print(f"  [!] Viavel para IoT industrial (< {limite_iot_industrial} ms)")
         else:
-            print(f"  ❌ Apenas para dispositivos móveis/5G (> {limite_iot_industrial} ms)")
+            print(f"  [X] Apenas para dispositivos moveis/5G (> {limite_iot_industrial} ms)")
     
-    print("\n✓ Experimento 6 concluído com sucesso!\n")
+    print("\n[OK] Experimento 4 concluido com sucesso!\n")
     
     return dados
 

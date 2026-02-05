@@ -1,5 +1,5 @@
 """
-Experimento 9: Análise de Segurança contra Espionagem (Eve)
+Experimento 6: Análise de Segurança contra Espionagem (Eve)
 Testa descorrelação espacial e temporal entre Alice-Bob vs Alice-Eve
 """
 
@@ -122,13 +122,13 @@ def experimento_eve_espacial(
     # Correlação temporal Alice-Bob (mesmo instante, Δt=0)
     correlacao_alice_bob = 0.95  # Alta correlação (reciprocidade)
     
-    print(f"Parâmetros:")
-    print(f"  Frequência: {frequencia_hz/1e9:.2f} GHz")
-    print(f"  Comprimento onda (λ): {comprimento_onda*100:.1f} cm")
-    print(f"  λ/2: {comprimento_onda*50:.1f} cm")
+    print(f"Parametros:")
+    print(f"  Frequencia: {frequencia_hz/1e9:.2f} GHz")
+    print(f"  Comprimento onda (lambda): {comprimento_onda*100:.1f} cm")
+    print(f"  lambda/2: {comprimento_onda*50:.1f} cm")
     print(f"  Velocidade: {velocidade_kmh} km/h")
     print(f"  Doppler: {freq_doppler_hz:.2f} Hz")
-    print(f"  Correlação Alice-Bob: {correlacao_alice_bob:.3f}\n")
+    print(f"  Correlacao Alice-Bob: {correlacao_alice_bob:.3f}\n")
     
     # Configuração BCH
     random.seed(42)
@@ -155,7 +155,7 @@ def experimento_eve_espacial(
     
     # Teste Alice-Bob primeiro (referência de KDR legítimo)
     print("Testando Alice-Bob (referência)...")
-    kdr_antes_bob, kdr_pos_bch_bob, kdr_pos_sha_bob = extrair_kdr(
+    ber_bob, kdr_bob_valor = extrair_kdr(
         palavra_codigo=palavra_codigo,
         rayleigh_param=rayleigh_param,
         tamanho_cadeia_bits=tamanho_cadeia_bits,
@@ -164,13 +164,14 @@ def experimento_eve_espacial(
         media_ruido=media_ruido,
         bch_codigo=bch_codigo,
         correlacao_canal=correlacao_alice_bob,
+        usar_amplificacao=False,
         modulacao=modulacao,
         erro_estimativa=erro_estimativa,
         guard_band_sigma=guard_band_sigma
     )
-    kdr_bob_valor = kdr_pos_bch_bob
     
-    print(f"✓ KDR Bob (pós-BCH): {kdr_bob_valor:.2f}%\n")
+    print(f"[OK] BER Bob: {ber_bob*100:.2f}%")
+    print(f"[OK] KDR Bob (pós-BCH): {kdr_bob_valor*100:.2f}%\n")
     
     # Loop sobre distâncias de Eve
     for dist_eve in tqdm(distancias_eve_m, desc="Testando distâncias de Eve"):
@@ -181,7 +182,7 @@ def experimento_eve_espacial(
         separacao_lambda_2 = dist_eve / (comprimento_onda / 2)
         
         # Medir correlação de coeficientes h (método Yuan et al.)
-        kdr_bob_interno, corr_h_bob, corr_h_eve = medir_seguranca_eve(
+        kdr_bob_interno, ber_eve_raw, ber_eve_pos_bch, corr_h_bob, corr_h_eve = medir_seguranca_eve(
             palavra_codigo=palavra_codigo,
             rayleigh_param=rayleigh_param,
             tamanho_cadeia_bits=tamanho_cadeia_bits,
@@ -205,9 +206,9 @@ def experimento_eve_espacial(
         resultados['correlacao_h_alice_bob'].append(corr_h_bob)
         resultados['correlacao_h_alice_eve'].append(corr_h_eve)
         
-        print(f"  {dist_eve:5.2f}m ({separacao_lambda_2:5.1f}×λ/2): "
-              f"ρ_espacial={rho_espacial:.3f}, "
-              f"ρ_h(A,E)={corr_h_eve:.3f}")
+        print(f"  {dist_eve:5.2f}m ({separacao_lambda_2:5.1f}x lambda/2): "
+              f"rho_espacial={rho_espacial:.3f}, "
+              f"rho_h(A,E)={corr_h_eve:.3f}")
     
     return resultados, kdr_bob_valor, comprimento_onda
 
@@ -292,7 +293,7 @@ def experimento_eve_temporal(
         correlacao_alice_eve = rho_espacial * rho_temporal_eve
         
         # Medir correlação de coeficientes h (método Yuan et al.)
-        kdr_bob_interno, corr_h_bob, corr_h_eve = medir_seguranca_eve(
+        kdr_bob_interno, ber_eve_raw, ber_eve_pos_bch, corr_h_bob, corr_h_eve = medir_seguranca_eve(
             palavra_codigo=palavra_codigo,
             rayleigh_param=rayleigh_param,
             tamanho_cadeia_bits=tamanho_cadeia_bits,
@@ -314,9 +315,9 @@ def experimento_eve_temporal(
         resultados['correlacao_h_alice_bob'].append(corr_h_bob)
         resultados['correlacao_h_alice_eve'].append(corr_h_eve)
         
-        print(f"  {atraso:5.1f}ms: ρ_temp={rho_temporal_eve:.3f}, "
-              f"ρ_total={correlacao_alice_eve:.3f}, "
-              f"ρ_h(A,E)={corr_h_eve:.3f}")
+        print(f"  {atraso:5.1f}ms: rho_temp={rho_temporal_eve:.3f}, "
+              f"rho_total={correlacao_alice_eve:.3f}, "
+              f"rho_h(A,E)={corr_h_eve:.3f}")
     
     return resultados
 
@@ -374,10 +375,10 @@ def criar_graficos(resultados_espacial, resultados_temporal, kdr_bob, lambda_cm,
     plt.tight_layout()
     
     # Salvar
-    caminho_figura = os.path.join('resultados', 'figuras', f'exp09_analise_eve_{timestamp}.png')
+    caminho_figura = os.path.join('resultados', 'figuras', f'exp06_analise_eve_{timestamp}.png')
     os.makedirs(os.path.dirname(caminho_figura), exist_ok=True)
     plt.savefig(caminho_figura, dpi=300, bbox_inches='tight')
-    print(f"\n✓ Gráfico salvo: {caminho_figura}")
+    print(f"\n[OK] Grafico salvo: {caminho_figura}")
     
     plt.close()
 
@@ -432,7 +433,7 @@ if __name__ == "__main__":
                         'correlacao_h_alice_bob', 'correlacao_h_alice_eve']
     salvar_resultado_csv(
         csv_dados_espacial,
-        f'exp09_eve_espacial_{timestamp}',
+        f'exp06_eve_espacial_{timestamp}',
         colunas_espacial
     )
     
@@ -452,14 +453,14 @@ if __name__ == "__main__":
                         'kdr_bob', 'correlacao_h_alice_bob', 'correlacao_h_alice_eve']
     salvar_resultado_csv(
         csv_dados_temporal,
-        f'exp09_eve_temporal_{timestamp}',
+        f'exp06_eve_temporal_{timestamp}',
         colunas_temporal
     )
     
     # JSON completo
     dados_completos = {
         'metadados': {
-            'experimento': 'exp09_analise_eve',
+            'experimento': 'exp06_analise_eve',
             'timestamp': timestamp,
             'kdr_bob_referencia': kdr_bob,
             'lambda_cm': lambda_m * 100,
@@ -471,7 +472,7 @@ if __name__ == "__main__":
     
     salvar_resultado_json(
         dados_completos,
-        f'exp09_analise_eve_{timestamp}',
+        f'exp06_analise_eve_{timestamp}',
         'Análise de segurança contra espionagem (Eve)'
     )
     
@@ -482,11 +483,11 @@ if __name__ == "__main__":
     print("\n" + "="*80)
     print("SUMÁRIO DOS RESULTADOS")
     print("="*80)
-    print(f"\n📊 KDR Bob (legítimo): {kdr_bob:.2f}%")
-    print(f"\n🔍 Correlação h (método Yuan et al.):")
-    print(f"  ρ(h_Alice, h_Bob) = {resultados_espacial['correlacao_h_alice_bob'][0]:.4f}")
-    print(f"  ρ(h_Alice, h_Eve) a 10cm = {resultados_espacial['correlacao_h_alice_eve'][0]:.4f}")
-    print(f"  ρ(h_Alice, h_Eve) a 1m = {resultados_espacial['correlacao_h_alice_eve'][3]:.4f}")
-    print(f"  ρ(h_Alice, h_Eve) a 5m = {resultados_espacial['correlacao_h_alice_eve'][5]:.4f}")
-    print(f"\n📍 Parâmetros: λ/2 = {lambda_m*50:.1f}cm, SNR = 9 dB")
+    print(f"\n[>] KDR Bob (legitimo): {kdr_bob:.2f}%")
+    print(f"\n[*] Correlacao h (metodo Yuan et al.):")
+    print(f"  rho(h_Alice, h_Bob) = {resultados_espacial['correlacao_h_alice_bob'][0]:.4f}")
+    print(f"  rho(h_Alice, h_Eve) a 10cm = {resultados_espacial['correlacao_h_alice_eve'][0]:.4f}")
+    print(f"  rho(h_Alice, h_Eve) a 1m = {resultados_espacial['correlacao_h_alice_eve'][3]:.4f}")
+    print(f"  rho(h_Alice, h_Eve) a 5m = {resultados_espacial['correlacao_h_alice_eve'][5]:.4f}")
+    print(f"\n[i] Parametros: lambda/2 = {lambda_m*50:.1f}cm, SNR = 9 dB")
     print("="*80 + "\n")
