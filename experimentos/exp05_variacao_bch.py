@@ -76,15 +76,14 @@ def experimento_variacao_bch(
         palavra_codigo = [random.randint(0, 1) for _ in range(n)]
         bch_codigo = gerar_tabela_codigos_bch(n, k)
         
+        ber_rates = []
         kdr_rates = []
-        kdr_pos_rates = []
-        kdr_amplificacao_rates = []
         
         for variancia in tqdm(variancias_ruido,
                              desc=f"  BCH({n},{k})",
                              leave=False,
                              colour="green"):
-            kdr, kdr_pos, kdr_amp = extrair_kdr(
+            ber, kdr = extrair_kdr(
                 palavra_codigo,
                 rayleigh_param,
                 n,
@@ -93,21 +92,19 @@ def experimento_variacao_bch(
                 media_ruido,
                 bch_codigo,
                 correlacao_canal,
-                usar_amplificacao=True,
+                usar_amplificacao=False,
                 modulacao=modulacao,
                 erro_estimativa=0.0,
                 guard_band_sigma=0.0
             )
             
+            ber_rates.append(ber)
             kdr_rates.append(kdr)
-            kdr_pos_rates.append(kdr_pos)
-            kdr_amplificacao_rates.append(kdr_amp)
         
         codigo_str = f"BCH({n},{k})"
         dados_todos_codigos[codigo_str] = {
+            'ber_rates': ber_rates,
             'kdr_rates': kdr_rates,
-            'kdr_pos_rates': kdr_pos_rates,
-            'kdr_amplificacao_rates': kdr_amplificacao_rates,
             'n': n,
             'k': k,
             't': capacidades[n]

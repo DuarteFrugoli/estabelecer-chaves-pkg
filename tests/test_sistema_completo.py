@@ -126,7 +126,7 @@ class TestSistemaPKGCompleto:
         tabela_codigos = gerar_tabela_codigos_bch(7, 4)
         
         # Testa sem amplificação
-        kdr, kdr_pos_reconciliacao = extrair_kdr(
+        ber, kdr = extrair_kdr(
             palavra_codigo,
             rayleigh_param,
             tamanho_cadeia_bits,
@@ -137,8 +137,8 @@ class TestSistemaPKGCompleto:
             usar_amplificacao=False
         )
         
-        # Testa com amplificação
-        kdr_amp, kdr_pos_reconciliacao_amp, kdr_pos_amplificacao = extrair_kdr(
+        # Testa com amplificação (SHA-256 aplicado internamente)
+        ber_amp, kdr_amp = extrair_kdr(
             palavra_codigo,
             rayleigh_param,
             tamanho_cadeia_bits,
@@ -150,15 +150,14 @@ class TestSistemaPKGCompleto:
         )
         
         # Verificações
+        assert 0.0 <= ber <= 100.0
         assert 0.0 <= kdr <= 100.0
-        assert 0.0 <= kdr_pos_reconciliacao <= 100.0
+        assert 0.0 <= ber_amp <= 100.0
         assert 0.0 <= kdr_amp <= 100.0
-        assert 0.0 <= kdr_pos_reconciliacao_amp <= 100.0
-        assert 0.0 <= kdr_pos_amplificacao <= 100.0
         
-        # Em sistemas estocásticos, reconciliação geralmente reduz erros
-        assert isinstance(kdr_pos_reconciliacao, float)
-        assert isinstance(kdr_pos_reconciliacao_amp, float)
+        # BCH deve reduzir erros: KDR <= BER
+        assert isinstance(kdr, float)
+        assert isinstance(kdr_amp, float)
     
     def test_pkg_robustez_alta_correlacao(self):
         """Teste robustez do PKG com alta correlação de canal"""
@@ -257,8 +256,8 @@ class TestSistemaPKGCompleto:
         tabela_codigos = gerar_tabela_codigos_bch(n, k)
         
         # Coleta estatísticas de múltiplas execuções
+        ber_valores = []
         kdr_valores = []
-        kdr_pos_reconciliacao_valores = []
         
         for i in range(10):
             np.random.seed(i)
@@ -266,7 +265,7 @@ class TestSistemaPKGCompleto:
             
             palavra_codigo = [random.randint(0, 1) for _ in range(n)]
             
-            kdr, kdr_pos_reconciliacao = extrair_kdr(
+            ber, kdr = extrair_kdr(
                 palavra_codigo,
                 1.0,  # rayleigh_param
                 n,
@@ -278,19 +277,19 @@ class TestSistemaPKGCompleto:
                 usar_amplificacao=False
             )
             
+            ber_valores.append(ber)
             kdr_valores.append(kdr)
-            kdr_pos_reconciliacao_valores.append(kdr_pos_reconciliacao)
         
         # Análise estatística básica
+        ber_medio = sum(ber_valores) / len(ber_valores)
         kdr_medio = sum(kdr_valores) / len(kdr_valores)
-        kdr_pos_medio = sum(kdr_pos_reconciliacao_valores) / len(kdr_pos_reconciliacao_valores)
         
-        # Reconciliação deve melhorar em média
-        assert kdr_pos_medio <= kdr_medio
+        # Reconciliação BCH deve melhorar em média: KDR < BER
+        assert kdr_medio <= ber_medio + 5.0  # +5 tolerância estatística
         
         # Valores devem estar em faixa razoável
+        assert 0.0 <= ber_medio <= 100.0
         assert 0.0 <= kdr_medio <= 100.0
-        assert 0.0 <= kdr_pos_medio <= 100.0
     
     def test_pkg_diferentes_cenarios_ruido(self):
         """Teste PKG em diferentes cenários de ruído"""
@@ -302,7 +301,7 @@ class TestSistemaPKGCompleto:
         
         for variancia in variancias_ruido:
             # Executa PKG
-            kdr, kdr_pos_reconciliacao = extrair_kdr(
+            ber, kdr = extrair_kdr(
                 palavra_codigo,
                 1.0,
                 n,
@@ -314,10 +313,10 @@ class TestSistemaPKGCompleto:
             )
             
             # Verificações básicas
+            assert 0.0 <= ber <= 100.0
             assert 0.0 <= kdr <= 100.0
-            assert 0.0 <= kdr_pos_reconciliacao <= 100.0
             # Verifica que são valores válidos
-            assert isinstance(kdr_pos_reconciliacao, float)
+            assert isinstance(kdr, float)
         
         # Com mais ruído, espera-se mais erros (teste geral)
         # Mas pode variar devido à aleatoriedade

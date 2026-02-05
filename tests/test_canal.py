@@ -242,8 +242,8 @@ class TestExtrairKDR:
         self.tabela_codigos = gerar_tabela_codigos_bch(7, 4)
     
     def test_extrair_kdr_basic(self):
-        """Teste básico da extração KDR sem amplificação"""
-        kdr, kdr_pos_reconciliacao = extrair_kdr(
+        """Teste básico da extração BER/KDR sem amplificação"""
+        ber, kdr = extrair_kdr(
             self.palavra_codigo,
             self.rayleigh_param,
             self.tamanho_cadeia_bits,
@@ -257,18 +257,16 @@ class TestExtrairKDR:
             guard_band_sigma=0.0
         )
         
+        assert isinstance(ber, float)
         assert isinstance(kdr, float)
-        assert isinstance(kdr_pos_reconciliacao, float)
+        assert 0.0 <= ber <= 100.0
         assert 0.0 <= kdr <= 100.0
-        assert 0.0 <= kdr_pos_reconciliacao <= 100.0
-        # Em sistemas estocásticos, reconciliação geralmente reduz erros
-        # mas pode ocasionalmente não reduzir devido à aleatoriedade
-        assert isinstance(kdr_pos_reconciliacao, float)
-        assert 0.0 <= kdr_pos_reconciliacao <= 100.0
+        # BCH deve reduzir erros: KDR <= BER
+        assert kdr <= ber + 1.0  # +1.0 tolerância para flutuações Monte Carlo
     
     def test_extrair_kdr_with_amplification(self):
-        """Teste da extração KDR com amplificação"""
-        kdr, kdr_pos_reconciliacao, kdr_pos_amplificacao = extrair_kdr(
+        """Teste da extração BER/KDR com amplificação"""
+        ber, kdr = extrair_kdr(
             self.palavra_codigo,
             self.rayleigh_param,
             self.tamanho_cadeia_bits,
@@ -276,22 +274,20 @@ class TestExtrairKDR:
             self.variancia_ruido,
             self.media_ruido,
             self.tabela_codigos,
-            usar_amplificacao=True,
+            usar_amplificacao=True,  # SHA-256 aplicado internamente
             modulacao='bpsk',
             erro_estimativa=0.0,
             guard_band_sigma=0.0
         )
         
+        assert isinstance(ber, float)
         assert isinstance(kdr, float)
-        assert isinstance(kdr_pos_reconciliacao, float)
-        assert isinstance(kdr_pos_amplificacao, float)
+        assert 0.0 <= ber <= 100.0
         assert 0.0 <= kdr <= 100.0
-        assert 0.0 <= kdr_pos_reconciliacao <= 100.0
-        assert 0.0 <= kdr_pos_amplificacao <= 100.0
     
     def test_extrair_kdr_no_noise(self):
-        """Teste KDR sem ruído"""
-        kdr, kdr_pos_reconciliacao = extrair_kdr(
+        """Teste BER/KDR sem ruído"""
+        ber, kdr = extrair_kdr(
             self.palavra_codigo,
             self.rayleigh_param,
             self.tamanho_cadeia_bits,
@@ -306,13 +302,13 @@ class TestExtrairKDR:
             guard_band_sigma=0.0
         )
         
-        # Sem ruído e canais idênticos, KDR deve ser muito baixo
-        assert kdr < 5.0  # Menos de 5% de erro
-        assert kdr_pos_reconciliacao < 5.0
+        # Sem ruído e canais idênticos, BER e KDR devem ser muito baixos
+        assert ber < 5.0  # Menos de 5% de erro
+        assert kdr < 5.0
     
     def test_extrair_kdr_high_correlation(self):
-        """Teste KDR com alta correlação de canal"""
-        kdr_alta, _ = extrair_kdr(
+        """Teste BER com alta correlação de canal"""
+        ber_alta, _ = extrair_kdr(
             self.palavra_codigo,
             self.rayleigh_param,
             self.tamanho_cadeia_bits,
@@ -327,7 +323,7 @@ class TestExtrairKDR:
             guard_band_sigma=0.0
         )
         
-        kdr_baixa, _ = extrair_kdr(
+        ber_baixa, _ = extrair_kdr(
             self.palavra_codigo,
             self.rayleigh_param,
             self.tamanho_cadeia_bits,
@@ -342,14 +338,14 @@ class TestExtrairKDR:
             guard_band_sigma=0.0
         )
         
-        # Alta correlação = canais mais similares = MENOR discordância = MENOR KDR
-        # Baixa correlação = canais diferentes = MAIOR discordância = MAIOR KDR
-        assert kdr_alta < kdr_baixa
+        # Alta correlação = canais mais similares = MENOR BER
+        # Baixa correlação = canais diferentes = MAIOR BER
+        assert ber_alta < ber_baixa
     
     def test_extrair_kdr_different_rayleigh_params(self):
-        """Teste KDR com diferentes parâmetros Rayleigh"""
+        """Teste BER/KDR com diferentes parâmetros Rayleigh"""
         # Parâmetro menor = canal mais fraco
-        kdr_fraco, _ = extrair_kdr(
+        ber_fraco, _ = extrair_kdr(
             self.palavra_codigo,
             0.5,  # Canal mais fraco
             self.tamanho_cadeia_bits,
@@ -364,7 +360,7 @@ class TestExtrairKDR:
         )
         
         # Parâmetro maior = canal mais forte
-        kdr_forte, _ = extrair_kdr(
+        ber_forte, _ = extrair_kdr(
             self.palavra_codigo,
             2.0,  # Canal mais forte
             self.tamanho_cadeia_bits,
@@ -378,9 +374,9 @@ class TestExtrairKDR:
             guard_band_sigma=0.0
         )
         
-        # Canal mais forte pode ter menor KDR (melhor SNR)
-        assert isinstance(kdr_fraco, float)
-        assert isinstance(kdr_forte, float)
+        # Ambos devem retornar valores válidos
+        assert isinstance(ber_fraco, float)
+        assert isinstance(ber_forte, float)
     
     def test_extrair_kdr_single_test(self):
         """Teste KDR com apenas um teste"""
@@ -472,8 +468,8 @@ class TestExtrairKDR:
         assert 0.0 <= kdr_pos_reconciliacao <= 100.0
     
     def test_extrair_kdr_qpsk_with_amplification(self):
-        """Teste da extração KDR com QPSK e amplificação"""
-        kdr, kdr_pos_reconciliacao, kdr_pos_amplificacao = extrair_kdr(
+        """Teste da extração BER/KDR com QPSK e amplificação"""
+        ber, kdr = extrair_kdr(
             self.palavra_codigo,
             self.rayleigh_param,
             self.tamanho_cadeia_bits,
@@ -487,12 +483,10 @@ class TestExtrairKDR:
             guard_band_sigma=0.0
         )
         
+        assert isinstance(ber, float)
         assert isinstance(kdr, float)
-        assert isinstance(kdr_pos_reconciliacao, float)
-        assert isinstance(kdr_pos_amplificacao, float)
+        assert 0.0 <= ber <= 100.0
         assert 0.0 <= kdr <= 100.0
-        assert 0.0 <= kdr_pos_reconciliacao <= 100.0
-        assert 0.0 <= kdr_pos_amplificacao <= 100.0
     
     def test_extrair_kdr_compare_bpsk_qpsk(self):
         """Compara KDR entre BPSK e QPSK"""
@@ -586,19 +580,18 @@ class TestExtrairKDRIntegration:
             guard_band_sigma=0.0
         )
         
-        # Verifica estrutura dos resultados
-        assert len(resultado_com_amp) == 3  # KDR, KDR pós-reconciliação, KDR pós-amplificação
-        assert len(resultado_sem_amp) == 2  # KDR, KDR pós-reconciliação
+        # Verifica estrutura dos resultados - ambos retornam (BER, KDR)
+        assert len(resultado_com_amp) == 2  # BER, KDR
+        assert len(resultado_sem_amp) == 2  # BER, KDR
         
         # Verifica propriedades
-        kdr, kdr_rec, kdr_amp = resultado_com_amp
+        ber, kdr = resultado_com_amp
+        assert 0.0 <= ber <= 100.0
         assert 0.0 <= kdr <= 100.0
-        assert 0.0 <= kdr_rec <= 100.0
-        assert 0.0 <= kdr_amp <= 100.0
         
-        kdr2, kdr_rec2 = resultado_sem_amp
+        ber2, kdr2 = resultado_sem_amp
+        assert 0.0 <= ber2 <= 100.0
         assert 0.0 <= kdr2 <= 100.0
-        assert 0.0 <= kdr_rec2 <= 100.0
     
     def test_extrair_kdr_consistency(self):
         """Teste de consistência entre execuções"""

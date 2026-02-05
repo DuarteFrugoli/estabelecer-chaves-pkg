@@ -40,7 +40,7 @@ class TestObterParametros:
         
         assert config['erro_estimativa_canal'] == 0.15
         assert config['velocidade_max_kmh'] == 5.0
-        assert config['guard_band_sigma'] == 0.5
+        assert config['guard_band_sigma'] == 0.3
     
     def test_obter_parametros_sensor_estatico(self):
         """Testa obtenção de parâmetros de sensor estático"""
@@ -48,7 +48,7 @@ class TestObterParametros:
         
         assert config['erro_estimativa_canal'] == 0.08
         assert config['velocidade_max_kmh'] == 0.0
-        assert config['guard_band_sigma'] == 0.3
+        assert config['guard_band_sigma'] == 0.7
     
     def test_obter_parametros_manual(self):
         """Testa obtenção de estrutura padrão para configuração manual"""

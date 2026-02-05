@@ -1,0 +1,1672 @@
+ProxiMate: Proximity-based Secure Pairing using Ambient
+Wireless Signals
+Suhas Mathur1∗, Rob Miller2, Alexander Varshavsky3, Wade Trappe2, and Narayan Mandayam2
+1AT&T Security Research Center, New York, NY, suhas@att.com
+2WINLAB, Rutgers University, North Brunswick, NJ
+2{rdmiller, trappe, narayan}@winlab.rutgers.edu
+3AT&T Labs, Florham Park, NJ, varshavsky@research.att.com
+ABSTRACT
+Forming secure associations between wireless devices that
+do not share a prior trust relationship is an important prob-
+lem. This paper presents ProxiMate, a system that allows
+wireless devices in proximity to securely pair with one an-
+other autonomously by generating a common cryptographic
+key directly from their shared time-varying wireless environ-
+ment. The shared key synthesized by ProxiMate can be used
+by the devices to authenticate each others’ physical proxim-
+ity and then to communicate conﬁdentially. Unlike tradi-
+tional pairing approaches such as Diﬃe-Hellman, ProxiMate
+is secure against a computationally unbounded adversary
+and its computational complexity is linear in the size of the
+key. We evaluate ProxiMate using an experimental proto-
+type built using an open-source software-deﬁned platform
+and demonstrate its eﬀectiveness in generating common se-
+cret bits. We further show that it is possible to speed up
+secret key synthesis by monitoring multiple RF sources si-
+multaneously or by shaking together the devices that need
+to be paired. Finally, we show that ProxiMate is resistant to
+even the most powerful attacker who controls the public RF
+source used by legitimate devices for pairing.
+1.
+INTRODUCTION
+The number of devices with wireless interfaces is growing
+at an increasingly rapid pace. This growth fuels the need for
+devices to interact as they move about and come in prox-
+imity of one another. As an example, two people meeting
+for the ﬁrst time may wish to exchange data between their
+mobile devices, or a passenger at a train station may wish
+to pay for a ticket by having their phone interact with an
+electronic ticket booth.
+Securing such interactions from malicious adversaries is
+an important and challenging problem. Due to the broad-
+cast nature of the wireless medium, how does one device
+∗Work done while the primary author was at WINLAB, Rut-
+gers University
+Permission to make digital or hard copies of all or part of this work for
+personal or classroom use is granted without fee provided that copies are
+not made or distributed for proﬁt or commercial advantage and that copies
+bear this notice and the full citation on the ﬁrst page. To copy otherwise, to
+republish, to post on servers or to redistribute to lists, requires prior speciﬁc
+permission and/or a fee.
+MobiSys’11, June 28–July 1, 2011, Bethesda, Maryland, USA.
+Copyright 2011 ACM 978-1-4503-0643-0/11/06 ...$5.00.
+Figure 1:
+Temporal variations in the wireless RF
+channel from a public source (Peter) can be used
+by parties in physical proximity (Alice and Bob) to
+extract a random cryptographic key. An adversary
+(Eve) who is not within the proximity of Alice and
+Bob cannot extract the same key.
+Here, λ is the
+wavelength of the public RF transmission.
+know that it is really interacting with the device it intends
+to communicate with, if it has never encountered this device
+before? As a result, setting up a secure link between wireless
+devices in proximity is presently a surprisingly cumbersome
+procedure that often requires signiﬁcant human intervention
+in the form of entering a shared key on both devices. More-
+over, with the global trend toward miniaturization and in-
+creased variety of device form factors, the devices may not
+have a common set of hardware components required for
+setting a human-supported secure association. For instance,
+the devices may or may not have a screen, buttons, LEDs,
+accelerometers, RFIDs and NFC chips. The only hardware
+component that is guaranteed to be present on all interop-
+erable devices is the wireless radio.
+In this paper, we show that devices in close physical prox-
+imity can derive a shared secret key directly from their com-
+mon but continuously ﬂuctuating radio environment. Our
+system, called ProxiMate, is based on the observation that
+wireless devices in close proximity perceive the same small
+scale temporal variations in their wireless channels, known
+as small-scale fading. We show that these common temporal
+variations can be used by the co-located devices to derive a
+shared secret key directly, without the need for an expensive
+Diﬃe-Hellman key exchange [1,2]. In contrast, as shown in
+Figure 1, an adversary that is not in close proximity to the
+co-located devices will perceive diﬀerent small-scale fading
+eﬀects and won’t be able to derive the same secret key. Fig-
+ure 2 illustrates that the temporal variations as perceived
+by two co-located devices are indeed correlated.
+
+Figure 2: A 30 second trace of the temporal channel variations observed at two receivers tuned to a TV
+broadcast frequency (584.31 MHz) when the receivers are 8 cm apart.
+The proximity at which the two co-located devices must
+reside in order to perceive common small scale fading eﬀects
+depends on the wavelength of the RF transmission. As a
+general rule of thumb, the devices located closer than half a
+wavelength will perceive similar signal ﬂuctuations, whereas
+a device that is located further than half a wavelength will
+perceive diﬀerent small scale fading eﬀects.
+For example,
+the wavelengths of an 90 MHz FM Radio, 624 MHz TV and
+2.4 GHz WLAN transmissions are 3.3m, 47cm and 12.5cm,
+respectively.
+This paper makes four contributions. First, we describe
+ProxiMate, a system for wireless devices in physical prox-
+imity to convert their correlated wireless channel measure-
+ments into identical sequences of bits, which can then be
+used as a shared encryption key. As part of ProxiMate’s al-
+gorithm, we introduce a novel encoding scheme, which we
+call list-encoding. Second, we evaluate the performance of
+ProxiMatethrough measurements of ambient wireless signals.
+Third, we propose to simultaneously monitor multiple RF
+sources and show that concurrent monitoring signiﬁcantly
+increases the rate at which secret bits can be extracted. As
+an example, ProxiMate can generate the equivalent of a 4-
+digit PIN used in Bluetooth systems within 0.34 sec with
+10 TV sources (see Section 4.6 for details). Finally, we de-
+scribe how the diﬀerential-phase of the received signals can
+be used to protect against a very powerful adversary who
+controls the public wireless source that is being used by co-
+located devices for the secret bit extraction.
+2.
+SYSTEM MODEL
+In this section, we deﬁne the problem of proximity-based
+secure association, describe our threat model and present an
+overview of wireless channel characteristics that are impor-
+tant for this paper.
+2.1
+Problem deﬁnition and threat model
+We assume that two legitimate wireless devices, Alice and
+Bob, are located in close physical proximity and are inter-
+ested in exchanging private information via compatible ra-
+dios, without an adversary Eve being able to decrypt their
+communication. This requires an authenticated and secure
+channel. Alice and Bob do not know each other a priori.
+Therefore, they cannot prove their identities to each other.
+However, Alice and Bob know that they are located in close
+physical proximity and can use this information for authen-
+tication. Note that Alice and Bob cannot simply use the
+Diﬃe-Hellman key exchange [1] protocol to establish a se-
+cure channel since Eve can easily masquerade as Alice to
+Bob or vice-versa, or launch a man-in-the-middle attack.
+We further assume that Alice, Bob and Eve can overhear a
+public source of radio waves Peter that transmits a signal
+with a wavelength of λ. Peter can be an FM radio station,
+a TV station, a WiFi AP or a cellular tower.
+We consider two threat models.
+First, we assume that
+Eve can eavesdrop on all communications, and can try to
+authenticate with Bob, pretending that she is Alice (or vice
+versa). Second, we show how our system can deal with the
+most powerful attacker who controls the public source of
+radio waves that Alice and Bob are using for authentication
+- that is Eve is Peter! In both cases, we assume that Eve
+is located at a further distance from both Alice and Bob
+than they are from each other. In Section 4, we show that
+to reliably derive a shared secret key, Alice and Bob need
+to be located closer than 0.1λ from each other, whereas the
+attacker needs to be located further than 0.4λ from Alice
+and Bob. For example, 0.1λ = 30 cm and 0.4λ = 120 cm for
+an FM radio station at 100 MHz.
+2.2
+Wireless channel
+We assume that the wireless channel between Peter and
+the legitimate devices is a multi-path channel, consisting of
+many reﬂectors and scatterers. Many of the paths taken by
+the signals transmitted by Peter are time-varying due to the
+movement of people and objects and varying atmospheric
+conditions.
+Even slight perturbations in the environment
+can generate signiﬁcant signal ﬂuctuations at the receiver.
+This is the case for all terrestrial wireless transmissions such
+as FM radio, TV and cellular networks. The state of the
+wireless channel at any given time instant can be expressed
+as a complex number, representing amplitude and phase of
+the composite channel (see Figure 3). The received signal
+has an amplitude given by the product of the transmit sig-
+nal’s amplitude and the amplitude of the channel at that
+
+Figure 3:
+Wireless signals travel along multiple
+paths, adding up to random amplitude and phase
+at the destination. Thus, a wireless channel can be
+represented as a 2-D vector resulting from the sum
+of many random 2-D vectors, each corresponding
+to a separate path from transmitter to receiver. If
+Alice and Bob are in proximity, the 2-D vectors cor-
+responding to the channels between Peter and them
+are correlated.
+instant. The phase of the received signal is the sum of the
+phase of the transmit signal and the phase of the channel at
+that instant.
+ProxiMate leverages two properties of the wireless channel.
+First, wireless channels at two locations in close proximity
+are highly correlated. However, this correlation diminishes
+fast as the distance between the two locations increases, and
+typically vanishes completely beyond λ/2. Second, both the
+strength and the phase of the wireless channel vary randomly
+in time due to changes in reﬂectors and scatterers. However,
+the signal is highly correlated at times t and t+δ if δ is small.
+The correlation vanishes as δ increases. The smallest δ for
+which the channel is statistically independent at times t and
+t+δ is termed the coherence time Tc of the channel. In other
+words, the coherence time of the channel indicates how often
+the channel appears random again.
+Thus, samples of the
+signal at times t and t + Tc are statistically independent [3].
+3.
+PROXIMATE
+In this section, we describe how Alice and Bob, two de-
+vices in close proximity, can derive a shared secret key by
+tuning into an ambient wireless signal. ProxiMate is based
+on the observation that measurements of the wireless chan-
+nels between an RF source and devices in proximity are
+highly correlated. Channel measurements consist of ampli-
+tude and phase components (see Figure 3 and Section 2.2),
+and since the two components vary independently of one an-
+other but are correlated at Alice and Bob, secret bits can be
+extracted from both separately. Extracting bits from phase
+has the advantage of being secure against a strong attacker
+who controls the public wireless source that is being used by
+Alice and Bob, as we show in Section 4.7.
+Below, we ﬁrst provide an outline of the logical steps in-
+volved in extracting secret-bits from a general correlated
+quantity at Alice and Bob. Figure 4 serves as a summary
+of the entire system and serves as a quick reference to the
+Symbol
+Meaning
+s(t)
+Signal transmitted by the public source, Peter.
+XU
+Complex samples collected by user U
+hP U
+Complex channel measurements between Peter and U
+QU
+Quantizer threshold of user U
+SU
+U’s estimate of s(t) gotten by demodulating XU
+KU
+Result of quantizing |hP U | w.r.t. QU .
+C
+An (n, k) linear block error correcting code.
+fc(x)
+n-bit Codeword in C that is closest to n-bit sequence x
+P
+Oﬀset of Ka w.r.t. closest codeword in C
+Table 1: Summary of notation. Underlined symbols
+indicate vectors. In subscripts, the letter ‘U’ refers
+to user and can be Alice, Bob or Eve.
+reader. We will then specialize this algorithm for the speciﬁc
+cases when the correlated quantity is amplitude of the wire-
+less channel (Section 3.8), and when it is the phase (Section
+3.9).
+1. Alice and Bob periodically sample an ambient wireless
+signal coming from Peter. Each of them uses the sam-
+ples to obtain a sequence of channel measurements.
+2. Each user also uses samples of the received signal to
+demodulate the signal transmitted by Peter.
+3. Each party uses its channel measurements to estimate
+the coherence time Tc of its channel.
+4. Alice obtains a sequence of bits from her channel mea-
+surements.
+The exact mechanism for obtaining bits
+from channel measurements depends upon whether am-
+plitude of phase is used for extracting bits. Each suc-
+cessive bit is obtained from channel measurements sep-
+arated in time by at least Tc, as calculated in step 3.
+5. Alice sends Bob a snippet of her demodulated signal
+from step 2. This is meant to help Bob synchronize to
+Alice’s time-frame so that he can extract similar bits
+as Alice.
+After synchronizing to Alice’s time frame,
+Bob extract bits from his channel measurements, just
+like Alice did in step 4.
+6. Along with the snippet in step 5, Alice sends Bob,
+in the clear, a function of the bit-sequence that she
+obtains from her measurements in step 4. Bob uses this
+information along with his own bits, which he obtains
+in step 5, to arrive at Alice’s bits with high probability.
+This step is called reconciliation [4].
+7. Alice and Bob discard part of their bits to eliminate
+any information that leaked out to Eve during step 6.
+This step is called privacy ampliﬁcation [5].
+Below we expand and elaborate on each of the steps de-
+scribed above. Refer to Table 1 for the summary of notation
+used. Underlined variables represent arrays (i.e. sequences
+of values rather than a single value). Subsections 3.1 to 3.7
+correspond to the numbering of the 7 steps outlined above.
+3.1
+Collecting samples and channel measure-
+ments
+Every T seconds, each user samples the signal received
+from Peter. T is a ﬁxed parameter of the protocol and is
+chosen to be much smaller than the expected approximate
+coherence time Tc.
+These samples are stored into a time
+series Xu, where u = Alice/Bob/Eve, and are used to mea-
+sure the channel time series hP U. Since the wireless channel
+
+Figure 4: Synopsis of ProxiMate’s key extraction algorithm. P: Peter, A: Alice, B: Bob, E: Eve.
+has both amplitude and phase, each element of the channel
+measurement vector hP U is represented by a complex num-
+ber. It is the temporal variation of the amplitude portions
+of hP A and hP B that is shown in Figure 2. It is important
+to understand that the samples Xu of the received signal
+are not the same as channel measurements hP U. Instead,
+channel measurements are derived from the samples of the
+received signal Xu.
+For example, if it is known that the
+transmit signal is of constant amplitude (ﬁxed power), then
+the variation in the amplitude of the received signal |Xu|
+must be purely due to the variations in the wireless channel
+and can therefore be treated as |hu|.
+3.2
+Demodulation
+From the sequence of received samples Xa, each user sep-
+arately demodulates s(t), the signal transmitted by Peter, to
+obtain the demodulated signal Su (u = Alice or Bob). For
+example, if Peter is an FM radio transmitter, the demodu-
+lated signal is simply the audio signal on the FM station.
+The purpose of demodulating Peter’s signal is to use it to
+time-synchronize Alice and Bob.
+3.3
+Estimating the coherence time
+Each user separately estimates the coherence time of the
+channel, Tc, using its sequence of channel measurements
+hP U. In estimating Tc, we assume a Rayleigh fading chan-
+nel [6]. We tested this assumption in practice and found it to
+be correct [7]. That is, the distribution of channel amplitude
+measurements matches closely a Rayleigh distribution.
+The coherence time Tc of a Rayleigh fading channel is re-
+lated to the level crossing rate, LCR, of the channel, i.e.
+simply the rate at which channel amplitude crosses a speci-
+ﬁed level. For a Rayleigh fading channel, this is [6]
+LCR =
+√
+2πfdρe−ρ2
+(1)
+where ρ the ratio between the level-crossing threshold con-
+sidered and the root mean square amplitude, and fd is the
+Doppler spread. From this, Tc can be estimated as [6]:
+Tc ≈
+1
+4fd =
+3ρe−ρ2
+2
+√
+2πLCR
+(2)
+For example, the coherence time of the channel being mon-
+itored in Figure 2 is estimated to be 0.22 sec.
+3.4
+Obtaining bits
+The process of translating channel measurements hP A and
+hP B to bits lies at the heart of ProxiMate. Here we will de-
+scribe a general method to obtain bits from a given corre-
+lated quantity at Alice and Bob and then we will specialize
+it to the case of amplitude in Section 3.8 and to phase in
+Section 3.9. Suppose the quantity that Alice and Bob are
+attempting to obtain bits from, is stored as an array A at
+Alice and an array B at Bob. For the case of amplitude,
+A = |hP A| and B = |hP B|, and for phase, A = angle(hP A)
+and B= angle(hP B). Alice and Bob separately compute the
+median Qu of their measurements A and B. Alice quantizes
+A once per Tc, using Qa as a quantizer threshold to extract
+one bit per coherence time, to obtain a bit-sequence Ka.
+That is, her quantizer output is a bit ”1” if the value of an
+element in A is < Qa and ”0” otherwise. Bob performs the
+exact same steps using his own measurements B, after syn-
+chronizing to Alice’s time-frame of reference (see next step
+- Section 3.5) and obtains the array of bits Kb.
+3.5
+Synchronization
+Alice sends Bob a snippet of her demodulated signal Sa,
+e.g. demodulated audio in the case of FM-radio, with the
+understanding that the start of this snippet corresponds to
+time t = 0 in her frame of reference. Bob can thus easily
+synchronize to Alice’s time-frame of reference by correlating
+his own demodulated signal Sb with Alice’s snippet.
+By
+synchronizing, the bits Kb obtained by Bob correspond to
+the same time instants as Alice’s bits Ka.
+Instead of employing a common snippet of the demod-
+ulated signal as a means for synchronization, one may be
+tempted to simply have Alice convey to Bob: ”I started
+measuring the channel, time t seconds ago”. Such an ap-
+proach may not work in practice because such a packet may
+sit in the transmit or receive buﬀers of Alice and/or Bob for
+variable lengths of time. Further, the synchronization reso-
+lution needed by ProxiMate is naturally served by the public
+source itself because the same source is also being used as a
+shared source of randomness by Alice and Bob.
+3.6
+Reconciliation
+After synchronization and quantization, Alice and Bob
+end up with n-bit sequences, Ka and Kb respectively, which
+
+may diﬀer at any given bit position with a probability ǫ.
+Reconciliation is the process of ‘repairing’ the diﬀerence be-
+tween Ka and Kb so that Alice and Bob end up with the
+same bit-sequence and can then use it as a key. The reconcil-
+iation process drastically reduces the errors between Alice’s
+and Bob’s bit sequences (hopefully eliminating all errors),
+but it also reduces the number of common bits that Alice
+and Bob share. Hence, reconciliation trades oﬀbit-error rate
+ǫ with the key bit-rate.
+A crucial observation that allows reconciliation is the fol-
+lowing: suppose we treat Alice’s bit sequence Ka as the key
+and would like Bob to somehow deduce Ka. Then Bob’s
+bit-sequence Kb can be thought of as a distorted version of
+Ka.
+How can Alice convey to Bob which bits in Kb are
+diﬀerent from Ka without actually sending him Ka (that
+would reveal Ka to Eve)? The answer lies in treating both
+Ka and Kb as distorted versions of ‘some’ n-bit codeword of
+an (n, k) error correcting code1 C. An (n, k) code C consists
+of a one-to-one encoding function that maps any k-bit string
+to a n bit string (n > k), and a many-to-one decoding func-
+tion that maps any n-bit string to one of 2k n-bit strings
+called ‘codewords’ of C. The code C to be used is known to
+all parties, including Eve.
+Let fc(·) be the decoding function of C that maps any n-bit
+sequence to the closest codeword in C. Alice ﬁrst computes
+fc(Ka), i.e. the codeword in C that is closest to Ka and
+then computes the oﬀset P = Ka −fc(Ka), i.e. the bit-
+by-bit diﬀerence between this codeword and Ka. Alice then
+sends P to Bob in cleartext.
+If the value of ǫ is roughly
+known, a code with a suitable error correcting ability can
+be chosen to allow Bob to decode Ka using Kb and P by
+the following operation: P + fc(Kb −P) which is equal to
+P +fc(Ka) with high probability, which in turn equals Ka by
+the deﬁnition of P. Therefore, at the end of this step, both
+Alice and Bob possess Ka with high probability. We refer to
+this construction as a quantization-based construction. We
+will see below, that this construction is not suitable for use
+for extracting a secret key from the amplitude of channel
+measurements hu, but is suitable for extracting the key from
+phase.
+3.7
+Privacy ampliﬁcation
+Since the oﬀset P is sent by Alice in the clear, Eve obtains
+partial information about Alice’s and Bob’s shared key, Ka.
+That is, although she cannot guess Ka by observing P alone,
+she knows something about Ka – in particular she knows
+that Ka −P = a valid codeword of C. It can be formally
+shown that Eve’s learns n −k bits of information about
+Alice’s and Bob’s n-bit strings by observing P. Therefore,
+in order to ensure that the key used by Alice and Bob is not
+even partially known to Eve, in the privacy ampliﬁcation
+step, Alice and Bob reduce the size of their bit-string by n−k
+bits to obtain k-bit strings, about which Eve has absolutely
+no information. The simplest way to accomplish this is to
+use the k-bit pre-image of the n-bit codeword fc(Ka), which
+Alice and Bob possess.
+We have now described how Alice and Bob can extract an
+identical secret key using ProxiMate from a corellated set of
+channel measurements. Next, we tweak the basic framework
+1For simplicity, we will assume the C is a linear block error
+correcting code (we use the (12, 23) Golay code in Section 4
+in our experimental evaluation.)
+Figure 5:
+An illustration of list-encoding.
+Alice
+uses relative maxima and minima to generate Ka.
+Discret-time indices Li, i = 1, . . . n of the selected ex-
+trema are collected into the list L to be sent to Bob.
+of ProxiMate above to make it suitable for extracting bits
+from amplitude (Section 3.8) and phase (Section 3.9).
+3.8
+List-encoding
+Unfortunately, the quantization-based construction described
+in Section 3.6 has the problem that unless the bit-error rate
+ǫ, between the bits of Ka and Kb is extremely small, the
+code C needed to do reconciliation successfully, must be of
+a very large block-length, i.e. n must be very large. The
+Bit-error rate ǫ is related to the distance between Alice and
+Bob d/λ (we evaluate this relationship in Section 4), and for
+typical values of d/λ in our problem, ǫ is moderately large
+(∼0.1 −0.2). For example, when using an ATSC TV signal
+at 584.31 MHz (channel 33) and when Alice and Bob are
+only 1.5 inches apart, we have ǫ ≈0.15. Using a code C with
+a very large block-length n requires that ProxiMate be run
+for a long time in order for Alice and Bob to collect n-bit
+long Ka and Kb. In this subsection, we show how it is pos-
+sible to lower ǫ for a given d/λ, by altering the way in which
+Alice and Bob obtain bits from their channel measurements.
+We now present list-encoding, an alternative to the quantization-
+based construction above for extracting bits from the ampli-
+tude of channel measurements, that signiﬁcantly lowers ǫ to
+a value suitable for use of error correcting codes with a rea-
+sonably small block length n. Short codes, in turn, enable
+ProxiMate to pair Alice and Bob in a shorter time-interval.
+List-encoding uses the relative minima and maxima in the
+temporal variations of |hP U| to create bits at Alice and Bob
+(see Figure 2) instead of quantization with a threshold Qu
+in the quantization-based construction. It involves the fol-
+lowing steps (see Figure 5)
+1. Alice locates sharp upward peaks and deep downward
+fades in the sequence of her channel measurements.
+2. Alice maps upward peaks to a bit ”1” and downward
+fades to a bit ”0”. In this way Alice obtains a bit-string
+Ka.
+3. Each successive extremum chosen by Alice is separated
+from the previous extremum by at least Tc to make
+sure that bits in the extracted key are independent.
+4. Alice collects the time-indices at which these extrema
+occur into a list L.
+5. Alice demodulates her received signal to obtain Sa,
+just like in the ProxiMate’s basic algorithm.
+
+0
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+0.4
+0.45
+0.5
+Distance between Alice and Bob (in λ)
+Probability of bit error
+ 
+ 
+Scalar quantization, 1 bit/Tc
+List encoding, 0.5 bits/Tc
+Figure 6:
+Bit-error rate between raw bits at Alice
+& Bob for a simple quantizer and for list-encoding
+(Section 3.8).
+6. Alice computes a code-oﬀset P of Ka with respect to
+a known linear block code C as before.
+7. Alice sends Bob a package consisting of {P, Sa, L}
+8. Bob synchronizes to Alice’s time-frame of reference us-
+ing Sa as before.
+9. Bob determines for each time-index in L, the location
+of the nearest extremum in his own sequence |hP A| of
+channel measurements. If his nearest extremum is a
+maximum, he assigns the bit ”1”, and for a minimum,
+he assigns a ”0”, and thus Bob builds his bit-sequence
+Kb.
+10. Bob performs reconciliation using P and Kb and knowl-
+edge of the code C as before.
+11. Alice and Bob locally perform privacy ampliﬁcation as
+before.
+Even though the values of the channel measurements hP A
+and hP B at Alice and Bob are not necessarily better corre-
+lated at the location of extrema in Alice’s process, the type
+of extrema (i.e. minimum or maximum) at Alice and Bob at
+these locations are in much better agreement, which lowers
+ǫ.
+Tradeoﬀwith rate. List-encoding has a subtle tradeoﬀ,
+which we will describe here but will defer detailed results
+to [7] due to space limitations. While in the basic version of
+the algorithm, Alice and Bob contribute 1 bit to Ka and Kb
+respectively per Tc, using extrema in the manner described
+above, reduces this to less than one bit per Tc. Therefore,
+the drop in ǫ comes as the cost of a drop in key bit-rate.
+However, it can be shown [7] that the overall eﬀect of list-
+encoding on key bit-rate after reconciliation is that the im-
+provement in ǫ due to list-encoding more than makes up for
+the drop in key bit-rate. Figure 6 shows, via simulation, the
+error bit-rate (ǫ) due to list-encoding and that due to the ba-
+sic version of ProxiMate, for diﬀerent values of the distance
+between Alice and Bob. Notice how list-encoding results in
+a signiﬁcantly lower ǫ, but produces half the number of bits
+per Tc generated by the basic version.
+Figure 7:
+The GNUradio setup corresponding to
+two devices (Alice and Bob).
+3.9
+Extracting bits from phase
+The phase of the signal alone cannot be directly used for
+extracting bits at Alice and Bob because the measurement
+of phase also depends upon the phase of the local oscillators
+(LO) at both the transmitter and the receiver. Since it is
+not pragmatic to assume phase synchronization between the
+LOs of Alice and Bob, we use the change in phase or phase
+diﬀerential over a ﬁxed time interval ∆, instead of the ac-
+tual value of the phase to extract bits. ∆must be at least as
+large as the coherence time Tc so as to ensure that successive
+bits are independent. We use the diﬀerential phase values in
+place of the amplitude of hP U in the quantization-based con-
+struction of ProxiMate and the rest of the algorithm remains
+the same.
+4.
+EVALUATION
+In this section, we describe our experimental setup, dis-
+cuss our evaluation metrics and present results from our pro-
+totype implementation of ProxiMate. Speciﬁcally, we ﬁrst
+experimentally evaluate what must the distance between Al-
+ice and Bob be in order to successfully generate a shared key,
+and how far Eve must be in order for this key to be secret.
+Then, we determine how many secret-bits per second Alice
+and Bob can generate and we explore the use of multiple
+sources in parallel in order to increase this rate.
+Finally,
+we experimentally study the case of a malicious public RF
+source.
+4.1
+Experimental setup
+We evaluated ProxiMate using an experimental prototype
+built on top of GNUradio [8]. GNUradio is an open source
+software toolkit, written in C++ and Python, that allows
+the creation of custom modular blocks for receiving, pro-
+cessing and transmitting RF signals. GNUradio interfaces
+via USB with a piece of hardware called the USRP (Uni-
+versal Software Radio Peripheral), which acts as the bridge
+between the RF and software worlds. We note that our goal
+in using the USRP in evaluating ProxiMate is not to suggest
+that software-deﬁned radios be used as accessories for the
+purpose of secure pairing. Rather, we use the USRP plat-
+form because software-based manipulation of radio signals
+at the level of detail needed by ProxiMate is not currently
+possible using commercial oﬀ-the-shelf wireless devices such
+as cellphones or Wiﬁcards.
+We hope that as compelling
+uses for ﬁne grained wireless measurements at higher layer
+APIs mounts, the near future will bring the ability to exploit
+channel information in higher layers.
+For any given scenario in our evaluations below, each user
+was mapped to a USRP radio front-end, connected to a
+laptop running GNUradio (see Figure 7 showing Alice and
+
+Bob). This setup allows each user to collect complex sam-
+ples (i.e. each sample has amplitude and phase) of the RF
+frequency band it is tuned into.
+In evaluating ProxiMate we used real RF signals in the
+television broadcast band between 512 and 608 MHz (chan-
+nels 21-36 in the US), and the FM-radio broadcast band
+between 88 and 108 MHz. Each broadcast TV channel con-
+tains an always-on constant-amplitude pilot tone, which we
+tune into, and track its amplitude to obtain channel mea-
+surements (i.e. |hP U|). For FM-radio signals, we make use
+of the fact that the FM radio signal has a very narrow spec-
+trum (200 kHz) and is transmitted at constant power by the
+transmitter. Thus, we measure the total received power over
+the 200 KHz band for a given FM radio channel as our chan-
+nel measurement |hP U|. For extracting bits using phase, we
+retain the phase of each sample, which is then used to com-
+pute the phase-diﬀerential across a time interval ∆> Tc.
+Overall, we collected close to 1.5 hours of data from the TV
+bands and 1 hour of data from the FM bands, spread over
+6 days of measurements.
+4.2
+Evaluation metrics
+In evaluating ProxiMate, we employ three metrics: key
+bit-rate, bit-error rate and mutual information.
+Key bit-rate reﬂects the rate at which two devices can
+generate secret bits.
+For example, if a key bit-rate is 1
+bit/sec, then a 128 bit key can be generated in 128 seconds.
+The higher the key bit-rate, the faster two devices can gen-
+erate a key of a given length. Key bit-rate depends on the
+encoding scheme and the coherence time of the channel. Re-
+call from Section 2.2 that the coherence time is an indicator
+of how often the channel can provide fresh random secret
+bits. Once the coherence time of a channel is estimated (us-
+ing the method in Section 3.3), we can calculate the key
+bit-rate.
+Bit error rate (BER) is the number of bit-errors divided
+by the total number of generated bits or, in other words, the
+fraction of bits extracted by the two devices that diﬀer. For
+instance, random selection of bits by two devices will result
+in a bit-error rate of ∼0.5, since, on average, the devices
+will generate diﬀerent bits roughly half the time. The lower
+the BER, the higher the likelihood that two devices will gen-
+erate exactly the same key at the end of ProxiMate. Given a
+wireless channel, BER depends on the distance between two
+devices. The larger the distance between two devices, the
+more likely they are going to observe diﬀerent variations of
+the signal, and, therefore, the more likely they are to gener-
+ate diﬀerent bits. Fixing the distance between two devices,
+ﬁxes their BER.
+Mutual information
+[9] between two random quanti-
+ties X and Y , denoted I(X; Y ), is a non-negative measure of
+the amount of information in bits, that observing the value
+of either of the quantities, say Y , conveys about the value
+of the other, X. If mutual information between X and Y is
+zero, then observing the value of one does not convey any
+information about the other.
+We use mutual information
+to measure the similarity between observations of two legit-
+imate devices and the dissimilarity between observation of
+an adversary and either of the legitimate devices. A mutual
+information of close to 0 between the channel measurements
+of an adversary and those of the legitimate devices would
+indicate adversary’s inability to obtain any useful informa-
+tion about the legitimate device’s measurements from its
+(a)
+(b)
+(c)
+Figure 9: Scatterplots of the channel estimates of (a)
+Alice Vs. Bob, (b) Alice Vs. Eve and (c) Bob Vs.
+Eve, made using a three-user measurement on an
+FM radio channel. Eve is at a distance of λ/2 from
+both Alice & Bob, who are d = 0.05λ apart. Each plot
+also shows an estimate of the mutual information
+per pair of channel estimates, computed using the
+algorithm in [10].
+observations. Further, since bits are extracted from chan-
+nel measurements (whether amplitude or phase), this would
+also necessarily indicate the adversary’s inability to get any
+information about the bits generated by the legitimate de-
+vices. Such bits can therefore be considered secret bits. Mu-
+tual information between two quantities X and Y can be
+empirically computed [10] if a large number of data pairs
+(Xi, Yi), i = 1, . . . is available.
+4.3
+What should be the distances between Al-
+ice, Bob and Eve?
+In order to evaluate: (a) the ability of Alice and Bob to
+extract the same bits, as a function of the distance between
+them, and (b) the inability of Eve to extract the same bits
+as Alice or Bob, we run instances of ProxiMate for various
+distances between two USRP receivers. Figure 8(a) shows
+the bit-error rate ǫ between bits obtained using list-encoding
+at two receivers for the TV and FM bands as a function of
+physical distance between the receivers. Figure 8(b) shows
+the BER for bits obtained from phase alone, using the sim-
+pler quantization procedure described in Section 3.9. The
+BERs shown in Figure 8 are before the application of error
+correcting code.
+The ﬁrst insight from these plots is that the BER ap-
+proaches 0.5 as the distance between the receivers approaches
+∼0.4λ. Second, in the case of amplitude, the BER between
+receivers that are within d < 0.1λ is within ∼0.03, but in
+the case of phase, the error performance is worse ∼0.03
+at d = 0.05λ.
+However, phase-based extraction has the
+additional quality of being resistant to a malicious public
+source, as we show in Section 4.7. Such low bit-error rates
+can be handled by error correcting codes with short block
+lengths. Our results suggest that adversary should be lo-
+cated farther than 0.4λ, and the legitimate devices should
+be within d = 0.1λ or less for amplitude-based bit extraction
+and d = 0.05λ for phase-based bit extraction.
+In order to characterize the information available to Eve
+about the channel measurements of Alice and Bob, we con-
+ducted measurements with three GNUradio receivers repre-
+senting Alice, Bob and Eve, simultaneously tuned in to the
+same FM-radio channel. Figure 9 shows pairwise scatter-
+plots of the amplitude of channel measurements of each pair
+of users when Eve is at a distance of 0.5λ from both Alice
+and Bob and Alice and Bob are 0.05λ apart.
+The upper
+left corner of each plot also shows the empirically computed
+
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+Distance between receivers (in λ)
+Bit error rate
+ 
+ 
+TV
+FM
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+Distance between receivers (in λ)
+Bit error rate
+ 
+ 
+FM
+TV
+(a)
+(b)
+Figure 8:
+The bit-error rate ǫ between the bits obtained (prior to reconciliation) by two devices as the
+distance between them is varied, using (a) list-encoding with channel amplitudes, and (b) phase-diﬀerentials,
+for a TV signal (584.31 MHz) and an FM signal (88.7 MHz). Errorbars indicate the min and max values in
+each case across 20 experiments of 120 seconds each.
+mutual information between the measurements of the two
+users being compared.
+The plots and the mutual information computations show
+that Eve obtains only a negligible amount of information
+about Alice’s and Bob’s measurements. One channel mea-
+surement provides Bob with 1.473 bits of information about
+Alice’s corresponding measurement. In contrast, one chan-
+nel measurement provides Eve with only 0.092 bits of infor-
+mation about Alice’s corresponding measurement and 0.083
+bits of information about Bob’s measurement. This means
+Alice and Bob have 15 ∼16 times more information about
+each other’s measurements than what Eve knows about their
+measurement. The intuitive meaning of this result is that
+if Alice and Bob generate a 15 bit key, then the theoretical
+maximum that Eve can know about this key is 1 bit and
+no more. If Alice and Bob use this 15 bit key, it is exactly
+equivalent to Alice and Bob generating a perfectly secret 14
+bit key about which Eve has completely no (0 bits) informa-
+tion.
+4.4
+How many secret bits can be extracted per
+unit time?
+We would like Alice and Bob to be able to establish an
+identical secret key of a given size in the shortest possible
+time. The rate at which secret bits can be extracted is de-
+termined by 3 factors: (i) The rate at which the Peter-Alice
+and Peter-Bob channels vary with time. The faster these
+channels vary, the faster, fresh randomness becomes avail-
+able to Alice and Bob. This notion is captured by the co-
+herence time Tc, which we will evaluate in this section. (ii)
+The distance between Alice and Bob. The greater the dis-
+tance between Alice and Bob, the greater the bit-error rate
+ǫ between the bits extracted by them. Making their secret
+bits identical by the process of reconciliation necessarily re-
+quires a reduction in the number of bits, because the use of
+an error-correcting code trades oﬀone for the other. There-
+fore, in evaluating the eﬀect of channels with diﬀerent Tc’s,
+we will use the same distance between Alice and Bob to keep
+the BER roughly the same. (iii) The number of separate
+sources of randomness (diﬀerent public sources) that Alice
+0
+0.05
+0.1
+0.15
+0.2
+0.25
+0.3
+0.35
+Time (sec)
+Stationary
+moving
+ slowly
+moving
+   fast
+(a)
+0.45
+0.65
+0.85
+1.05
+1.25
+1.45
+Time (Sec)
+Stationary
+moving
+ slowly
+moving
+   fast
+(b)
+Figure 10: Average estimates of the coherence time
+made using equation 2 for (a) TV (584.31 MHz) and
+(b) FM (98.7 MHz) signals. Each estimate is com-
+puted using six one-minute traces.
+Error bars in-
+dicate the min and the max estimates in each case.
+and Bob are monitoring. As long as the channels between
+diﬀerent public sources and Alice/Bob are independent, the
+sources can be treated as independent sources of random-
+ness.
+We will explore multiple sources further in Section
+4.5.
+The coherence time Tc of a given wireless channel tells
+us how often a time-varying channel can provide fresh se-
+cret random bits. It is important to understand that Tc has
+to do with the multiple paths between a transmitter (in our
+case Peter) and the receiver (in our case Alice/Bob), i.e. the
+propagation environment, rather than the time-varying na-
+ture of the transmit signal s(t) itself. It is possible to create
+an increased rate of random temporal variation in a wireless
+channel by physically moving or shaking the receivers Alice
+and Bob together. Moving Peter, or reﬂectors and scatter-
+ers in the propagation path would also have the same eﬀect,
+but these entities are not under our control. Since a lower
+Tc enables a higher secret bit-rate, it is useful to investigate
+the extent to which physical movement changes the Tc.
+To evaluate the eﬀect of physical movement on Tc, we
+collected channel measurements at Alice and Bob for three
+cases: stationary, moving slowly, and moving fast. For the
+
+(a) Amplitude
+(b) Phase
+Figure 11:
+Average secret-bits per second before
+performing reconciliation, using (a) list-encoding
+on
+amplitude
+measurements,
+and
+(b)phase-
+diﬀerentials.
+Alice
+and
+Bob
+were
+separated
+d = 0.1λ.
+latter two cases, we physically waved Alice’s and Bob’s an-
+tennas together in the air, ﬁrst slowly, and then vigorously.
+Figure 10 plots the coherence time for each of three cases
+for both TV and FM signals. The ﬁgure shows that shaking
+devices together vigorously can lower Tc by a factor or 2
+to 2.5, and hence increase the rate at which secret bits can
+be extracted by the same factor. For example, a stationary
+Alice and Bob can extract a new bit from a TV signal once
+every 0.27 sec (1.25 sec for FM), but if shaken vigorously,
+they can get a new bit once per 0.12 sec (0.55 sec for FM).
+Figure 11 plots the average key bit-rate at which secret
+bits were extracted from a single RF source for the three
+types of environments we have considered (stationary, mov-
+ing slowly and moving fast). Alice and Bob were positioned
+0.1λ apart, which translates to 5 cm for the TV signal and 34
+cm for the FM radio signal. The ﬁgure reveals two important
+results: (i) The key bit-rate is roughly proportional to the
+frequency of the RF signal used, for both amplitude-based
+and phase-based extraction.
+(ii) Fast physical movement
+can improve the key bit-rate by a factor of 3 ∼4 compared
+to the stationary case.
+The results in this plot are prior to reconciliation.
+For
+reconciliation, we used the (23, 12) error-correcting Golay
+code because it is a linear short-blocklength code, with very
+simple linear encoding and decoding algorithms. The Golay
+code takes 23-bit segments of bits, Ka and Kb, and reduces
+them to 12-bit segments (i.e. it reduces the bit-rates, shown
+in Figure 11, by a factor of 12
+23), reducing the bit-error rate ǫ
+drastically in the process. For instance, applying the (23, 12)
+Golay code on the bits obtained from the TV signal when
+Alice and Bob were moved together fast results in a ﬁnal
+secret bit rate of 1.8 secret bits per sec, with a bit-error rate
+of 2.4×10−3. When the same code is applied to bits obtained
+from phase-diﬀerential measurements, the ﬁnal bit-rate is
+4.3 secret-bits/sec with a bit-error rate of 5× 10−2, which is
+a very high bit-error rate. However, if the code is applied two
+times, i.e. if another round of reconciliation is performed,
+then the rate is 2.2 secret-bits/sec, with an error rate of
+10−5. Note that each time reconciliation is performed, there
+is an accompanying privacy ampliﬁcation step to eliminate
+information leaked out to Eve during reconciliation. As a
+result, one round of reconciliation and privacy ampliﬁcation
+produces a reduction in the rate (secret-bits/sec) by a factor
+of 12
+23 (i.e. approximately half) when the (23,12)-Golay code
+is used.
+4.5
+Monitoring multiple sources
+Our analysis thus far has only considered a single RF
+source. By simultaneously monitoring multiple RF sources,
+Alice and Bob can increase the amount of common random-
+ness available to them per unit time. In fact, the number
+of secret bits per second achievable, scales linearly with the
+number of added sources, so long as the sources themselves
+are physically separated by a distance of at least λ/2. In
+such a scenario, Alice and Bob can treat each signal source as
+an independent source of common randomness and run par-
+allel instances of our secret bit extraction algorithm. Note
+that monitoring multiple sources does not require additional
+hardware or antennas. Instead, we simply need to modify
+the receiver bandwidth to include frequency bands we wish
+to receive. In our experimental setup with GNUradio, this is
+achieved by a simple parameter conﬁguration. In our eval-
+uation of multiple sources, we focus on FM signals, because
+the narrow bandwidth of each FM radio station allows us
+to use the GNUradio platform to receive many FM stations
+simultaneously. With a bandwidth of 200 KHz per FM sta-
+tion, the maximum number of FM sources that Alice and
+Bob can receive with a single GNUradio+USRP setup is 40.
+While not all channels in the FM band may carry an FM ra-
+dio station with a strong signal, most regions in the country
+have an adequate FM radio coverage. Although we could
+observe signals on all 40 channels, we sampled the channel
+responses for ﬁve radio stations within 1 MHz of block of
+spectrum (at 97.9, 98.3, 98.7, 99.1, and 99.5 MHz) for this
+study. Figure 12 shows the locations of three of these local
+FM stations from the NJ/NY area on a map, and the inset
+shows the ﬁve successive FM radio stations on the frequency
+dial within 1 MHz block of spectrum.
+To determine the extent to which wireless channels cor-
+responding to diﬀerent FM-radio stations are independent
+of one another, we employ Mutual Information as a metric.
+Recall that if the mutual information I(X; Y ) between two
+quantities X and Y is ∼0 then X and Y are nearly inde-
+pendent because observing one gives no information about
+the other. In particular, we evaluate the mutual information
+between Alice’s channel measurements at a given instant of
+time, across three of these FM stations, taken two at a time.
+Figure 13 shows the mutual information values for Alice’s
+channel measurements for the three stations, taken pairwise
+on the left. For comparison, on the right are comptuations
+of mutual information between the measurements of Alice
+and Bob for each of the three stations.
+Our results sug-
+
+Figure 12: Locations of three FM radio stations we
+tested in the NY/NJ area, with respect to the loca-
+tion of Alice and Bob (marked by a star). The plot
+below shows ﬁve FM radio stations being monitored
+simultaneously by Alice’s GNUradio, including the
+three FM-stations we used for evaluating indepen-
+dence.
+Figure 13: Left: Mutual Information between mea-
+surements of Alice on the three FM radio stations,
+taken two at a time. Right: Mutual information be-
+tween channel measurements of Alice versus those
+of Bob on three diﬀerent FM radio stations.
+gest that temporal variations in the channels from diﬀerent
+FM radio stations are in fact fairly independent. We ran
+our list-encoding algorithm on the 5 FM channels taken as
+parallel, independent sources of randomness, and observed
+a combined average secret bit rate of 1.08 bps, with an aver-
+age error rate of 0.039 when Alice and Bob were stationary
+and 0.1λ apart, and 4.27 bps with an average error rate of
+0.042 when Alice and Bob were moved together in unison.
+We conclude that, when compared to the results of a sin-
+gle FM channel, sampling the abundance of public sources
+could signiﬁcantly increase key bit-rate.
+4.6
+Putting it all together
+A large number of factors aﬀect the performance of ProxiMate:
+the distance between Alice and Bob, the wavelength of the
+public source, whether Alice and Bob are held stationary or
+moved, the length of the desired key, the amount of time
+available, the number of RF sources being monitored, and
+Stationary
+Moving slow
+Moving fast
+TV
+33
+10.2
+7.5
+FM
+102.5
+41.2
+31.5
+(a) Amplitude, Prob(key mismatch) ≤10−3
+Stationary
+Moving slow
+Moving fast
+TV
+16.4
+7
+6
+FM
+50.2
+33
+29
+(b) Phase, Prob(key mismatch) ≤10−5
+Stationary
+Moving slow
+Moving fast
+TV
+11
+4.2
+3.3
+FM
+33.62
+18.3
+15
+(c) Both Amplitude and Phase
+4.3 × 10−4 ≤Prob(key mismatch)≤6.2 × 10−4
+Table 2: Number of seconds needed to form a 128-
+bit key with 10 sources, when Alice and Bob are
+d = 0.05λ apart.
+the probability that the ﬁnal keys do not match in the end.
+In order to obtain a simpliﬁed view into ProxiMate’s perfor-
+mance, we decided to hold all but two of the factors constant.
+Table 2 shows the amount of time needed by Alice and
+Bob to form a 128-bit key, when they are d = 0.05λ apart,
+and use 10 sources in parallel, such that the probability that
+the ﬁnal 128 bit keys (i.e. after reconciliation) extracted by
+them do not match is ﬁxed (see Table 2). Table 2(a) is com-
+puted using the secret-bits/sec rates in Figure 11(a), the bit-
+error rates shown in Figure 8(a) and assuming the applica-
+tion of one round of reconciliation and privacy ampliﬁcation
+using the (23,12)-Golay code. Table 2(b) for phase-based
+bit-extraction is computed using the secret-bits/sec rates in
+Figure 11(b), the bit-error rates shown in Figure 8(b) and
+assuming the application of two rounds of reconciliation and
+privacy ampliﬁcation using the (23,12)-Golay code, because
+one round of reconciliation brings the key-mismatch prob-
+ability to only ∼10−1 (bit-error rate of ∼10−3), which is
+too high to be useable. Finally, we combine the results of
+Table 2(a) and (b), in creating Table 2(c) assuming that
+Alice and Bob run parallel instances of ProxiMate on ampli-
+tude and phase. The key mismatch probability is computed
+by ﬁrst computing the average bit-error rate, assuming that
+the 128-bit key consists of bits contributed by the ampli-
+tude and phase instances of ProxiMate in the proportion of
+their secret-bit rates. Instead of providing the key mismatch
+probability for each of the six cells in Table 2, we summarize
+its range below it.
+Table 2(c) shows that the overall performance of ProxiMate
+is impressive, given the extremely low key mismatch prob-
+abilities.
+Further, the amount of time needed can simply
+be scaled down linearly if more RF sources are used. As
+a comparison, when both amplitude and phase are used by
+ProxiMate, we deduce from the results in Table 2(c), that
+the amount of time needed to establish a key the size of
+the Bluetooth 4-digit PIN (13.2 bits) is 0.34 sec with 10 TV
+sources shaken fast and 3.5 sec with 10 FM sources when
+Alice and Bob are stationary.
+4.7
+Coping with an adversarial source
+
+In this section, we ﬁrst show analytically and then validate
+empirically that our diﬀerential phase secret bit extraction
+can tolerate a powerful attacker who controls the transmis-
+sion source.
+4.7.1
+Analytical Examination
+A powerful attacker is able to manipulate the amplitude of
+the signal received by Alice and Bob in a controlled manner
+because the eﬀect of the wireless channel on the transmit
+signal’s amplitude is multiplicative – the amplitude of the
+received signal can be anywhere between 0 and a very large
+number.
+That is, by increasing or decreasing the ampli-
+tude of a transmitted signal, an adversary can increase or
+decrease the amplitude of the received signal, respectively.
+In contrast, the eﬀect of the wireless channel on the trans-
+mit signal’s phase is additive, and the phase of the resultant
+received signal must lie between 0 and 2π, as phase wraps
+around after 2π. Note that the overall phase, as computed
+by Alice and Bob, is the sum of the channel’s phase and
+the signal’s phase, modulo 2π. Therefore, even if the adver-
+sary can produce an arbitrary change in phase of its trans-
+mit signal during the time interval across which Alice and
+Bob compute their diﬀerential phase, she has no control over
+the change in the channel’s phase during the same interval.
+Hence the change in overall phase modular 2π observed by
+Alice and Bob is unknown to the adversary. To explain this
+mathematically, we next illustrate this observation with a
+concrete example.
+Suppose the adversary source transmits the signal
+A(t) cos (2πfct + φ(t))
+instead of transmitting a signal cos (2πfct). That is, the ad-
+versary inserts the multiplicative amplitude term A(t), and
+the additive phase term φ(t), both of which can be arbitrary
+functions of time. The receiver’s channel estimate is then
+h(t) = H(t)A(t) · ej(φ(t)+θ(t))
+(3)
+where H(t) is the true channel amplitude and θ(t) is the true
+channel phase at time t if the transmitter is not adversarial.
+The adversary has inserted A(t)ejφ(t) in front of the true
+channel state H(t)ejθ(t), causing the channel to appear to
+have amplitude of A(t)H(t) and a phase of φ(t) + θ(t).
+If Alice and Bob use only amplitude of their channels to
+extract bits, then an active Eve can vary A(t) to inﬂuence
+the bits extracted by Alice and Bob in a manner chosen by
+her, and would therefore possess some information about
+the extracted key. However, the phase θ(t) added by the
+channel, and hence the phase of the signal received at Alice
+& Bob θ(t) + φ(t) is not controllable by Eve, because phase
+is a number in the range 0 to 2π radians (i.e. 360 degrees),
+as phase wraps around 0 after going beyond 2π.
+4.7.2
+Empirical Validation
+We evaluated our diﬀerential phase method for extract-
+ing secret bits by creating our own FM source (Eve) using
+the GNUradio as a transmitter this time. We generates a
+transmit signal at Eve’s GNUradio with arbitrarily varying
+amplitude and phase. Alice and Bob were located in a dif-
+ferent room d = 0.04λ apart. Each user, Alice, Bob and
+Eve is made to collect phase-diﬀerential across a time inter-
+val ∆, which is conservatively chosen to be greater than the
+Tc, known from our previous evaluations (Section 4.4). We
+Figure 14: Diﬀerential phase measurements of Alice
+vs Bob (left), compared with those of Alice vs Eve
+(right). The axes represent the interval [−π, π] radi-
+ans. Each plot shows a mutual information estimate
+between the diﬀerential phases of the corresponding
+two users, computed using the algorithm in [10].
+compared Alice’s and Bob’s phase-diﬀerentials against the
+phase diﬀerentials in Eve’s transmit signal.
+Figure 14(a) shows a scatterplot between Alice’s and Bob’s
+phase-diﬀerentials, and Figure 14(b) shows a scatterplot of
+Alice’s phase-diﬀerentials versus the phase-diﬀerentials in
+Eve’s transmit signal.
+Each plot also shows an estimate
+of the mutual information (in bits per phase-diﬀerential).
+These results indicate that phase-diﬀerential in the received
+signals at Alice and Bob are highly correlated, and can there-
+fore be used to extract bits using the basic quantization
+procedure of ProxiMate.
+On the other hand, the phase-
+diﬀerentials in Eve’s transmit signal are nearly independent
+of those of Alice or Bob. Therefore, Eve has no useful infor-
+mation about the change in phases at Alice and Bob, or to
+be precise, she has 1.803
+0.023 ≈78 (from the mutual information
+estimates in Figure 14) times less information about Alice’s
+and Bob’s measurements than they do about each others’
+measurements. Therefore if Alice and Bob generate a 78-bit
+key, it is equivalent to a 77-bit secret key.
+5.
+DISCUSSION AND LESSONS LEARNED
+In this section, we discuss the security aspects of ProxiMate,
+its limitations, and lessons learned during our work.
+Spatial security. Our experimental evaluation in Sec-
+tion 4.3 shows that if an adversary is more than 0.4λ away
+from both Alice and Bob, then the fraction of Eve’s bits
+that diﬀer from those of Alice or Bob, is very close to 0.5,
+which is the same as having Eve randomly guess Alice’s and
+Bob’s bits. For an FM and TV signals, 0.4λ corresponds to
+∼1 −1.3 m and 20 −50 cm, respectively. Further, mutual
+information between the measurements of Eve and those of
+Alice or Bob, provide an upper bound on the amount of in-
+formation available to Eve about Alice’s & Bob’s measure-
+ments. For example, from the mutual information numbers
+in Figure 9, we see that when Alice & Bob are 0.05λ apart
+and Eve is 0.5λ away from each other, the amount of infor-
+mation that Eve has about Alice’s or Bob’s measurements is
+more than an order of magnitude lower than the information
+Alice and Bob have about each other’s observations. This
+implies that for each sequence of 10 bits generated by Alice
+& Bob, Eve can guess at most 1 bit.
+Active adversary. An active Eve may transmit a signal
+in addition to Peter’s public signal in an attempt to inﬂuence
+Alice’s and Bob’s estimates of their channels from Peter.
+
+This is a weaker form of the attack in which Eve has full
+control of the signal transmitted by Peter (Section 3.9). As
+before, using phase diﬀerentials in place of amplitudes of the
+channel measurements allows Alice and Bob to form a key
+without revealing any bits to Eve.
+Adversarial channel-manipulations.
+If an attacker
+can manipulate the wireless channel by controlling scatter-
+rers and reﬂectors in the path of the signal between Peter
+and Alice/Bob (see Figure 3), she can, in principle, inﬂu-
+ence the temporal variations observed by Alice and Bob.
+However, this is hard to accomplish in a controlled manner
+(i.e. to produce desired temporal variations in the channel
+measurements at Alice and Bob), especially when the pub-
+lic source is distant, as is likely to be the case with public
+broadcast sources such as FM and TV transmitters. We note
+that the use of RSSI, as obtained from oﬀ-the-shelf 802.11
+wireless LAN network interface cards, may not be secure in
+the context of exploiting shared randomness from wireless
+channels.
+RSSI values are more predictable by a distant
+adversaries than a ﬁner grained channel measurement, and
+it has been shown in [11] that RSSI measurements can be
+manipulated by an adversary.
+Does a directional antenna help the adversary? A
+directional antenna does not help an adversary.
+This is
+because the adversary is not interested in overhearing ex-
+changes between Alice and Bob – we already assume that
+the information exchanged between Alice and Bob after the
+measurement stage of ProxiMate is perfectly available to Eve.
+Instead, the attacker is interested in getting the same mea-
+surements that Alice and Bob are making. Since the channel
+between the public source and the attacker is independent of
+the channels between the source and Alice or Bob (assuming
+the attacker is suﬃciently distant), no amount of processing
+of the Alice-Eve or Bob-Eve channel will provide informa-
+tion to Eve that is useful in predicting the Peter-Alice or
+Peter-Bob channels.
+Adversarial channel-modeling. What if a passive Eve
+attempts to model the temporal variation in the channels be-
+tween the public source and Alice/Bob by placing herself at
+the location of Alice/Bob, before or after the key extraction
+protocol?
+Such an adversary cannot get any useful mea-
+surements about the measurements made by Alice and Bob,
+provided that at least one coherence time interval (hundreds
+of milliseconds, in the case of TV signals) had elapsed be-
+tween the instance of the key-generation protocol and the
+adversary arriving at location of Alice/Bob. This is because
+the wireless channel decorrelates over a coherence time in-
+terval, and channel models are only a statistical description
+of the channel.
+Statistical randomness of secret bits.
+The bits in
+the secret key must be statistically independent in order to
+be suitable for use as a cryptographic key. This is ensured
+in list-encoding by having Alice wait for at least one co-
+herence time interval between successive bit extractions. As
+explained in Section 2.2, the coherence time, is by deﬁnition,
+the amount of time needed for the channel state to become
+random after an observation, and is estimated in ProxiMate
+by Alice using an empirical estimate of the level crossing
+rate.
+Access to low level samples. The current generation of
+radio device (e.g. cellphones, WiFi cards) do not provide ac-
+cess to sample level information in software. This presents a
+challenge to the immediate adoption of security mechanisms
+such as ProxiMate as well as earlier eﬀorts [11–14] that pro-
+pose the use of radio signals for improving security primi-
+tives in software alone. It is of this reason that we have had
+to use the USRP/GNUradio platform for our experimental
+evaluation. We are not suggesting that wireless devices use
+full-ﬂedged software-deﬁned radios for the purpose of secure
+pairing. Instead, we argue that ﬁne-grained wireless channel
+measurements have interesting uses in the context of secu-
+rity, and need not be thrown away at lower layers in the
+stack but should be made available to APIs in higher lay-
+ers. We hope the present work is a step in that direction.
+We believe that with suﬃciently beneﬁcial use-cases, and in-
+creasing adoption of software-deﬁned highly programmable
+radios, such functionality is likely to become available in fu-
+ture generations of devices. Finally, it has recently come to
+our attention that there exists a tool for having new genera-
+tion 802.11n network interface cards make channel measure-
+ments available to higher layers [15]. The tool reportedly al-
+lows channel measurements on a per-subcarrier basis. While
+we have not used this tool ourselves, this is a positive step
+in this direction and it obviates the need for a full ﬂedged
+software deﬁned radio for implementing a system such as
+ProxiMate.
+Tradeoﬀs. In evaluating the system through real radio
+signal measurements, we learnt that ProxiMate has a number
+of tradeoﬀs. Longer wavelength (λ) signals make ProxiMate
+more useable than small wavelengths, considering the typical
+distances at which Alice and Bob might want to pair in typ-
+ical pervasive computing scenarios. For example, in the 2.4
+GHz band used by 802.11 based wireless LAN systems, the
+wavelength is just 12.5 cm, which means that Alice and Bob
+would need to be well within λ/2 = 6.25 cm in order to form
+a shared key. While this limits the usability of ProxiMate at
+2.4 GHz somewhat, it may still be usable in some scenarios
+– consider for instance the fact that NFC requires a distance
+of < 4 cm between communicating parties. However, longer
+wavelengths also increase the coherence time of the chan-
+nel, almost proportionally, thus requiring longer to form the
+same size key. Further, a longer wavelength also implies that
+the minimum distance for an adversary, viz. λ/2 is larger.
+Also, it is easier to monitor multiple FM-radio stations, than
+it is to monitor multiple TV signals because many FM-radio
+stations can ﬁt into a given block of monitored spectrum due
+to the much narrower bandwidth of FM radio (200 KHz) as
+compared to TV signals (6 MHz).
+Computational complexity.
+For an n bit key, the
+computational complexity needed by Diﬃe Hellman (used
+in [2,16]) is O(n3), which is indicative of the required com-
+putational ability need to perform modular exponentiation
+in Diﬃe Hellman.
+Because it uses a linear error correct-
+ing code, ProxiMate has a computational complexity of O(n)
+and therefore signiﬁes a lower requirement on computational
+ability. The comparison between computational complexity
+therefore has bearing on the computational ability to run
+the two types of key establishment algorithms, rather than
+the duration of time required, because ProxiMate also in-
+volves a measurement step which can prolong running time
+to varying extents, depending upon the coherence time of
+the wireless channel being monitored.
+6.
+RELATED WORK
+The idea of using common radio environment as a proof of
+physical proximity was ﬁrst presented in Amigo [2]. Amigo
+
+System
+Based on
+Insecure against
+Time needed
+Required proxim-
+ity between legiti-
+mate devices
+NFC
+Short range RF1
+Attacker
+with
+directional
+an-
+tenna, attacker in close proxim-
+ity (NFC by itself has no encryp-
+tion)
+Very quick (Time needed
+for data transfer)
+< 4 cm
+Bluetooth
+Pre-shared
+secret
+or
+human-entered PINs
+Weak PINs, default PINs
+Slow – Time needed to
+set up common PIN
+< 100 m
+Accelerometers
+[17, 18]
+Accelerometers on hand-
+held devices shaken ran-
+domly in unison
+Analysis
+by
+computation-
+ally
+strong
+attacker
+watch-
+ing/recording video of shaking
+process.
+To
+shake
+devices
+to-
+gether
+Held
+by
+the
+same
+person
+AMIGO [2]
+Shared
+ambient
+WiFi
+environment
+Computationally unbounded or
+very proximate adversary
+To measure RSSI from
+suﬃcient
+#
+of
+WiFi
+packets
+< λ/2
+Ensemble [16]
+Transmission by devices
+wishing to pair, and mul-
+tiple
+other
+devices
+to
+make measurements
+Computationally unbounded or
+very proximate adversary
+To measure RSSI from
+suﬃcient # of packets
+< λ/2
+ProxiMate
+Shared
+ambient
+radio
+environment
+Very proximate adversary
+To make suﬃcient dura-
+tion of channel measure-
+ments from potentially
+multiple sources.
+< λ/2
+Table 3: Qualitative comparison of ProxiMate with prior work on secure pairing and other existing systems.
+relies on the Diﬃe-Hellman protocol for a secret key ex-
+change between two devices and then utilizes the received
+signal strength indicator (RSSI) from WiFi packets for a
+proof of physical proximity. Ensemble [16] extended Amigo
+by having the pairing devices transmit instead of receive
+packets, and showed how an ensemble of trusted body-worn
+devices can determine proximity of the pairing devices by
+monitoring their transmissions. ProxiMate has four advan-
+tages over Amigo. First, ProxiMate doesn’t use the Diﬃe-
+Hellman key exchange protocol, but instead derives the shared
+key directly from the radio environment. Removing the re-
+liance on the Diﬃe-Hellman key exchange has two beneﬁts:
+(a) Diﬃe-Hellman involves discrete modular exponentiation
+which is O(n3) in the size n of the desired key, whereas
+ProxiMate uses a linear code, whose complexity is O(n).
+This makes ProxiMate particularly useful in domains where
+the entities wishing to form a key have limited computa-
+tional resources, such as sensor networks [19]; (b) reliance
+on Diﬃe-Hellman implicitly assumes that the adversary is
+computational bounded, whereas ProxiMate extracts secret
+bits from the wireless channel itself and is therefore secure
+against even a computationally unbounded adversary. Sec-
+ond, instead of relying just on WiFi, ProxiMate can utilize
+any available radio technology. For example, in this paper
+we show how ProxiMate utilizes FM radio and TV signals
+for secret key extraction. Third, instead of relying on in-
+dividual packets (which would make the system reliant on
+the rate at which packets are observed, or even if they are
+observed at all), ProxiMate uses a continuous signal to mea-
+sure the time-varying channel, thereby improving the speed
+at which common randomness can be harvested. Finally, a
+number of recent papers [2,11,16] propose the use of RSSI
+from 802.11-based wireless LANs as a source of randomness.
+The popularity of RSSI in the systems community is un-
+derstandable because RSSI values are easily available from
+the preamble of received 802.11 packets using oﬀ-the-shelf
+802.11 network interface cards. However, what is less obvi-
+ous about RSSI is that it is not a very suitable metric for
+security purposes. The central principle behind ProxiMate
+is that legitimate parties within proximity have access to
+a private source of randomness which is completely unpre-
+dictable by a suﬃciently distant adversary. Unfortunately,
+RSSI is a very aggregate measure of the wireless channel
+quality (because it is a measure of the signal attenuation
+across the entire 20 MHz 802.11 channel), and this makes it
+predictable even by a distant adversary. That is, an adver-
+sary with knowledge of Alice’s and Bob’s locations with re-
+spect to a transmitter can produce reasonable guesses about
+the RSSI observed by them, as well as induced desired varia-
+tions in the RSSI observed by them. The latter fact has been
+experimentally shown in [11]. The predictability of the wire-
+less channel becomes harder as we consider a ﬁner metric,
+such as by reducing the bandwidth under observation, and
+by sampling the wireless channel at ﬁner time granularity.
+Accordingly, ProxiMate uses a ﬁner grained 2-dimensional
+(amplitude and phase) channel measurements, which aren’t
+as easy to manipulate in a controlled manner as RSSI [11].
+Several prior works have shown how two devices can derive
+a secret key based on ﬂuctuations of the radio environment
+between them [11,12,14]. These techniques focus on secur-
+ing the wireless link and assume that the two communicating
+devices have been authenticated before, whereas ProxiMate
+provides both authentication and security. In addition, the
+reliance on random ﬂuctuating channel between communi-
+cating devices makes these techniques unsuitable in a setting
+where two communicating devices are in close physical prox-
+imity. This is because the randomness in a wireless chan-
+nel arises from RF propagation along multiple time-varying
+paths, and in a proximity setting, the direct path dominates,
+making the channel predictable, rather than random.
+Recent work shows how shaking of devices equipped with
+accelerometers can be used to authenticate devices [17,18].
+Unfortunately, this require the presence of accelerometers
+on devices, they might be susceptible to attacks where an
+adversary replicates the shaking movement, and may not be
+appropriate in certain scenarios, such as an authentication
+between a public display and a laptop. Finally, one cannot
+rely solely on the short-range nature of technologies such
+as Bluetooth and near-ﬁeld communication (NFC) [20] be-
+
+cause they are susceptible to attacks by eavesdroppers with
+directional antennas [21,22].
+7.
+CONCLUDING REMARKS
+This paper shows how wireless devices in proximity can
+pair autonomously by using their correlated channel mea-
+surements from ambient wireless signals to form a shared
+crypto-key. The speed with which users can securely pair
+depends on their physical separation, and on the rate of
+temporal variation in the chosen channels. Pairing can be
+accelerated by monitoring multiple sources simultaneously,
+or by manually shaking the legitimate devices together. We
+showed that using changes in phase, in place of amplitude
+variations proves to be robust against active attacks.
+Fi-
+nally, ProxiMate can easily be extended to allow establishing
+a common secure association for more than two devices.
+We believe that a number of useful optimizations of ProxiMate
+can improve its functionality and performance even further.
+For example, if Alice and Bob do not end up with identical
+bits after using an error correcting code, they do not need to
+discard them and start over, but can instead employ further
+rounds of error correction. Another direction for improve-
+ment would be to explore the use of non-binary quantization
+for improved extraction rates.
+8.
+REFERENCES
+[1] W. Diﬃe and M. Hellman, “New directions in
+cryptography,” IEEE Trans. on Information Theory,
+vol. 22, no. 6, pp. 644–654, 1976.
+[2] A. Varshavsky, A. Scannell, A. LaMarca, and
+E. de Lara, “Amigo: Proximity-based authentication
+of mobile devices,” in In Proceedings of UbiComp
+2007: Ubiquitous Computing, 2007, pp. 253–270.
+[3] A. Molisch, Wireless Communications.
+Wiley-IEEE
+Press, 2005.
+[4] G. Brassard and L. Salvail, “Secret key reconciliation
+by public discussion,” Advances in Crytology Proc. -
+Eurocrypt ’93, Lecture Notes in Computer Science,
+vol. 765, pp. 410–423, 1994.
+[5] C. H. Bennett, G. Brassard, and J.-M. Robert,
+“Privacy ampliﬁcation by public discussion,” SIAM J.
+Comput., vol. 17, no. 2, pp. 210–229, 1988.
+[6] T. S. Rappaport, Wireless Communications:
+Principles and Practice.
+Prentice Hall PTR., 2001.
+[7] “Technical report WINLAB, Rutgers University,
+strongly secure pairing of wireless devices in physical
+proximity,
+http://www.winlab.rutgers.edu/∼suhas/CliqueTR2010.pdf.”
+[8] “http://gnuradio.org/trac.”
+[9] T. M. Cover and J. A. Thomas, Elements of
+Information Theory.
+John Wiley, 1991.
+[10] Q. Wang, S. R. Kulkarni, and S. Verdu, “A
+nearest-neighbor approach to estimating divergence
+between continuous random vectors,” in Int. Symp. on
+Inform. Theory, 2006, pp. 242–246.
+[11] S. Jana, S. N. Premnath, M. Clark, S. K. Kasera,
+N. Patwari, and S. V. Krishnamurthy, “On the
+eﬀectiveness of secret key extraction from wireless
+signal strength in real environments,” in Proceedings of
+the 15th Annual International Conference on Mobile
+Computing and Networking (MobiCom ’09),
+September 2009, pp. 321–332.
+[12] S. Mathur, W. Trappe, N. Mandayam, C. Ye, and
+A. Reznik, “Radio-telepathy: Extracting a secret key
+from an unauthenticated wireless channel,” in Proc. of
+the 14th annual conference on mobile computing and
+systems (MobiCom 2008), San Francisco, CA, Sept
+2008.
+[13] C. Ye, S. Mathur, A. Reznik, Y. Shah, W. Trappe,
+and N. Mandayam, “Information-theoretically secret
+key generation for fading wireless channels,” Accepted
+for publication at the IEEE Trans. on Information
+Forensics and Security, June 2010, preprint available
+at http://arxiv.org/abs/0910.5027, 2010.
+[14] B. Azimi-Sadjadi, A. Kiayias, A. Mercado, and
+B. Yener, “Robust key generation from signal
+envelopes in wireless networks,” in CCS ’07:
+Proceedings of the 14th ACM conference on Computer
+and communications security, 2007, pp. 401–410.
+[15] D. Halperin, W. Hu, A. Sheth, and D. Wetherall,
+“Tool release: gathering 802.11n traces with channel
+state information,” SIGCOMM Comput. Commun.
+Rev., vol. 41, pp. 53–53. [Online]. Available:
+http://doi.acm.org/10.1145/1925861.1925870
+[16] A. Kalamandeen, A. Scannell, E. de Lara, A. Sheth,
+and A. LaMarca, “Ensemble: cooperative
+proximity-based authentication,” in Proceedings of the
+8th international conference on Mobile systems,
+applications, and services.
+New York, NY, USA:
+ACM, 2010, pp. 331–344. [Online]. Available:
+http://doi.acm.org/10.1145/1814433.1814466
+[17] R. Mayrhofer and H. Gellersen, “Shake well before
+use: Intuitive and secure pairing of mobile devices,”
+IEEE Transactions on Mobile Computing, vol. 8,
+no. 6, pp. 792–806, 2009.
+[18] D. Bichleri, G. Stromberg, and M. Huemer, “Key
+generation based on acceleration data of shaking
+processes,” Ubiquitous Computing 2007, pp. 304–317,
+2007.
+[19] D. Liu and P. Ning, “Establishing pairwise keys in
+distributed sensor networks,” in Proceedings of the
+10th ACM conference on Computer and
+communications security, ser. CCS ’03.
+New York,
+NY, USA: ACM, 2003, pp. 52–61. [Online]. Available:
+http://doi.acm.org/10.1145/948109.948119
+[20] “Near ﬁeld communications forum,
+http://www.nfc-forum.org/.”
+[21] J. Wright, Dispelling Common Bluetooth
+Misconceptions.
+SANS Technology Institute Security
+Laboratory, 2007.
+[22] E. Haselsteiner and K. Breitfuss, “Security in near
+ﬁeld communication (NFC),” Workshop on RFID
+Security RFIDSec, 2006.

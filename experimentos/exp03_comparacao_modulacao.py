@@ -71,14 +71,13 @@ def experimento_comparacao_modulacao(
     for modulacao in ['bpsk', 'qpsk']:
         print(f"\n--- Testando {modulacao.upper()} ---")
         
+        ber_rates = []
         kdr_rates = []
-        kdr_pos_rates = []
-        kdr_amplificacao_rates = []
         
         for variancia in tqdm(variancias_ruido,
                              desc=f"  {modulacao.upper()}",
                              colour="cyan"):
-            kdr, kdr_pos, kdr_amp = extrair_kdr(
+            ber, kdr = extrair_kdr(
                 palavra_codigo,
                 rayleigh_param,
                 tamanho_cadeia_bits,
@@ -87,20 +86,18 @@ def experimento_comparacao_modulacao(
                 media_ruido,
                 bch_codigo,
                 correlacao_canal,
-                usar_amplificacao=True,
+                usar_amplificacao=False,
                 modulacao=modulacao,
                 erro_estimativa=0.0,
                 guard_band_sigma=0.0
             )
             
+            ber_rates.append(ber)
             kdr_rates.append(kdr)
-            kdr_pos_rates.append(kdr_pos)
-            kdr_amplificacao_rates.append(kdr_amp)
         
         dados_modulacoes[modulacao] = {
-            'kdr_rates': kdr_rates,
-            'kdr_pos_rates': kdr_pos_rates,
-            'kdr_amplificacao_rates': kdr_amplificacao_rates
+            'ber_rates': ber_rates,
+            'kdr_rates': kdr_rates
         }
     
     # Prepara resultados

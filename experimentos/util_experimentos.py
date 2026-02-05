@@ -36,7 +36,7 @@ def salvar_resultado_json(dados, nome_experimento, descricao=""):
     with open(filepath, 'w', encoding='utf-8') as f:
         json.dump(resultado_completo, f, indent=2, ensure_ascii=False)
     
-    print(f"✓ Resultados salvos em: {filepath}")
+    print(f"[OK] Resultados salvos em: {filepath}")
     return filepath
 
 
@@ -60,7 +60,7 @@ def salvar_resultado_csv(dados, nome_experimento, colunas):
         writer.writeheader()
         writer.writerows(dados)
     
-    print(f"✓ CSV salvo em: {filepath}")
+    print(f"[OK] CSV salvo em: {filepath}")
     return filepath
 
 
@@ -83,7 +83,7 @@ def salvar_grafico(fig, nome_experimento, nome_grafico=""):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     filepath = os.path.join(base_dir, "resultados", "figuras", filename)
     fig.savefig(filepath, dpi=300, bbox_inches='tight')
-    print(f"✓ Gráfico salvo em: {filepath}")
+    print(f"[OK] Gráfico salvo em: {filepath}")
     return filepath
 
 
@@ -92,7 +92,7 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
                                    nome_arquivo, 
                                    legenda_template=None):
     """
-    Cria gráfico comparativo de KDR para diferentes variações de parâmetro
+    Cria gráfico comparativo de BER e KDR para diferentes variações de parâmetro
     
     Args:
         snr_db: Array com valores de SNR
@@ -102,18 +102,17 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
         nome_arquivo: Nome do arquivo para salvar
         legenda_template: Template para legendas (ex: "σ = {}")
     """
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
     fig.suptitle(titulo, fontsize=14, fontweight='bold')
     
     cores = plt.cm.tab10(np.linspace(0, 1, len(dados_variacoes)))
     
     titulos_subplots = [
-        'KDR Antes da Reconciliação',
-        'KDR Pós Reconciliação',
-        'KDR Pós Amplificação (SHA-256)'
+        'BER (antes da reconciliação)',
+        'KDR (após reconciliação BCH)'
     ]
     
-    metricas = ['kdr_rates', 'kdr_pos_rates', 'kdr_amplificacao_rates']
+    metricas = ['ber_rates', 'kdr_rates']
     
     for i, (metrica, titulo_sub) in enumerate(zip(metricas, titulos_subplots)):
         ax = axes[i]
@@ -129,7 +128,8 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
                    color=cores[j], label=label)
         
         ax.set_xlabel(xlabel)
-        ax.set_ylabel('KDR (%)')
+        ylabel = 'BER (%)' if metrica == 'ber_rates' else 'KDR (%)'
+        ax.set_ylabel(ylabel)
         ax.set_title(titulo_sub)
         ax.grid(True, alpha=0.3)
         ax.legend()
@@ -183,7 +183,7 @@ def gerar_tabela_latex(dados, nome_experimento):
     with open(filepath, 'w', encoding='utf-8') as f:
         f.write(latex)
     
-    print(f"✓ Tabela LaTeX salva em: {filepath}")
+    print(f"[OK] Tabela LaTeX salva em: {filepath}")
     return filepath
 
 

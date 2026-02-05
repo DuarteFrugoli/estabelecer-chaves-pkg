@@ -1,0 +1,2301 @@
+Estabelecimento de chave criptogr´afica utilizando o
+ganho do canal sem fio como segredo – Parte 2
+Jo˜ao Gabriel F. Ribeiro, ´Italo Augusto S. Tacca, Guilherme P. Aquino,
+Luciano L. Mendes e Vanessa M. Renn´o
+Centro de Referˆencia em Radiocomunicac¸˜oes (CRR), Laborat´orio de Cyber Seguranc¸a e Internet das Coisas (CS&I Lab.)
+Instituto Nacional de Telecomunicac¸˜oes - Inatel
+joao.g@get.inatel.br, italo.augusto@inatel.br,
+guilhermeaquino@inatel.br, lucianol@inatel.br, vanessarenno@inatel.br
+Resumo—O
+avanc¸o
+exponencial
+das
+tecnologias
+de
+comunicac¸˜ao sem fio trouxe in´umeros benef´ıcios para diversos
+setores
+da
+sociedade,
+permitindo
+maior
+conectividade
+e
+automac¸˜ao. No entanto, esse progresso tamb´em ampliou as
+preocupac¸˜oes com a seguranc¸a da informac¸˜ao, uma vez que o
+aumento da superf´ıcie de ataque introduz novas vulnerabilidades
+e potenciais ameac¸as cibern´eticas. Para mitigar esses riscos,
+´e essencial o estabelecimento de canais seguros para a troca
+de chaves criptogr´aficas, garantindo a confidencialidade das
+comunicac¸˜oes.
+Neste
+trabalho,
+investiga-se
+um
+m´etodo
+de
+estabelecimento de chaves baseado nas propriedades f´ısicas do
+canal sem fio, utilizando o ganho do canal como segredo. Esse
+m´etodo se destaca por n˜ao exigir alto poder computacional nem
+consumo excessivo de energia dos dispositivos, tornando-se uma
+alternativa vi´avel para aplicac¸˜oes em redes de pr´oxima gerac¸˜ao,
+como B5G e IoT. Foram analisados dois m´etodos de reconciliac¸˜ao
+de informac¸˜ao, considerando diferentes c´odigos corretores de
+erro e cen´arios de propagac¸˜ao. Os resultados demonstram que o
+tamanho das sequˆencias de chaves impacta diretamente a taxa
+de sucesso na reconciliac¸˜ao, sendo que sequˆencias mais longas,
+combinadas com t´ecnicas avanc¸adas de codificac¸˜ao, maximizam
+a seguranc¸a e a eficiˆencia do processo. Dessa forma, o estudo
+reforc¸a a viabilidade do uso do canal f´ısico como mecanismo
+de gerac¸˜ao de chaves, contribuindo para o fortalecimento da
+seguranc¸a nas comunicac¸˜oes sem fio emergentes.
+Palavras chave—Seguranc¸a da Informac¸˜ao, Estabelecimento de
+Chaves, Comunicac¸˜ao Sem Fio, Confidencialidade, Reconciliac¸˜ao
+de Informac¸˜ao.
+Abstract—The exponential advancement of wireless communi-
+cation technologies has brought numerous benefits across various
+sectors, enabling greater connectivity and automation. However,
+this progress has also heightened concerns regarding information
+security, as the expanded attack surface introduces new vulne-
+rabilities and potential cyber threats. To mitigate these risks,
+establishing secure channels for cryptographic key exchange is
+essential to ensure the confidentiality of communications. This
+study investigates a key establishment method based on the
+physical properties of the wireless channel, using channel gain
+as a secret. This approach stands out for not requiring high
+computational power or excessive energy consumption, making
+it a viable alternative for next-generation networks such as B5G
+and IoT. Two reconciliation methods were analyzed, considering
+different error-correcting codes and propagation scenarios. The
+results demonstrate that key sequence length directly impacts the
+success rate of reconciliation, with longer sequences, combined
+with advanced coding techniques, maximizing security and ef-
+ficiency. Thus, this study reinforces the feasibility of using the
+physical channel as a key generation mechanism, contributing to
+enhanced security in emerging wireless communications.
+Index Terms—Information Security, Key Establishment, Wire-
+less Communication, Information Reconciliation.
+I. INTRODUC¸ ˜AO
+De acordo com a previs˜ao da Statista [1], o n´umero de
+dispositivos conectados `a Internet das Coisas (Internet of
+Things, IoT) ultrapassar´a 39,6 bilh˜oes at´e 2033, refletindo
+um crescimento expressivo na adoc¸˜ao e proliferac¸˜ao desses
+dispositivos, o que imp˜oe novos desafios `a seguranc¸a dos
+dados durante a troca de informac¸˜oes. A IoT, composta por
+dispositivos inteligentes que se comunicam entre si e com
+outros sistemas por meio da Internet, j´a est´a amplamente
+integrada a diversos setores da sociedade [2], incluindo sa´ude,
+automac¸˜ao residencial, manufatura e infraestrutura cr´ıtica, entre
+outros. Essa conex˜ao massiva de dispositivos est´a alinhada
+com as expectativas para as futuras redes de comunicac¸˜oes
+m´oveis 5G a Al´em (5G and Beyond, B5G), que visam suportar
+um ecossistema altamente distribu´ıdo e interconectado. No en-
+tanto, esse aumento exponencial na quantidade de dispositivos
+conectados amplia significativamente a superf´ıcie de ataque
+cibern´etica, expondo novas vulnerabilidades que podem ser
+exploradas por agentes maliciosos [3].
+Nesse contexto, a evoluc¸˜ao cont´ınua das pr´aticas de
+seguranc¸a da informac¸˜ao torna-se essencial para mitigar riscos
+e garantir a protec¸˜ao dos dados. A ciberseguranc¸a abrange
+um conjunto de ac¸˜oes, medidas, processos e soluc¸˜oes tec-
+nol´ogicas voltadas `a protec¸˜ao de sistemas, redes, aplicativos
+e dispositivos contra ameac¸as cibern´eticas. Para que as redes
+B5G alcancem seu potencial m´aximo, ´e fundamental que a
+seguranc¸a da informac¸˜ao seja tratada como um pilar central no
+desenvolvimento dessas tecnologias.
+Conforme definido pelo manual de seguranc¸a de computa-
+dores do Instituto Nacional de Padr˜oes e Tecnologia (National
+Institute of Standards and Technology, NIST), a seguranc¸a ci-
+bern´etica visa proteger sistemas automatizados para garantir os
+princ´ıpios de confidencialidade, integridade e disponibilidade
+— conhecidos como a tr´ıade Confidencialidade Integridade
+Disponibilidade (Confidentiality Integrity Availability, CIA)[4].
+Com a evoluc¸˜ao tecnol´ogica e o crescimento das ameac¸as ci-
+bern´eticas, esse modelo foi expandido para incluir os pilares de
+autenticidade e irretratabilidade, resultando em um arcabouc¸o
+mais abrangente e robusto para a seguranc¸a da informac¸˜ao em
+sistemas interconectados [5].
+Esses cinco pilares desempenham pap´eis fundamentais na
+construc¸˜ao de comunicac¸˜oes seguras. A confidencialidade pro-
+tege as informac¸˜oes contra acessos n˜ao autorizados, enquanto a
+
+integridade assegura que os dados permanec¸am precisos e inal-
+terados. Disponibilidade garante que servic¸os e informac¸˜oes
+estejam acess´ıveis quando necess´ario, o que ´e essencial para
+aplicac¸˜oes cr´ıticas. Autenticidade verifica a identidade das
+entidades envolvidas na comunicac¸˜ao, prevenindo falsificac¸˜oes.
+Por fim, irretratabilidade impede que agentes neguem ac¸˜oes
+realizadas, assegurando rastreabilidade e atribuic¸˜ao de respon-
+sabilidades. A implementac¸˜ao eficiente desses pilares ´e indis-
+pens´avel para atender `as crescentes demandas por seguranc¸a
+nas redes de futuras gerac¸˜oes B5G [6, 7].
+Dentre esses pilares, a confidencialidade se destaca como um
+aspecto central para a protec¸˜ao da informac¸˜ao em ambientes
+conectados, sendo o foco principal deste estudo. A confidenci-
+alidade ´e a garantia de que as informac¸˜oes estejam acess´ıveis
+apenas a indiv´ıduos devidamente autorizados, protegendo-as
+contra acessos ou divulgac¸˜oes n˜ao autorizadas. Preservar a
+confidencialidade envolve a implementac¸˜ao de restric¸˜oes ade-
+quadas ao acesso e `a divulgac¸˜ao de dados, bem como a adoc¸˜ao
+de medidas destinadas a proteger a privacidade de indiv´ıduos
+e informac¸˜oes sens´ıveis. A violac¸˜ao desse princ´ıpio ocorre
+sempre que informac¸˜oes s˜ao acessadas ou divulgadas sem
+autorizac¸˜ao [4].
+A criptografia pode ser classificada em dois tipos princi-
+pais: sim´etrica e assim´etrica [8]. Na criptografia sim´etrica,
+a mesma chave secreta ´e utilizada para cifrar e decifrar os
+dados. Tamb´em conhecida como criptografia convencional ou
+de chave ´unica, essa t´ecnica destaca-se pela eficiˆencia e baixa
+latˆencia, uma vez que se baseia em operac¸˜oes booleanas. Isso
+a torna ideal para aplicac¸˜oes que demandam alta velocidade,
+como transac¸˜oes online. Entretanto, sua principal limitac¸˜ao ´e
+a incapacidade de garantir a irretratabilidade, o que impede a
+implementac¸˜ao de assinaturas digitais.
+Por outro lado, a criptografia assim´etrica foi desenvolvida
+para superar essas limitac¸˜oes. Essa abordagem utiliza um par
+de chaves – uma p´ublica e outra privada – permitindo que
+a chave p´ublica seja amplamente compartilhada, enquanto
+a chave privada permanece confidencial. A criptografia as-
+sim´etrica possibilita a irretratabilidade, o que viabiliza o uso
+de assinaturas digitais. Contudo, apresenta maior complexidade
+computacional e, consequentemente, maior tempo de proces-
+samento, sendo menos eficiente para aplicac¸˜oes que requerem
+alta velocidade [9].
+Um aspecto crucial da confidencialidade e, por con-
+sequˆencia, dos algoritmos de criptografia ´e o estabelecimento
+de canais seguros para a troca de chaves criptogr´aficas [5].
+M´etodos tradicionais incluem a infraestrutura de chave p´ublica,
+o acordo de Diffie-Hellman e a distribuic¸˜ao de chaves por
+meio de criptografia quˆantica, Distribuic¸˜ao quˆantica de chaves
+(Quantum Key Distribution, QKD) [5, 10, 11]. A infraestrutura
+de chave p´ublica est´a associada `a criptografia assim´etrica, em
+que cada usu´ario possui um par de chaves – uma p´ublica e outra
+privada – para codificar e decodificar informac¸˜oes de forma se-
+gura [5]. J´a o m´etodo Diffie-Hellman permite que duas partes,
+mesmo sem conhecimento pr´evio, compartilhem uma chave
+secreta em um canal inseguro, utilizando c´alculos matem´aticos
+complexos [10]. A distribuic¸˜ao quˆantica de chaves, por sua
+vez, utiliza propriedades da mecˆanica quˆantica para estabelecer
+chaves sim´etricas por meio de estados quˆanticos (qubits),
+garantindo seguranc¸a te´orica contra as interceptac¸˜oes [11, 12].
+Embora eficazes, os m´etodos tradicionais de seguranc¸a enfren-
+tam limitac¸˜oes significativas ao serem aplicados a dispositivos
+inteligentes, como os desenvolvidos para IoT, e a diversas
+aplicac¸˜oes m´oveis previstas para redes Quinta Gerac¸˜ao de
+Rede M´ovel Celular (5G) e Sexta Gerac¸˜ao de Rede M´ovel
+Celular (6G). Essas limitac¸˜oes decorrem da alta complexidade
+computacional e do elevado consumo de energia necess´arios
+para o estabelecimento de canais seguros para troca de chaves
+criptogr´aficas, tornando-os inadequados para dispositivos com
+recursos limitados [13, 14].
+Al´em disso, diversas aplicac¸˜oes m´oveis emergentes deman-
+dam altas taxas de transmiss˜ao de dados, alta confiabilidade,
+baixa latˆencia e seguranc¸a integrada – requisitos indispens´aveis
+para sistemas avanc¸ados de comunicac¸˜ao. Exemplos incluem
+ve´ıculos autˆonomos, que precisam de respostas em tempo
+real para evitar colis˜oes; Unmanned Aerial Vehicles (UAVs),
+conhecidos como drones, empregados em miss˜oes de entrega
+ou resgate; plataformas de cirurgia remota que exigem trans-
+miss˜ao instantˆanea e precisa de dados; e sistemas de realidade
+aumentada e virtual voltados para entretenimento e treinamen-
+tos. Redes industriais inteligentes, utilizadas na automac¸˜ao e
+controle de f´abricas conectadas, bem como redes de sa´ude
+conectadas, que operam com dispositivos m´edicos port´ateis
+e monitoramento remoto, tamb´em dependem de soluc¸˜oes de
+seguranc¸a que sejam compat´ıveis com suas limitac¸˜oes com-
+putacionais e energ´eticas [15]. Portanto, ´e crucial que o
+estabelecimento de canais seguros para a troca de chaves
+criptogr´aficas seja eficiente e adequado `as restric¸˜oes impostas
+por essas aplicac¸˜oes, garantindo a seguranc¸a necess´aria sem
+comprometer o desempenho ou a viabilidade energ´etica dos
+dispositivos.
+Nesse cen´ario, a gerac¸˜ao de chaves na camada f´ısica emerge
+como uma alternativa promissora [14, 16, 17, 18]. Essa
+abordagem explora propriedades intr´ınsecas dos canais de
+comunicac¸˜ao sem fio, como a reciprocidade e a aleatoriedade
+dos canais de desvanecimento, para estabelecer chaves crip-
+togr´aficas de forma eficiente. Recentemente, sistemas que uti-
+lizam o ganho do canal sem fio como segredo para a gerac¸˜ao de
+chaves tˆem sido propostos [13, 19, 20]. Essa t´ecnica reduz sig-
+nificativamente os requisitos computacionais e o consumo de
+energia, tornando-se particularmente adequada para aplicac¸˜oes
+previstas para as redes B5G. Ao explorar caracter´ısticas f´ısicas
+do canal, como o desvanecimento, o atraso de propagac¸˜ao
+e o Indicador de Forc¸a de Sinal Recebido (Received Signal
+Strength Indicator, RSSI), ´e poss´ıvel estabelecer seguranc¸a
+te´orica baseada nas propriedades do ambiente de comunicac¸˜ao,
+sem depender de problemas matem´aticos complexos [21, 22].
+Este artigo tem como objetivo consolidar as principais carac-
+ter´ısticas do uso do ganho do canal sem fio como soluc¸˜ao para a
+implementac¸˜ao da confidencialidade na camada f´ısica de redes
+B5G. A proposta ´e explorar o potencial dessa abordagem para
+atender `as crescentes demandas de seguranc¸a nas comunicac¸˜oes
+futuras, promovendo sistemas mais eficientes e resilientes
+diante dos desafios impostos pela conectividade emergente.
+Para isso, a Sec¸˜ao II apresenta uma revis˜ao de m´etodos
+
+existentes para o estabelecimento de chaves criptogr´aficas.
+A Sec¸˜ao III discute as principais caracter´ısticas e etapas do
+estabelecimento de chaves secretas utilizando as propriedades
+do canal de comunicac¸˜ao sem fio. A Sec¸˜ao IV descreve o
+modelo de sistema considerado neste estudo. Nas Sec¸˜oes V
+e VI, s˜ao exemplificadas, respectivamente, duas abordagens
+para o processo de reconciliac¸˜ao, essencial para a criac¸˜ao de
+canais seguros, com a apresentac¸˜ao dos resultados num´ericos
+obtidos por meio de simulac¸˜oes desses m´etodos. Por fim, a
+Sec¸˜ao VII traz as principais conclus˜oes do estudo.
+II. M´ETODOS EXISTENTES PARA ESTABELECIMENTO DE
+CHAVES CRIPTOGR ´AFICAS
+Para garantir a confidencialidade das comunicac¸˜oes digitais,
+algoritmos de criptografia devem ser implementados nos dis-
+positivos respons´aveis pela troca de informac¸˜oes. No entanto,
+um dos desafios cr´ıticos na aplicac¸˜ao de algoritmos crip-
+togr´aficos, sejam eles de criptografia sim´etrica ou assim´etrica, ´e
+o estabelecimento seguro das chaves criptogr´aficas, elementos
+essenciais para a cifragem e decifragem das mensagens [4, 5].
+Geralmente, os participantes da comunicac¸˜ao encontram-se
+em locais distintos e precisam compartilhar a mesma chave
+criptogr´afica (no caso da criptografia sim´etrica) ou estabelecer
+um mecanismo seguro para validar as chaves p´ublicas (no caso
+da criptografia assim´etrica) a fim de assegurar a confidenci-
+alidade da comunicac¸˜ao [8, 9]. Sem um canal seguro para
+a troca dessas chaves, a comunicac¸˜ao torna-se vulner´avel a
+ataques de interceptac¸˜ao, como o ataque man-in-the-middle, no
+qual um invasor pode capturar ou modificar as chaves trocadas
+entre as partes. Al´em disso, o processo de estabelecimento
+das chaves criptogr´aficas deve ser conduzido de forma que um
+agente mal-intencionado n˜ao consiga obter acesso `a chave e,
+consequentemente, descriptografar mensagens n˜ao destinadas
+a ele.
+Para mitigar esses riscos, diferentes m´etodos foram desen-
+volvidos visando garantir a troca segura de chaves, mesmo
+em canais de comunicac¸˜ao potencialmente inseguros. Entre os
+principais m´etodos adotados est˜ao a infraestrutura de chave
+p´ublica, o acordo de chaves de Diffie-Hellman e a criptografia
+quˆantica, cada um com suas particularidades e aplicac¸˜oes
+espec´ıficas na seguranc¸a da informac¸˜ao.
+A. Infraestrutura de Chave p´ublica
+A infraestrutura de chave p´ublica ´e um sistema amplamente
+utilizado para garantir a seguranc¸a das comunicac¸˜oes em
+redes, combinando criptografia assim´etrica e sim´etrica para
+proporcionar confidencialidade, autenticidade e integridade das
+informac¸˜oes [5]. Esse mecanismo ´e fundamental para proto-
+colos como o Seguranc¸a da camada de transporte (Transport
+Layer Security, TLS), que protege a transmiss˜ao de dados
+na Internet, assegurando a comunicac¸˜ao segura entre clientes
+e servidores, incluindo transac¸˜oes banc´arias, autenticac¸˜ao de
+usu´arios e troca de informac¸˜oes sens´ıveis [23].
+O estabelecimento de um canal seguro utilizando a in-
+fraestrutura de chave p´ublica ocorre em duas etapas prin-
+cipais. A primeira etapa envolve a criptografia assim´etrica,
+usada para a troca segura da chave secreta que ser´a utilizada
+na comunicac¸˜ao. A segunda etapa faz uso da criptografia
+sim´etrica, que permite a transmiss˜ao eficiente dos dados com
+menor custo computacional. Inicialmente, quando um cliente
+deseja estabelecer uma comunicac¸˜ao segura com um servi-
+dor, ele envia uma solicitac¸˜ao contendo informac¸˜oes sobre
+os algoritmos criptogr´aficos suportados. O servidor responde
+com um certificado digital, que cont´em sua chave p´ublica e
+´e assinado por uma autoridade certificadora. Esse certificado
+permite que o cliente valide a identidade do servidor e tenha
+certeza de que est´a se comunicando com a entidade leg´ıtima,
+evitando ataques man-in-the-middle [24]. Ap´os a validac¸˜ao do
+certificado, o cliente gera uma chave secreta de sess˜ao, que
+ser´a utilizada para a criptografia sim´etrica da comunicac¸˜ao.
+No entanto, essa chave n˜ao pode ser enviada diretamente, pois
+a transmiss˜ao de um dado sens´ıvel por um canal inseguro
+poderia comprometer a confidencialidade da comunicac¸˜ao.
+Para resolver esse problema, o cliente cifra a chave secreta
+utilizando a chave p´ublica do servidor, garantindo que apenas o
+servidor — que possui a chave privada correspondente — possa
+descriptograf´a-la [5]. Dessa forma, a chave secreta de sess˜ao
+´e transmitida de maneira segura, impedindo que um atacante
+a intercepte. Ap´os a troca bem-sucedida da chave secreta,
+inicia-se a segunda etapa, o uso da criptografia sim´etrica para
+a comunicac¸˜ao cont´ınua. Nesse est´agio, todas as mensagens
+trocadas entre o cliente e o servidor s˜ao cifradas utilizando
+a chave compartilhada anteriormente, garantindo a seguranc¸a
+dos dados transmitidos. A criptografia sim´etrica ´e escolhida
+para essa fase devido ao seu menor custo computacional em
+comparac¸˜ao `a criptografia assim´etrica, tornando a comunicac¸˜ao
+mais eficiente.
+Esse processo de estabelecimento de um canal seguro por
+meio da infraestrutura de chave p´ublica ´e amplamente adotado
+para proteger as comunicac¸˜oes digitais. No entanto, apesar
+de sua efic´acia, a infraestrutura de chave p´ublica apresenta
+desafios em relac¸˜ao ao consumo de recursos computacionais
+e `a complexidade operacional. A validac¸˜ao de certificados
+digitais e a execuc¸˜ao de operac¸˜oes criptogr´aficas assim´etricas
+exigem um alto poder de processamento, tornando esse m´etodo
+menos vi´avel para dispositivos com restric¸˜oes de energia e
+capacidade de processamento, como sensores IoT e sistemas
+embarcados. Assim, embora a infraestrutura de chave p´ublica
+seja um dos m´etodos mais seguros para o estabelecimento
+de canais confi´aveis, sua aplicac¸˜ao em determinados cen´arios
+pode ser limitada. Nesses casos, alternativas mais leves, como
+estabelecimento de canal seguro para troca de chaves em
+camada f´ısica, podem ser exploradas para garantir seguranc¸a
+com maior eficiˆencia energ´etica.
+Para exemplificar o estabelecimento de uma sess˜ao atrav´es
+do m´etodo de infraestrutura de chave p´ublica, considere a
+Figura 1 [5, 23]. Nessa figura, Rivest-Shamir-Adleman (RSA)
+se refere ao algoritmo de criptografia assim´etrica utilizado para
+a troca segura da chave secreta, Advanced Encryption Standard
+(AES) representa o algoritmo de criptografia sim´etrica empre-
+gado para cifrar e decifrar os dados da comunicac¸˜ao, PUS
+´e a chave p´ublica utilizada para criptografar a chave secreta
+de sess˜ao, garantindo que apenas o destinat´ario correto possa
+acess´a-la, e PRs ´e a chave privada correspondente, usada pelo
+servidor para descriptografar a chave secreta e possibilitar o
+
+Fig. 1. Estabelecimento de sess˜ao utilizando infraestrutura de chave p´ublica
+in´ıcio da comunicac¸˜ao segura.
+B. Acordo de Diffie-Hellman
+Os acordos de troca de chaves criptogr´aficas s˜ao essenci-
+ais para garantir a confidencialidade das comunicac¸˜oes em
+redes inseguras, permitindo que dispositivos compartilhem uma
+chave secreta sem que esta seja diretamente transmitida. Um
+dos protocolos utilizados para esse fim ´e o acordo de chave de
+Diffie-Hellman, que possibilita que duas partes estabelec¸am
+uma chave secreta comum por meio de um canal p´ublico,
+sem que um advers´ario seja capaz de intercept´a-la e utiliz´a-
+la para descriptografar a comunicac¸˜ao [10]. Esse m´etodo ´e
+empregado em diversos protocolos de seguranc¸a, incluindo
+o Seguranc¸a de protocolo de internet (Internet Protocol Se-
+curity, IPSec), que oferece autenticac¸˜ao, confidencialidade e
+gerenciamento de chaves para proteger o tr´afego na camada
+de rede [25]. O Diffie-Hellman pode ser implementado em
+diferentes variac¸˜oes, como o Elliptic Curve Diffie-Hellman
+(ECDH), que proporciona menor demanda computacional,
+tornando-se mais adequado para dispositivos com restric¸˜oes
+de processamento [26].
+A Figura 2 ilustra o processo de estabelecimento de uma
+sess˜ao segura utilizando o acordo de Diffie-Hellman, desta-
+cando as trocas de informac¸˜oes necess´arias para que ambas
+as partes derivem uma chave secreta compartilhada de forma
+segura.
+Similarmente ao estabelecimento pela infraestrutura de
+chave p´ublica, o dispositivo 1 envia as opc¸˜oes de seguranc¸a
+que podem ser utilizadas pelo dispositivo 2. Nesse caso, s˜ao
+escolhidas o tipo de criptografia sim´etrica e a func¸˜ao Hash a
+serem utilizadas na comunicac¸˜ao, um valor primo p, que ser´a
+utilizado na gerac¸˜ao da chave secreta, entre outras informac¸˜oes.
+O dispositivo 2 responde ao dispositivo 1 com as opc¸˜oes de
+seguranc¸a escolhidas.
+Dado o conhecimento destes parˆametros, o dispositivo 1 en-
+via uma mensagem para o dispositivo 2 com alguns parˆametros
+baseados no acordo de Diffie-Hellman. Portanto, do lado do
+dispositivo 1, ser´a definido um parˆametro secreto com qualquer
+n´umero inteiro, a. No exemplo ilustrado na Figura 2, define-
+Fig. 2. Estabelecimento de uma sess˜ao pelo acordo de Diffie-Hellman
+se a = 6. Al´em desse parˆametro, tem-se o valor de p, que ´e
+um n´umero primo, que foi definido na troca das mensagens
+anteriores para escolha das opc¸˜oes de seguranc¸a. Suponha que
+p = 23. Mais ainda, ´e escolhido um parˆametro g, que deve ser
+um n´umero inteiro, relativamente primo e menor que o valor
+de p. No exemplo, tem-se que g = 5. Com esses valores, o
+dispositivo 1 vai calcular o valor de A da seguinte forma [10]
+A = ga mod p,
+(1)
+onde mod ´e a operac¸˜ao m´odulo congruente. Com os dados
+da Figura 2, o resultado de (1) ´e igual a 8. Em seguida,
+os parˆametros A e g s˜ao enviados para o dispositivo 2.
+De forma semelhante, o dispositivo 2 define outros valores
+para concretizar o estabelecimento da comunicac¸˜ao segura,
+como um valor inteiro qualquer para um parˆametro b, por
+exemplo b = 15. Al´em disso, ´e utilizado o valor de p trocado
+anteriormente e o parˆametro g recebido do dispositivo 1. Como
+resultado, o dispositivo 2 calcula um valor de B, sendo dado
+por
+B = gb mod p.
+(2)
+Com os dados exemplificados, a equac¸˜ao (2) resulta em 19.
+Com esse resultado, o dispositivo 2 envia os parˆametros g e B
+para o dispositivo 1.
+De posse dos parˆametros, os dispositivos 1 e 2 fazem o
+c´alculo localmente de uma chave secreta K, sendo dada,
+respectivamente, por [10]
+K = Ba mod p
+(3)
+K = Ab mod p.
+(4)
+Ao efetuarem as operac¸˜oes (3) e (4) individualmente em
+cada um dos dispositivos, o resultado encontrado para o
+valor K ser´a o mesmo em ambos, estabelecendo, assim, a
+troca da chave secreta. Com a chave secreta K definida,
+os dispositivos podem trocar dados da aplicac¸˜ao de forma
+criptografada, utilizando o algoritmo de criptografia sim´etrica
+escolhida previamente pelo protocolo [25].
+´E importante ressaltar que cada usu´ario possui sua pr´opria
+chave privada (a e b), e essa chave n˜ao ´e compartilhada em
+momento algum durante o processo de estabelecimento da
+
+chave secreta. Esse aspecto torna a comunicac¸˜ao extremamente
+segura e robusta contra poss´ıveis invasores, pois a chave secreta
+´e gerada de forma exclusiva e n˜ao pode ser acessada ou inter-
+ceptada por terceiros. A implementac¸˜ao do acordo de Diffie-
+Hellman ´e amplamente utilizada em Rede virtual privadas
+(Virtual Private Networks, VNPs), protocolos de seguranc¸a
+para a camada de rede e outras aplicac¸˜oes que exigem um
+mecanismo seguro e eficiente para a troca de chaves crip-
+togr´aficas. No entanto, devido ao seu alto custo computacional,
+este m´etodo pode n˜ao ser ideal para equipamentos e soluc¸˜oes
+que demandam baixo processamento, baixa latˆencia e altas
+taxas de transmiss˜ao, uma vez que as operac¸˜oes matem´aticas
+envolvidas no c´alculo da chave secreta podem impactar o
+desempenho e a eficiˆencia energ´etica desses sistemas [27].
+C. Distribuic¸˜ao quˆantica de chaves
+A
+criptografia
+quˆantica
+destaca-se
+por
+n˜ao
+requerer
+comunicac¸˜oes secretas pr´evias entre as partes, por permitir
+a detecc¸˜ao de intrusos e por garantir seguranc¸a mesmo na
+presenc¸a de um advers´ario com poder computacional ili-
+mitado [11]. Um dos princ´ıpios fundamentais da mecˆanica
+quˆantica que torna essa seguranc¸a poss´ıvel ´e a impossibilidade
+de clonar um estado quˆantico arbitr´ario (no-cloning theorem),
+o que impede a c´opia exata da informac¸˜ao quˆantica. Al´em
+disso, a medic¸˜ao de um estado quˆantico inevitavelmente o
+perturba, tornando a presenc¸a de um atacante detect´avel [12]. A
+criptografia quˆantica utiliza essas propriedades f´ısicas para es-
+tabelecer um canal seguro para a troca de chaves criptogr´aficas.
+Durante a d´ecada de 1980, foi proposto o protocolo BB84,
+o primeiro esquema pr´atico de distribuic¸˜ao quˆantica de chaves
+QKD
+[28]. Desenvolvido por Charles H. Bennett e Gilles
+Brassard em 1984, o BB84 baseia-se na transmiss˜ao de f´otons
+polarizados por meio de um canal quˆantico. Vale destacar que,
+nesses casos, a criptografia quˆantica n˜ao ´e utilizada para a
+transmiss˜ao de mensagens criptografadas, mas sim exclusi-
+vamente para gerar e distribuir uma chave secreta, que pode
+ent˜ao ser empregada em um algoritmo de criptografia sim´etrica
+convencional.
+No estabelecimento de um canal seguro pelo protocolo
+BB84, a unidade fundamental de informac¸˜ao ´e o qubit (quan-
+tum bit), que pode ser representado por estados de polarizac¸˜ao
+de f´otons. Dois conjuntos de bases ortogonais s˜ao utilizados:
+a base retil´ınea (V-H, vertical 0° / horizontal 90°) e a base
+diagonal (D-C, diagonal 45° / contra-diagonal 135°), conforme
+ilustrado na Figura 3. Essas bases representam os estados
+quˆanticos 0 e 1. Quando um emissor deseja transmitir uma
+chave para um receptor, ele gera uma sequˆencia de f´otons
+polarizados de acordo com bases escolhidas aleatoriamente,
+transformando a mensagem de n bits em n qubits com
+polarizac¸˜oes espec´ıficas.
+O receptor, ao receber os f´otons, tamb´em escolhe aleatori-
+amente suas bases de medic¸˜ao. Como consequˆencia das leis
+da mecˆanica quˆantica, se a base utilizada pelo receptor for a
+mesma da emiss˜ao, o valor do qubit recebido corresponder´a ao
+original. Caso contr´ario, o resultado da medic¸˜ao ser´a aleat´orio.
+Para garantir que apenas os bits corretamente medidos sejam
+utilizados na formac¸˜ao da chave, o receptor comunica ao
+emissor, por um canal p´ublico, quais bases escolheu para
+Fig. 3. Bases de medic¸˜ao Protocolo BB84
+Fig. 4. Ineficiˆencia de invas˜ao
+cada qubit recebido. O emissor ent˜ao informa quais bases
+coincidem com as dele. Apenas os qubits cujas bases de envio
+e recepc¸˜ao coincidiram s˜ao utilizados para compor a chave
+secreta final [11].
+Mesmo que um atacante tente interceptar os f´otons trans-
+mitidos, sua presenc¸a ser´a detectada devido `as propriedades
+da mecˆanica quˆantica. Caso um invasor utilize uma base
+de medic¸˜ao incorreta, ele perturbar´a os estados quˆanticos,
+introduzindo erros nos bits da chave [12]. Para verificar a inte-
+gridade da chave compartilhada, emissor e receptor comparam
+publicamente uma parte dos bits gerados. Se a taxa de erro
+ultrapassar um limite predefinido, a chave ´e descartada e um
+novo processo de distribuic¸˜ao ´e iniciado.
+O diferencial dessa t´ecnica est´a na impossibilidade de copiar
+um estado quˆantico sem alter´a-lo, conforme o princ´ıpio da in-
+certeza de Heisenberg [29]. Qualquer tentativa de interceptac¸˜ao
+inevitavelmente modifica os f´otons, alertando os usu´arios sobre
+a presenc¸a de um invasor, como ilustrado na Figura 4. Como
+resultado, a QKD oferece um n´ıvel de seguranc¸a inquebr´avel,
+mesmo contra ataques de computadores quˆanticos, uma vez
+que sua protec¸˜ao ´e garantida pelas leis fundamentais da f´ısica.
+Diferentemente da infraestrutura de chave p´ublica e acordo
+de Diffie-Hellman, cuja seguranc¸a depende da complexidade
+matem´atica de problemas computacionais, a QKD elimina
+a possibilidade de que um avanc¸o no poder computacional
+comprometa a seguranc¸a das chaves trocadas [11].
+No entanto, a implementac¸˜ao pr´atica da criptografia quˆantica
+
+enfrenta desafios. Imperfeic¸˜oes no canal quˆantico, a presenc¸a
+de ru´ıdo e limitac¸˜oes na gerac¸˜ao e detecc¸˜ao de f´otons podem
+introduzir erros na chave final, tornando necess´ario o uso
+de t´ecnicas de reconciliac¸˜ao e amplificac¸˜ao de privacidade
+para garantir a confidencialidade. Al´em disso, a infraestrutura
+necess´aria para a transmiss˜ao segura de f´otons—como redes
+de fibra ´optica dedicadas e repetidores quˆanticos—imp˜oe um
+alto custo operacional e limitac¸˜oes na escalabilidade da tec-
+nologia [30]. Essas restric¸˜oes tornam a QKD invi´avel para
+aplicac¸˜oes em redes B5G, que exigem alta mobilidade, baixa
+latˆencia e grande escalabilidade.
+III. ESTABELECIMENTO DE CHAVES SECRETAS
+UTILIZANDO AS CARACTER´ISTICAS DO CANAL DE
+COMUNICAC¸ ˜AO SEM FIO
+O estabelecimento de chaves secretas utilizando as carac-
+ter´ısticas do canal de comunicac¸˜ao sem fio ´e uma abor-
+dagem promissora para garantir a seguranc¸a da troca de
+informac¸˜oes em sistemas distribu´ıdos [14, 16]. Diferentemente
+dos m´etodos tradicionais, que dependem de infraestrutura crip-
+togr´afica complexa, essa t´ecnica explora as variac¸˜oes naturais
+do canal sem fio para gerar chaves secretas entre dispositivos
+pr´oximos. Essa abordagem apresenta vantagens significativas,
+como baixo custo computacional, menor consumo energ´etico
+e uma seguranc¸a baseada nas propriedades f´ısicas do meio
+de transmiss˜ao, tornando-a especialmente adequada para dis-
+positivos com recursos limitados, como os pertencentes ao
+ecossistema IoT [21].
+A seguranc¸a desse m´etodo baseia-se na aleatoriedade n˜ao
+determin´ıstica do canal sem fio, que gera variac¸˜oes ´unicas na
+propagac¸˜ao do sinal, garantindo que apenas dispositivos fisica-
+mente pr´oximos compartilhem informac¸˜oes coerentes sobre o
+meio [18, 22]. Essa caracter´ıstica reduz a possibilidade de ata-
+ques de terceiros, j´a que um invasor posicionado fora da regi˜ao
+de coerˆencia do canal n˜ao conseguir´a inferir corretamente os
+valores das chaves geradas. O processo de gerac¸˜ao de chaves
+a partir das caracter´ısticas do canal de comunicac¸˜ao ocorre por
+meio de diversas etapas fundamentais, como a sondagem do
+canal, extrac¸˜ao da aleatoriedade, quantizac¸˜ao, reconciliac¸˜ao da
+informac¸˜ao e amplificac¸˜ao de privacidade [17, 14], conforme
+ilustrado na Figura 5. Cada uma dessas etapas, abordadas
+em detalhes a seguir, desempenha um papel fundamental na
+garantia de que os dispositivos leg´ıtimos compartilhem uma
+chave idˆentica e segura, de forma que um poss´ıvel invasor n˜ao
+consiga reconstru´ı-la.
+A. Sondagem do Canal
+A sondagem do canal ´e a primeira etapa do processo de
+gerac¸˜ao de chaves e tem como objetivo medir as caracter´ısticas
+dinˆamicas do canal de comunicac¸˜ao [17, 14]. Essas medic¸˜oes
+s˜ao obtidas por meio da troca de sinais de sondagem entre
+os dispositivos envolvidos, permitindo a captura de parˆametros
+como ganho do canal, atenuac¸˜ao e RSSI [22]. Esses parˆametros
+s˜ao altamente sens´ıveis a mudanc¸as no ambiente, garantindo
+que as chaves geradas sejam exclusivas para dispositivos
+pr´oximos e imposs´ıveis de prever por um atacante externo.
+O modelo de canal adotado geralmente considera o desvane-
+cimento multipercurso, um fenˆomeno caracter´ıstico de sistemas
+Fig. 5. Diagrama de blocos processo de estabelecimento de chaves seguras
+atrav´es da camada f´ısica
+sem fio, onde o sinal transmitido sofre m´ultiplas reflex˜oes e
+difrac¸˜oes antes de chegar ao receptor. Esse fenˆomeno contribui
+para a aleatoriedade do canal, garantindo que as chaves geradas
+sejam ´unicas e imprevis´ıveis [13]. Entretanto, em ambientes
+onde h´a baixa dispers˜ao de m´ultiplos caminhos ou alta in-
+terferˆencia, as medic¸˜oes do canal podem se tornar altamente
+correlacionadas e previs´ıveis, comprometendo a seguranc¸a do
+processo.
+Para mitigar esse problema, diversas soluc¸˜oes tˆem sido
+propostas, como o uso de sinais de sondagem aleat´orios e
+a adoc¸˜ao de t´ecnicas de diversidade espacial baseadas em
+M´ultiplas Entradas M´ultiplas Sa´ıdas (Multiple-Input Multiple-
+Output, MIMO) [31]. O uso de m´ultiplas antenas, por exemplo,
+pode aumentar a entropia das medic¸˜oes e tornar o canal mais
+resistente a ataques passivos, dificultando a reconstruc¸˜ao da
+chave por um invasor [32]. Al´em disso, t´ecnicas de modulac¸˜ao
+adaptativa e variac¸˜ao da frequˆencia de sondagem podem me-
+lhorar a robustez da chave gerada, garantindo medic¸˜oes mais
+aleat´orias e menos previs´ıveis [33].
+A efetividade da sondagem do canal depende diretamente da
+correlac¸˜ao entre as medic¸˜oes feitas pelos dispositivos leg´ıtimos.
+Para que uma chave segura seja estabelecida, ´e essencial que
+as medic¸˜oes sejam altamente correlacionadas entre os partici-
+pantes da comunicac¸˜ao, mas permanec¸am descorrelacionadas
+para um atacante externo. Esse desafio pode ser enderec¸ado
+por meio de m´etodos que aumentam a variabilidade espacial
+e temporal do canal, reduzindo as chances de um advers´ario
+prever os valores utilizados na gerac¸˜ao da chave.
+Portanto, a sondagem do canal desempenha um papel crucial
+no estabelecimento de chaves seguras, fornecendo a base para
+as etapas subsequentes do processo.
+B. Extrac¸˜ao de Aleatoriedade
+A extrac¸˜ao de aleatoriedade ´e uma etapa fundamental no
+processo de gerac¸˜ao de chaves criptogr´aficas baseadas no canal
+de comunicac¸˜ao. Ap´os a medic¸˜ao do canal, as partes envolvidas
+devem identificar e extrair as variac¸˜oes imprevis´ıveis do meio
+de transmiss˜ao para garantir que a chave gerada seja ´unica
+
+e n˜ao replic´avel por um advers´ario. Esse processo ´e essencial
+para assegurar que a chave final seja resistente a ataques, espe-
+cialmente aqueles conduzidos por um interceptor posicionado
+nas proximidades dos dispositivos leg´ıtimos [17, 14].
+A transmiss˜ao do sinal pelo canal de comunicac¸˜ao en-
+volve a propagac¸˜ao de uma onda eletromagn´etica, que trans-
+porta a informac¸˜ao bin´aria previamente convertida em sinais
+cont´ınuos. No entanto, devido `a interferˆencia do meio, ao
+ru´ıdo e `as caracter´ısticas dinˆamicas do canal, a onda ele-
+tromagn´etica sofre diversas perturbac¸˜oes, resultando em si-
+nais recebidos que n˜ao correspondem exatamente aos valo-
+res discretos dos bits originalmente transmitidos. Alterac¸˜oes
+na amplitude, frequˆencia e fase da onda ocorrem devido a
+fenˆomenos como reflex˜ao, difrac¸˜ao, desvanecimento e ru´ıdo
+t´ermico, introduzindo variac¸˜oes imprevis´ıveis na recepc¸˜ao.
+Essas distorc¸˜oes geram vers˜oes modificadas do sinal original
+nos receptores, indicando as sequˆencias alteradas observadas
+pelos dispositivos leg´ıtimos. Como consequˆencia, os valores
+recebidos em cada terminal podem apresentar pequenas dis-
+crepˆancias, tornando a correspondˆencia exata dos bits trans-
+mitidos um desafio. Para mitigar esse problema, ´e necess´ario
+um processo eficiente de extrac¸˜ao da aleatoriedade, que deve
+remover componentes previs´ıveis do sinal e preservar apenas
+as variac¸˜oes verdadeiramente aleat´orias [17].
+Um dos principais desafios dessa etapa ´e a presenc¸a de
+componentes determin´ısticos na medic¸˜ao do canal, que podem
+ser previs´ıveis e, portanto, explor´aveis por um atacante. O
+desvanecimento de grande escala, causado por fatores como
+a distˆancia entre os dispositivos e a atenuac¸˜ao do sinal,
+pode ser relativamente est´avel e facilmente inferido por um
+advers´ario posicionado em uma localizac¸˜ao estrat´egica. Caso
+esses componentes previs´ıveis n˜ao sejam devidamente remo-
+vidos, a chave gerada pode se tornar vulner´avel a ataques de
+reconstruc¸˜ao.
+Para garantir a robustez do processo, t´ecnicas avanc¸adas
+s˜ao empregadas na extrac¸˜ao de aleatoriedade, com o obje-
+tivo de minimizar a influˆencia dos componentes previs´ıveis.
+Uma abordagem eficaz consiste no uso de m´edia m´ovel, que
+permite filtrar variac¸˜oes de grande escala, preservando apenas
+as flutuac¸˜oes de pequena escala do sinal, que s˜ao altamente
+sens´ıveis a pequenas mudanc¸as ambientais e, consequente-
+mente, imprevis´ıveis para um interceptor [34]. Al´em disso,
+t´ecnicas baseadas em diferenciac¸˜ao temporal e espacial podem
+ser aplicadas para aumentar a entropia do sinal extra´ıdo,
+tornando a chave final mais segura.
+Assim, a extrac¸˜ao de aleatoriedade desempenha um papel
+cr´ıtico na seguranc¸a da gerac¸˜ao de chaves baseadas no canal,
+garantindo que a chave resultante seja imprevis´ıvel, ´unica para
+cada sess˜ao de comunicac¸˜ao e resistente a ataques passivos.
+Ao utilizar t´ecnicas apropriadas de filtragem e processamento
+de sinal, ´e poss´ıvel minimizar riscos e assegurar que apenas
+os dispositivos autorizados possam derivar e utilizar a chave
+gerada.
+C. Quantizac¸˜ao
+A quantizac¸˜ao ´e uma etapa essencial no processo de gerac¸˜ao
+de chaves criptogr´aficas baseadas no canal de comunicac¸˜ao
+sem fio. Ap´os a extrac¸˜ao da aleatoriedade das medic¸˜oes do
+canal, os valores cont´ınuos obtidos precisam ser convertidos
+em representac¸˜oes discretas, permitindo que os dispositivos
+leg´ıtimos compartilhem uma sequˆencia bin´aria comum, a qual
+ser´a utilizada como chave secreta [17, 14]. Essa convers˜ao ´e
+necess´aria porque as medic¸˜oes do canal ocorrem no dom´ınio
+anal´ogico, sendo influenciadas por efeitos como ru´ıdo t´ermico,
+interferˆencia externa e desvanecimento multipercurso, o que
+pode resultar em pequenas discrepˆancias entre os valores
+observados pelos dispositivos participantes [13].
+O processo de quantizac¸˜ao transforma essas medic¸˜oes
+cont´ınuas em sequˆencias bin´arias por meio de um crit´erio
+predefinido. Uma abordagem comum consiste em estabelecer
+um limiar de decis˜ao, onde valores abaixo de um determinado
+ponto de referˆencia s˜ao mapeados como bit 0 e valores acima
+desse limiar s˜ao mapeados como bit 1. Neste estudo, por
+exemplo, adota-se a regra de que sinais com amplitude inferior
+a 0,5 s˜ao classificados como bit 0, enquanto sinais com ampli-
+tude maior ou igual a 0,5 s˜ao classificados como bit 1. Esse
+processo possibilita que os dispositivos receptores interpretem
+corretamente os sinais cont´ınuos recebidos, reconstruindo a
+sequˆencia transmitida apesar das distorc¸˜oes introduzidas pelo
+canal e pelo ru´ıdo.
+Apesar da simplicidade do processo, a quantizac¸˜ao pode
+enfrentar desafios t´ecnicos. Um dos principais problemas de-
+corre da imperfeic¸˜ao do canal de comunicac¸˜ao, que pode
+causar pequenos desvios entre as medic¸˜oes realizadas pelos
+dispositivos envolvidos. Al´em disso, o deslocamento temporal
+entre as medic¸˜oes bidirecionais pode levar a variac¸˜oes que
+resultam em bits inconsistentes entre os dispositivos leg´ıtimos.
+Como consequˆencia, as sequˆencias geradas por cada n´o da
+comunicac¸˜ao podem apresentar diferenc¸as, comprometendo a
+construc¸˜ao de uma chave criptogr´afica idˆentica nos dispositi-
+vos.
+Para reduzir a discrepˆancia entre os bits gerados pelos
+dispositivos leg´ıtimos, diversas estrat´egias podem ser adota-
+das. O uso de t´ecnicas de quantizac¸˜ao robustas, associadas a
+m´etodos de pr´e-processamento das medic¸˜oes, pode melhorar a
+correlac¸˜ao entre os valores quantizados e minimizar o impacto
+do ru´ıdo no processo. Uma soluc¸˜ao amplamente utilizada ´e a
+interpolac¸˜ao dos sinais medidos, por meio da aplicac¸˜ao de fil-
+tros que suavizam variac¸˜oes abruptas e reduzem discrepˆancias
+entre os dispositivos envolvidos.
+Al´em
+disso,
+a
+adoc¸˜ao
+de
+esquemas
+adaptativos
+de
+quantizac¸˜ao, que ajustam dinamicamente os limiares de de-
+cis˜ao com base na distribuic¸˜ao estat´ıstica das medic¸˜oes do
+canal, pode contribuir para maximizar a similaridade entre as
+sequˆencias geradas e aumentar a eficiˆencia da quantizac¸˜ao [35].
+No entanto, mesmo com essas t´ecnicas, algumas diferenc¸as
+ainda podem permanecer entre os bits extra´ıdos pelos dis-
+positivos leg´ıtimos. Para garantir que ambos compartilhem
+exatamente a mesma chave, torna-se necess´aria a etapa de
+reconciliac¸˜ao, onde erros residuais s˜ao corrigidos sem com-
+prometer a seguranc¸a do sistema.
+D. Reconciliac¸˜ao da Informac¸˜ao
+A reconciliac¸˜ao da informac¸˜ao ´e uma etapa essencial no
+processo de estabelecimento de chaves criptogr´aficas seguras
+a partir de parˆametros do canal de comunicac¸˜ao sem fio. Ap´os
+
+a extrac¸˜ao de aleatoriedade e a quantizac¸˜ao das medic¸˜oes do
+canal, pequenas discrepˆancias podem surgir entre as sequˆencias
+de bits geradas pelos dispositivos leg´ıtimos devido a ru´ıdo,
+atenuac¸˜ao do sinal e variac¸˜oes temporais do canal [14, 16].
+Como resultado, ´e necess´ario um processo de correc¸˜ao que
+permita alinhar essas sequˆencias sem comprometer a seguranc¸a
+da comunicac¸˜ao.
+A
+reconciliac¸˜ao
+tem
+como
+principal
+objetivo
+corrigir
+diferenc¸as entre as chaves geradas pelos dispositivos sem re-
+velar informac¸˜oes cr´ıticas a um advers´ario potencial [17]. Para
+isso, os dispositivos trocam mensagens auxiliares contendo
+informac¸˜oes parciais sobre a sequˆencia quantizada, projetadas
+para permitir a correc¸˜ao de erros sem fornecer dados sufici-
+entes para que um interceptador reconstrua a chave secreta.
+Essa abordagem garante que, ao final do processo, ambos os
+dispositivos possuam chaves idˆenticas, garantindo a integridade
+da comunicac¸˜ao segura.
+Apesar de sua importˆancia, a reconciliac¸˜ao apresenta de-
+safios significativos. Um dos principais problemas ´e que
+informac¸˜oes adicionais precisam ser trocadas entre os disposi-
+tivos, o que pode potencialmente expor parte da chave a um ad-
+vers´ario. Esse risco aumenta `a medida que a discrepˆancia entre
+os bits gerados pelos dispositivos leg´ıtimos se torna maior, pois
+mais dados auxiliares precisam ser transmitidos para corrigir as
+diferenc¸as. Assim, h´a um balanc¸o entre eficiˆencia e seguranc¸a,
+onde um n´umero excessivo de correc¸˜oes pode comprometer a
+privacidade da chave.
+Para mitigar esses riscos, s˜ao utilizadas t´ecnicas avanc¸adas
+de correc¸˜ao de erro e reconciliac¸˜ao eficiente, que bus-
+cam minimizar a quantidade de informac¸˜oes expostas du-
+rante o processo [19, 20]. Entre as abordagens mais utili-
+zadas, destacam-se os c´odigos corretores de erro, m´etodos
+como Low-Density Parity-Check (LDPC) e Bose-Chaudhuri-
+Hocquenghem (BCH), pois permitem a detecc¸˜ao e correc¸˜ao
+de erros nas sequˆencias de bits, reduzindo a necessidade de
+troca excessiva de informac¸˜oes auxiliares. O algoritmo Cascade
+tamb´em ´e uma das t´ecnicas eficazes para reconciliac¸˜ao [36]. O
+Cascade utiliza um esquema iterativo que verifica a paridade de
+segmentos da chave, corrigindo diferenc¸as de forma eficiente
+sem expor a estrutura completa da sequˆencia quantizada. Essas
+estrat´egias garantem que as chaves finais sejam idˆenticas em
+ambos os dispositivos, ao mesmo tempo em que limitam
+as informac¸˜oes que um advers´ario poderia obter durante o
+processo de correc¸˜ao.
+A reconciliac¸˜ao de chaves ´e uma etapa fundamental para
+assegurar a confiabilidade e seguranc¸a da comunicac¸˜ao baseada
+nas caracter´ısticas do canal de comunicac¸˜ao. Ao empregar
+t´ecnicas eficientes de correc¸˜ao de erro e minimizar a exposic¸˜ao
+de informac¸˜oes durante a troca de mensagens auxiliares, essa
+etapa garante que dispositivos leg´ıtimos compartilhem uma
+chave secreta idˆentica, mesmo na presenc¸a de ru´ıdo e pequenas
+discrepˆancias na quantizac¸˜ao. Dessa forma, a reconciliac¸˜ao
+fortalece o processo de estabelecimento de chaves, tornando-o
+mais robusto contra ataques e interferˆencias externas.
+E. Amplificac¸˜ao de Privacidade
+A amplificac¸˜ao de privacidade ´e a etapa final no pro-
+cesso de gerac¸˜ao de chaves criptogr´aficas baseadas no ca-
+nal de comunicac¸˜ao e tem como objetivo eliminar qualquer
+informac¸˜ao parcial que um advers´ario possa ter obtido durante
+as fases anteriores [37, 17]. Mesmo com a reconciliac¸˜ao,
+onde os dispositivos leg´ıtimos alinham suas sequˆencias de bits
+para obter uma chave idˆentica, ainda h´a o risco de que um
+interceptador tenha coletado fragmentos de informac¸˜oes ´uteis
+a partir das mensagens auxiliares trocadas nas etapas anteriores.
+Algumas informac¸˜oes s˜ao transmitidas publicamente no est´agio
+de reconciliac¸˜ao, podendo ser acessadas por um advers´ario
+e comprometendo potencialmente a seguranc¸a da sequˆencia
+de chaves. Dessa forma, a amplificac¸˜ao de privacidade atua
+como uma camada adicional de seguranc¸a, garantindo que a
+chave final tenha entropia suficiente e seja resistente a ataques
+passivos e ativos.
+O
+princ´ıpio
+fundamental
+dessa
+t´ecnica
+consiste
+na
+transformac¸˜ao da chave reconciliada em uma nova chave menor
+e mais segura, eliminando qualquer correlac¸˜ao que um invasor
+possa explorar. Para isso, s˜ao aplicados m´etodos matem´aticos
+e criptogr´aficos, como func¸˜oes de hash universais e c´odigos
+de extrac¸˜ao de aleatoriedade [38, 39], que tornam a chave
+final completamente imprevis´ıvel para qualquer agente externo.
+O uso de func¸˜oes de hash criptogr´aficas, como o algoritmo
+de hash seguro (SHA) e a func¸˜ao de hash Merkle-Damgard,
+assegura que pequenas variac¸˜oes na entrada resultem em sa´ıdas
+drasticamente diferentes, impossibilitando a reconstruc¸˜ao da
+chave por meio de qualquer fragmento de informac¸˜ao va-
+zado [40, 41].
+Um dos principais desafios dessa etapa ´e estimar correta-
+mente a quantidade de informac¸˜ao vazada durante as fases
+anteriores do processo, como a quantizac¸˜ao e a reconciliac¸˜ao.
+A escolha da taxa de compress˜ao adequada para a amplificac¸˜ao
+de privacidade depende da an´alise da entropia da chave bruta e
+do impacto da correlac¸˜ao espacial e temporal nas medic¸˜oes do
+canal. Se a taxa de compress˜ao for muito agressiva, pode-se
+perder demasiada informac¸˜ao ´util, reduzindo a taxa de gerac¸˜ao
+de chaves. Por outro lado, uma compress˜ao insuficiente pode
+resultar em chaves parcialmente previs´ıveis, comprometendo a
+seguranc¸a do sistema [14].
+Para lidar com esse problema, a aplicac¸˜ao de m´etodos de
+an´alise de entropia auxilia na determinac¸˜ao da compress˜ao
+necess´aria para cada conjunto de chaves, garantindo um
+equil´ıbrio entre seguranc¸a e eficiˆencia. Assim, a amplificac¸˜ao
+de privacidade se estabelece como um componente essencial
+na construc¸˜ao de sistemas robustos de gerac¸˜ao de chaves
+criptogr´aficas baseadas no canal de comunicac¸˜ao.
+IV. EXEMPLO DE UM MODELO DE SISTEMA PARA O
+PROCESSO DE RECONCILIAC¸ ˜AO
+O modelo de sistema analisado neste estudo ´e composto por
+trˆes entidades principais: um ponto de acesso (transmissor)
+e dois dispositivos receptores (A e B), ambos posiciona-
+dos pr´oximos entre si e localizados a distˆancias similares
+do transmissor [19, 20]. O processo de estabelecimento de
+chaves tem in´ıcio com a transmiss˜ao de uma sequˆencia bin´aria
+de referˆencia X pelo transmissor, a qual ´e recebida pelos
+dispositivos A e B por meio do canal de comunicac¸˜ao sem
+fio. Esse modelo, ilustrado na Figura 6, representa um cen´ario
+
+Fig. 6. Modelo de sistema de transmiss˜ao
+em que os dispositivos receptores compartilham caracter´ısticas
+semelhantes de propagac¸˜ao do sinal devido `a sua proximidade.
+Ap´os a transmiss˜ao do sinal de informac¸˜ao X, cada receptor
+observa um sinal recebido afetado pelo canal de comunicac¸˜ao
+e pelo ru´ıdo presente no meio, caracterizando um sistema de
+recepc¸˜ao t´ıpico de redes sem fio. O modelo matem´atico que
+descreve a recepc¸˜ao do sinal em cada dispositivo pode ser
+representado por
+yi = hi ∗x + ni,
+(5)
+onde yi representa o sinal recebido pelo dispositivo i, hi ´e a
+influˆencia do canal de transmiss˜ao, caracterizado por modelos
+de desvanecimento, x ´e o bit transmitido pelo transmissor, ni
+´e o Ru´ıdo Gaussiano Branco Aditivo (Additive white Gaussian
+noise, AWGN), que representa flutuac¸˜oes aleat´orias no sinal
+recebido, i indica o receptor correspondente (A ou B).
+O cen´ario analisado assume que os dois receptores (A ou B)
+est˜ao posicionados pr´oximos, implicando que ambos experien-
+ciam condic¸˜oes de propagac¸˜ao semelhantes. Como resultado,
+a envolt´oria do canal nos dois dispositivos segue a mesma
+distribuic¸˜ao estat´ıstica, com parˆametros de desvanecimento
+equivalentes devido `a correlac¸˜ao espacial. Essa caracter´ıstica
+´e essencial para que ambos obtenham medic¸˜oes altamente
+correlacionadas, facilitando a gerac¸˜ao de chaves secretas. Al´em
+do desvanecimento do canal, os receptores est˜ao sujeitos ao
+AWGN, cujas componentes na e nb possuem a mesma m´edia
+e variˆancia. Isso garante que o n´ıvel de degradac¸˜ao aleat´oria do
+sinal seja estatisticamente equivalente para ambos os disposi-
+tivos. Assim, ainda que as medic¸˜oes individuais possam apre-
+sentar pequenas discrepˆancias devido a flutuac¸˜oes aleat´orias, a
+correlac¸˜ao espacial possibilita a aplicac¸˜ao de um processo de
+reconciliac¸˜ao para alinhar as sequˆencias quantizadas e garantir
+a concordˆancia na chave secreta gerada.
+Neste estudo, considera-se um canal de desvanecimento
+Rayleigh, amplamente utilizado na modelagem de sistemas de
+comunicac¸˜ao sem fio. Esse modelo ´e adequado para ambientes
+onde a propagac¸˜ao do sinal ocorre predominantemente por
+multipercurso, sem linha de visada dominante [42]. Nesses
+cen´arios, a amplitude do sinal recebido segue uma distribuic¸˜ao
+Rayleigh, resultante da soma de m´ultiplos componentes com
+fases e amplitudes aleat´orias. Assim, a magnitude do sinal
+recebido pode ser descrita por uma distribuic¸˜ao estat´ıstica
+espec´ıfica, cuja Func¸˜ao Densidade de Probabilidade (FDP) ´e
+dada por
+f(x; σ) =
+(
+x
+σ2 e−x2
+2σ2 ,
+x ≥0,
+0,
+x < 0.
+(6)
+onde x representa a amplitude do sinal e σ > 0 ´e o fator de
+escala da distribuic¸˜ao. Esse parˆametro est´a diretamente relaci-
+onado ao desvio padr˜ao das componentes Gaussianas do canal.
+Essa relac¸˜ao evidencia que o valor de σ influencia diretamente
+a dispers˜ao da magnitude do sinal recebido, caracterizando
+a variabilidade imposta pelo desvanecimento multipercurso,
+conforme ilustrado pela Figura 7.
+Fig. 7. FDP da distribuic¸˜ao Rayleigh em func¸˜ao do parˆametro de escala σ.
+A variabilidade induzida pelo desvanecimento multipercurso
+pode causar flutuac¸˜oes significativas na potˆencia do sinal,
+influenciando a confiabilidade do enlace e a qualidade da
+estimativa do canal.
+Ap´os a recepc¸˜ao do sinal Ya em A e Yb em B, am-
+bos os dispositivos realizam a demodulac¸˜ao do sinal re-
+cebido, convertendo-o em sequˆencias bin´arias quantizadas.
+Dessa forma, o usu´ario A detecta uma sequˆencia bin´aria
+Ka, enquanto o usu´ario B detecta uma sequˆencia bin´aria
+Kb. Como resultado das variac¸˜oes introduzidas pelo ru´ıdo
+do canal, as sequˆencias Ka e Kb podem apresentar pe-
+quenas diferenc¸as, exigindo a aplicac¸˜ao de mecanismos de
+reconciliac¸˜ao para garantir que ambas as partes compartilhem
+uma chave criptogr´afica idˆentica. Ou seja, para estabelecer
+uma chave criptogr´afica segura entre os receptores, o objetivo
+final do processo ´e garantir que B obtenha uma sequˆencia
+idˆentica a Ka, tornando essa sequˆencia bin´aria a chave secreta
+compartilhada entre os usu´arios [13, 37, 17]. Esse m´etodo
+dispensa a necessidade de troca expl´ıcita da chave e n˜ao
+requer uma infraestrutura centralizada de gerenciamento de
+chaves, sendo, portanto, uma alternativa eficiente e segura para
+sistemas de comunicac¸˜ao sem fio.
+O processo de reconciliac¸˜ao desempenha um papel funda-
+mental na correc¸˜ao de discrepˆancias entre as chaves geradas
+pelas partes comunicantes. Essas discrepˆancias surgem devido
+a imperfeic¸˜oes do canal de comunicac¸˜ao, como desvaneci-
+mento, ru´ıdo t´ermico e quantizac¸˜ao imprecisa. Para garantir
+que ambos os dispositivos compartilhem uma chave idˆentica,
+utilizamos c´odigos de correc¸˜ao de erros em ambos os m´etodos
+de reconciliac¸˜ao abordados. Aqui, ser´a analisado o impacto
+da aplicac¸˜ao dos c´odigos corretores de erro Hamming, BCH,
+LDPC e Golay na eficiˆencia do processo de reconciliac¸˜ao.
+O c´odigo de Hamming ´e um c´odigo linear de bloco ampla-
+mente utilizado para correc¸˜ao de um ´unico erro e detecc¸˜ao de
+erros duplos em cada palavra-c´odigo [43]. Sua estrutura baseia-
+
+se na inserc¸˜ao de bits de paridade em posic¸˜oes espec´ıficas,
+permitindo a identificac¸˜ao e correc¸˜ao de um erro por bloco de
+dados. O n´umero total de bits na palavra-c´odigo ´e dado por
+n = k + r, onde k ´e o n´umero de bits de informac¸˜ao e r
+´e o n´umero de bits de paridade. Para garantir que todos os
+erros de um ´unico bit possam ser corrigidos, r deve satisfazer
+a seguinte condic¸˜ao 2r ≥k + r + 1. As palavras-c´odigo s˜ao
+geradas pela multiplicac¸˜ao da matriz geradora G pelas palavras
+de dados poss´ıveis, formando um espac¸o amostral capaz de
+corrigir erros pontuais. A Figura 8 apresenta um exemplo
+de matriz geradora para o c´odigo de Hamming. A principal
+vantagem do c´odigo de Hamming ´e sua baixa complexidade
+computacional, tornando-o adequado para aplicac¸˜oes de baixa
+latˆencia e sistemas embarcados. No entanto, seu limite restrito
+de correc¸˜ao o torna menos eficaz em canais altamente ruidosos,
+onde m´ultiplos erros podem ocorrer dentro de uma mesma
+palavra-c´odigo, reduzindo sua eficiˆencia em ambientes de
+comunicac¸˜ao com altas taxas de Taxa de Erro de Bit (Bit Error
+Rate, BER).
+Fig. 8. Matriz geradora para o c´odigo de Hamming.
+O c´odigo BCH ´e um c´odigo c´ıclico e sistem´atico projetado
+para corrigir m´ultiplos erros dentro de uma palavra-c´odigo. Ele
+utiliza os princ´ıpios dos polinˆomios definidos sobre campos
+finitos GF(2m) para implementar um esquema de correc¸˜ao
+altamente eficiente, permitindo a adaptac¸˜ao da capacidade de
+correc¸˜ao de erros de acordo com as condic¸˜oes do canal. O
+parˆametro t define o n´umero m´aximo de erros que podem
+ser corrigidos por palavra codificada, enquanto o tamanho da
+sequˆencia n ´e dado por n = 2m−1, onde m ´e o grau do campo
+finito. O tamanho da palavra de dados k ´e calculado como
+k = n −r, sendo r o n´umero de bits de paridade necess´arios.
+A relac¸˜ao correta entre r, m e t ´e r ≥m.t. Essa relac¸˜ao indica
+que o n´umero de bits de paridade cresce proporcionalmente ao
+grau do campo finito m e ao n´umero de erros que o c´odigo
+deve corrigir t, garantindo a capacidade desejada de detecc¸˜ao
+e correc¸˜ao de erros.
+A principal vantagem do c´odigo BCH reside em sua ca-
+pacidade de correc¸˜ao ajust´avel, tornando-o adequado para
+aplicac¸˜oes em canais ruidosos e sistemas sem fio. No entanto,
+essa flexibilidade tem um custo: a sobrecarga computacio-
+nal aumenta `a medida que o n´umero de erros corrig´ıveis
+cresce, tornando sua implementac¸˜ao mais complexa quando
+comparada a c´odigos mais simples, como o de Hamming.
+Al´em disso, a necessidade de bits redundantes adicionais pode
+impactar a eficiˆencia espectral, especialmente em sistemas de
+comunicac¸˜ao com largura de banda limitada. A Figura 9 ilustra
+a estrutura do c´odigo BCH e seu processo de codificac¸˜ao.
+O tamanho de k (n´umero de bits de informac¸˜ao) pode variar
+dentro de uma sequˆencia de n bits na estrutura do c´odigo BCH.
+A escolha de k afeta diretamente a quantidade de bits de pari-
+dade e, consequentemente, a capacidade de correc¸˜ao de erros.
+Neste trabalho, foram selecionados valores de k que garantem
+um equil´ıbrio entre a redundˆancia necess´aria para a correc¸˜ao de
+erros e a manutenc¸˜ao da aleatoriedade da sequˆencia codificada.
+Essa abordagem maximiza a variabilidade do espac¸o amostral,
+contribuindo para a eficiˆencia do processo de reconciliac¸˜ao e
+aumentando a robustez do sistema frente a interferˆencias e
+degradac¸˜oes do canal [44, 45, 46, 47].
+Fig. 9. Representac¸˜ao do c´odigo BCH.
+Os c´odigos LDPC s˜ao c´odigos de correc¸˜ao de erros baseados
+em grafos esparsos, projetados para alcanc¸ar um desempenho
+pr´oximo ao limite de Shannon. Eles s˜ao amplamente utilizados
+em redes sem fio, comunicac¸˜oes via sat´elite e sistemas de
+alta capacidade devido `a sua alta taxa de correc¸˜ao de erros
+em canais ruidosos. Sua estrutura permite a decodificac¸˜ao
+iterativa, um processo no qual mensagens probabil´ısticas s˜ao
+trocadas entre os n´os do grafo, ajustando dinamicamente as
+correc¸˜oes. Essa abordagem garante uma eficiˆencia elevada na
+recuperac¸˜ao de informac¸˜oes, tornando os c´odigos LDPC ideais
+para aplicac¸˜oes em ambientes com elevada taxa de erro.
+A principal caracter´ıstica dos c´odigos LDPC ´e sua matriz
+de paridade esparsa, na qual a distribuic¸˜ao dos bits ”1”influ-
+encia diretamente a capacidade de correc¸˜ao. Dois parˆametros
+fundamentais definem essa estrutura: o grau de vari´avel (dv),
+que representa o n´umero de bits ”1”por coluna da matriz de
+paridade, e o grau de verificac¸˜ao (dc), que indica o n´umero
+de bits ”1”por linha. Para garantir a esparsidade da matriz
+e otimizar a decodificac¸˜ao iterativa, ´e essencial que dv seja
+menor que dc e que dc seja um divisor do tamanho da palavra-
+c´odigo n, assegurando uma conex˜ao equilibrada entre os bits
+de informac¸˜ao e as verificac¸˜oes de paridade. A Figura 11 ilustra
+a matriz geradora utilizada nos c´odigos LDPC.
+Embora os c´odigos LDPC oferec¸am um excelente desempe-
+nho na correc¸˜ao de erros, sua decodificac¸˜ao iterativa apresenta
+alta complexidade computacional, exigindo consider´avel poder
+de processamento e mem´oria. Esse fator pode limitar sua
+aplicac¸˜ao em sistemas embarcados e dispositivos IoT, que pos-
+suem restric¸˜oes energ´eticas e de capacidade de processamento.
+O c´odigo Golay ´e um c´odigo de correc¸˜ao de erros altamente
+eficiente, utilizado em comunicac¸˜oes digitais e aplicac¸˜oes que
+
+Fig. 10. Matriz geradora para o c´odigo LDPC.
+exigem elevada confiabilidade na transmiss˜ao de dados. Em
+sua vers˜ao bin´aria estendida (24, 12), ele ´e um c´odigo linear
+de bloco capaz de detectar e corrigir at´e trˆes erros de bit
+por palavra-c´odigo, al´em de detectar at´e quatro erros. Essa
+robustez o torna adequado para canais altamente ruidosos, onde
+a integridade dos dados ´e essencial.
+Fig. 11. Matriz geradora para o c´odigo Golay.
+A construc¸˜ao do c´odigo Golay baseia-se em uma matriz ge-
+radora G, formada pela concatenac¸˜ao de uma matriz identidade
+I12 com uma matriz P, garantindo que cada palavra-c´odigo
+possua uma estrutura redundante capaz de corrigir erros sem
+a necessidade de retransmiss˜ao. A representac¸˜ao dessa matriz
+geradora pode ser visualizada na Figura 11.
+Uma das principais vantagens do c´odigo Golay ´e sua ca-
+pacidade de fornecer correc¸˜ao eficiente de erros com um
+n´umero relativamente pequeno de bits de paridade, tornando-
+o uma alternativa interessante para sistemas que operam sob
+restric¸˜oes de largura de banda. No entanto, sua implementac¸˜ao
+exige maior complexidade computacional quando comparada a
+c´odigos mais simples, como o de Hamming. Apesar disso, sua
+elevada confiabilidade justifica seu uso em aplicac¸˜oes cr´ıticas,
+como comunicac¸˜oes aeroespaciais e sistemas de transmiss˜ao
+de dados onde a taxa de erro precisa ser minimizada.
+Nos c´odigos corretores de erro, o espac¸o amostral ´e com-
+posto por todas as poss´ıveis sequˆencias distintas de n bits.
+O tamanho desse espac¸o depende do n´umero de bits de
+informac¸˜ao k, resultando em um total de 2k sequˆencias ´unicas.
+A gerac¸˜ao das palavras-c´odigo geralmente ocorre por meio da
+multiplicac¸˜ao das palavras de informac¸˜ao de k bits por uma
+matriz geradora de dimens˜oes k × n. No entanto, em alguns
+casos, como nos c´odigos BCH, a gerac¸˜ao ´e baseada em um
+polinˆomio gerador em vez de uma matriz convencional.
+Quando o n´umero de bits de informac¸˜ao k ´e elevado, o
+espac¸o amostral cresce exponencialmente, tornando o processo
+de reconciliac¸˜ao da informac¸˜ao por meio de c´odigos corre-
+tores de erro computacionalmente oneroso, pois exigiria a
+comparac¸˜ao com um grande n´umero de sequˆencias poss´ıveis.
+Para mitigar essa complexidade, neste trabalho, optou-se por
+limitar o espac¸o amostral a 211 sequˆencias para valores de
+k > 11. Nessa abordagem, as palavras de informac¸˜ao s˜ao
+selecionadas de forma aleat´oria dentro do intervalo de 0 a
+2k −1, garantindo diversidade nas sequˆencias e evitando
+padr˜oes excessivamente ordenados que poderiam comprometer
+a representatividade do espac¸o amostral e impactar a an´alise
+do desempenho do c´odigo.
+Por outro lado, para c´odigos com k ≤11, as palavras
+de informac¸˜ao seguem uma sequˆencia ordenada crescente, de
+0 a 2k −1. Essa escolha simplifica o processo de an´alise
+e simulac¸˜ao para palavras menores, onde a complexidade
+adicional da aleatoriedade n˜ao ´e essencial.
+A limitac¸˜ao do espac¸o amostral a um tamanho reduzido, mas
+ainda suficientemente diversificado, garantiu que a aleatorie-
+dade necess´aria fosse preservada, sem comprometer a efic´acia
+do processo de reconciliac¸˜ao da informac¸˜ao na gerac¸˜ao de
+chaves criptogr´aficas seguras a partir do canal. A Figura 12
+ilustra a func¸˜ao utilizada para a gerac¸˜ao do espac¸o amostral.
+Fig. 12. Func¸˜ao para gerar o espac¸o-amostral
+Para avaliar a eficiˆencia do processo de reconciliac¸˜ao das
+chaves criptogr´aficas, foram conduzidos 10.000 testes em cinco
+cen´arios distintos de propagac¸˜ao, variando as condic¸˜oes de
+ru´ıdo e o modelo do canal de transmiss˜ao para cada um dos
+c´odigos corretores de erro mencionados. Os testes foram rea-
+lizados para diferentes tamanhos n das sequˆencias de chaves.
+Esses cen´arios abrangem desde condic¸˜oes ideais at´e ambientes
+altamente degradados, permitindo uma an´alise detalhada do
+impacto dos fatores externos na convergˆencia da chave secreta.
+O Cen´ario 1 (Ru´ıdo Nulo com Canal Unit´ario) considera a
+situac¸˜ao ideal em que o canal de comunicac¸˜ao n˜ao apresenta
+ru´ıdo e os receptores A e B recebem exatamente o mesmo
+sinal, uma vez que o ganho do canal ´e unit´ario (h = 1). O
+Cen´ario 2 (Baixo Ru´ıdo com Canal Unit´ario) introduz um
+n´ıvel baixo de ru´ıdo no canal, em que os sinais recebidos
+por A e B ainda permanecem altamente correlacionados, mas
+pequenas variac¸˜oes comec¸am a ser percept´ıveis. J´a o Cen´ario 3
+(Baixo Ru´ıdo com Canal Rayleigh), representa uma condic¸˜ao
+mais pr´oxima da realidade, onde o canal apresenta desvaneci-
+mento multipercurso modelado por uma distribuic¸˜ao Rayleigh.
+Embora o ru´ıdo ainda seja relativamente baixo, as variac¸˜oes
+estoc´asticas no ganho do canal afetam a similaridade dos
+sinais recebidos pelos dispositivos. No Cen´ario 4 (Alto Ru´ıdo
+com Canal Unit´ario), o ru´ıdo ´e significativamente elevado,
+tornando a comunicac¸˜ao mais suscet´ıvel a erros. Como o
+ganho do canal permanece unit´ario, as variac¸˜oes estoc´asticas
+s˜ao eliminadas, e o principal desafio da reconciliac¸˜ao est´a
+na presenc¸a intensa de ru´ıdo t´ermico no sinal recebido. Por
+fim, o Cen´ario 5 (Alto Ru´ıdo com Canal Rayleigh) os sinais
+recebidos s˜ao impactados tanto por alto ru´ıdo t´ermico quanto
+
+por desvanecimento Rayleigh, resultando em grande variac¸˜ao
+na qualidade do canal entre os dispositivos A e B.
+V. M´ETODO DE RECONCILIAC¸ ˜AO DO ARTIGO PROXIMATE:
+PROXIMITY-BASED SECURE PAIRING USING AMBIENT
+WIRELESS SIGNALS
+Nesta sec¸˜ao, o m´etodo de reconciliac¸˜ao de informac¸˜ao
+apresentado baseia-se na t´ecnica descrita no artigo ”Proxi-
+Mate: Proximity-based Secure Pairing using Ambient Wireless
+Signals” [19]. Esse m´etodo explora a utilizac¸˜ao de func¸˜oes
+corretoras de erro, cuja capacidade de codificac¸˜ao ´e definida
+por um esquema f(n, k), onde n representa o tamanho da
+palavra-c´odigo e k o tamanho da palavra-informac¸˜ao.
+No cen´ario considerado, os usu´arios A e B recebem si-
+nais transmitidos pelo emissor, os quais s˜ao processados para
+gerar sequˆencias bin´arias quantizadas Ka e Kb, respectiva-
+mente. Como os dispositivos est˜ao posicionados pr´oximos, as
+sequˆencias Ka e Kb podem ser interpretadas como vers˜oes
+distorcidas de uma mesma palavra-c´odigo de n bits, sendo
+poss´ıveis de correc¸˜ao por meio de uma func¸˜ao corretora de
+erros fc(·). Dessa forma, para garantir que ambos comparti-
+lhem a mesma chave, ou seja, se reconciliem, o usu´ario A
+gera uma sequˆencia auxiliar P, dependente de Ka e da func¸˜ao
+fc(·), e a transmite para o usu´ario B. Com base em Kb e
+na mesma func¸˜ao de codificac¸˜ao fc(·), o usu´ario B consegue
+reconstruir Ka, garantindo que ambos possuam a mesma chave
+secreta. O objetivo da reconciliac¸˜ao ´e reduzir as discrepˆancias
+entre Ka e Kb por meio da aplicac¸˜ao da func¸˜ao corretora de
+erro, garantindo que ambos os usu´arios cheguem a uma mesma
+sequˆencia final.
+No modelo proposto, o usu´ario A aplica a func¸˜ao de
+codificac¸˜ao fc(·) sobre sua sequˆencia Ka, obtendo a palavra-
+c´odigo mais pr´oxima dentro do espac¸o amostral do c´odigo
+corretor de erro. Em outras palavras, a func¸˜ao de codificac¸˜ao
+fc(Ka) ´e definida como a palavra-c´odigo dentro do espac¸o
+amostral que apresenta a menor distˆancia de Hamming
+(diferenc¸a bit a bit) em relac¸˜ao a Ka. Em seguida, a sequˆencia
+auxiliar P, que ser´a transmitida do usu´ario A para B, ´e definida
+como
+P = Ka −fc(Ka),
+(7)
+onde P representa a diferenc¸a bit a bit entre Ka e a palavra-
+c´odigo fc(Ka) gerada pela func¸˜ao corretora de erro.
+Assume-se um canal de comunicac¸˜ao ideal entre A e B,
+dado que os dispositivos est˜ao pr´oximos e sujeitos a condic¸˜oes
+ambientais similares. Assim, ao receber P, o usu´ario B realiza
+a seguinte operac¸˜ao
+P + fc(Kb −P) = P + fc(Ka) →Ka.
+(8)
+Como resultado, mesmo que Kb contenha pequenos erros em
+relac¸˜ao a Ka, a func¸˜ao corretora de erro fc(·) ´e capaz de
+mapear Kb−P para a palavra-c´odigo mais pr´oxima, garantindo
+que B obtenha Ka com alta probabilidade. Esse mecanismo ´e
+eficiente para corrigir pequenas discrepˆancias introduzidas pelo
+ru´ıdo do canal.
+Ao final da etapa de reconciliac¸˜ao, tanto o usu´ario A
+quanto o usu´ario B possuem a mesma chave secreta Ka,
+possibilitando a estabelecimento de um canal seguro para
+troca de informac¸˜oes confidenciais entre eles. A Figura 13
+ilustra o processo de reconciliac¸˜ao aplicado em [19]. Na
+subsec¸˜oes seguintes s˜ao apresentados resultados num´ericos
+sobre a eficiˆencia do m´etodo de reconciliac¸˜ao considerando
+diferentes cen´arios e c´odigos corretivos de erro, avaliando o
+desempenho do sistema sob variadas condic¸˜oes de canal e
+n´ıveis de ru´ıdo, conforme descrito na Sec¸˜ao IV.
+Fig. 13. Modelo de Sistema para reconciliac¸˜ao de Chaves Criptogr´aficas [19]
+A. Hamming
+Nesta subsec¸˜ao, avalia-se a eficiˆencia do estabelecimento
+de chaves criptogr´aficas nos dispositivos A e B utilizando
+o m´etodo de reconciliac¸˜ao previamente apresentado, conside-
+rando o c´odigo corretor de erro de Hamming para diferentes
+tamanhos de sequˆencia.
+a.1) Para sequˆencias de 7 bits
+No c´odigo de Hamming, uma sequˆencia de 7 bits ´e com-
+posta por 4 bits de informac¸˜ao e 3 bits de paridade. Devido
+ao tamanho relativamente reduzido da sequˆencia, ´e poss´ıvel
+enumerar todo o espac¸o amostral, cujo tamanho ´e dado por
+2k, resultando em 16 sequˆencias distintas.
+Fig. 14. Probabilidade do receptor B gerar Ka para uma sequˆencia de 7 bits.
+A Figura 14 apresenta a probabilidade de estabelecimento de
+chaves criptogr´aficas nos cinco cen´arios descritos no modelo de
+sistema da Sec¸˜ao IV. Os resultados obtidos foram: 100% no
+cen´ario ideal, 32.92% no cen´ario de baixo ru´ıdo com canal
+unit´ario, 31.35% no cen´ario realista com canal Rayleigh e
+baixo ru´ıdo, 7.48% no cen´ario com canal unit´ario e alto ru´ıdo,
+e 6.76% no cen´ario com canal Rayleigh e alto ru´ıdo. Esses
+resultados mostram que, mesmo em condic¸˜oes de baixo ru´ıdo
+e sem considerar os efeitos do desvanecimento, as taxas de
+sucesso no estabelecimento de chaves foram limitadas. Em
+cen´arios com ru´ıdo elevado, essa taxa foi ainda mais reduzida,
+evidenciando a vulnerabilidade do m´etodo para sequˆencias
+curtas. Portanto, para aumentar a confiabilidade do processo
+de reconciliac¸˜ao, ´e essencial utilizar sequˆencias de maior
+
+comprimento, o que proporciona maior aleatoriedade do espac¸o
+amostral e melhora a resiliˆencia contra erros de transmiss˜ao.
+a.2) Para sequˆencias de 15 bits
+Para sequˆencias de 15 bits, o c´odigo de Hamming utilizado
+segue a configurac¸˜ao (15,11), onde 11 bits correspondem `a
+informac¸˜ao ´util k = 11 e os 4 bits restantes s˜ao de paridade,
+introduzidos para detecc¸˜ao e correc¸˜ao de erros. Dessa forma,
+o espac¸o amostral gerado cont´em 211 sequˆencias poss´ıveis.
+A Figura 15 apresenta a probabilidade de estabelecimento de
+chaves para os diferentes cen´arios analisados.
+Fig. 15. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits.
+Os resultados demonstram que a taxa m´edia de sucesso no
+estabelecimento da chave permanece extremamente baixa em
+todos os cen´arios, exceto no cen´ario ideal. Especificamente,
+foram obtidas probabilidades de 4.59% no cen´ario 2, 4.94%
+no cen´ario 3, 0.08% no cen´ario 4 e 0.06% no cen´ario 5. Esse
+desempenho insatisfat´orio ocorre porque, embora o aumento no
+tamanho da sequˆencia proporcione uma ampliac¸˜ao do espac¸o
+amostral, os 11 bits de informac¸˜ao ainda representam um
+volume reduzido para garantir um estabelecimento confi´avel
+da chave, especialmente em ambientes com ru´ıdo e desvane-
+cimento. Al´em disso, a presenc¸a de apenas 4 bits de paridade
+limita a capacidade do c´odigo de corrigir erros de transmiss˜ao
+em condic¸˜oes adversas. Assim, reforc¸a-se a necessidade de
+utilizar sequˆencias de maior comprimento, com mais bits de
+informac¸˜ao e mecanismos de correc¸˜ao mais robustos, para
+aprimorar a confiabilidade do processo de reconciliac¸˜ao.
+a.3) Para sequˆencias de 127 bits
+Conforme ilustrado na Figura 16, os resultados para a
+sequˆencia de 127 bits, composta por 120 bits de informac¸˜ao e
+7 bits de paridade, indicam um desempenho significativamente
+superior em relac¸˜ao `as sequˆencias menores analisadas anteri-
+ormente. No entanto, devido `a complexidade computacional
+envolvida na gerac¸˜ao do espac¸o amostral completo, que origi-
+nalmente teria 2120 combinac¸˜oes, foi adotada uma abordagem
+de reduc¸˜ao, limitando-o a 211 sequˆencias, conforme discutido
+na Sec¸˜ao IV.
+Os resultados mostram que, em cen´arios de baixo ru´ıdo,
+a taxa de sucesso no estabelecimento de uma chave idˆentica
+entre os receptores A e B ´e pr´oxima de 100%, evidenciando a
+efic´acia do aumento do tamanho da sequˆencia nesse contexto.
+Em contrapartida, em cen´arios de alto ru´ıdo, a probabilidade
+de sucesso ainda ´e consideravelmente baixa, com valores de
+0.16% no cen´ario 4 e 0.25% no cen´ario 5, indicando que a
+presenc¸a de ru´ıdo intenso continua impactando adversamente
+o processo de reconciliac¸˜ao.
+Fig. 16. Probabilidade do receptor B gerar Ka para uma sequˆencia de 127
+bits.
+Embora o uso de sequˆencias de 127 bits represente um
+avanc¸o em relac¸˜ao a tamanhos menores, os resultados res-
+saltam a necessidade de ampliar ainda mais o comprimento
+das sequˆencias para mitigar os efeitos do ru´ıdo e do desva-
+necimento, garantindo maior robustez na gerac¸˜ao de chaves
+criptogr´aficas. Al´em disso, estrat´egias complementares, como
+c´odigos corretores de erro mais eficientes ou t´ecnicas de pr´e-
+processamento dos dados, podem ser exploradas para otimizar
+ainda mais o desempenho do sistema.
+a.4) Para sequˆencias de 255 bits
+Considerando a sequˆencia de 255 bits, composta por 247
+bits de informac¸˜ao e 8 bits de paridade, o espac¸o amostral
+original seria de 2247, tornando sua explorac¸˜ao invi´avel devido
+`a complexidade computacional. Assim, como nas an´alises an-
+teriores, o espac¸o foi reduzido para 211, permitindo a avaliac¸˜ao
+dos cen´arios sem comprometer a viabilidade do experimento.
+Neste ´ultimo conjunto de testes com o c´odigo de Hamming,
+verificou-se que, em todos os cen´arios de baixo ru´ıdo, a taxa de
+sucesso no estabelecimento de uma chave entre os receptores
+A e B atingiu 100%, conforme ilustrado na Figura 17. Esse
+resultado demonstra a efic´acia do uso de sequˆencias mais
+longas para mitigar os impactos de erros na transmiss˜ao.
+Nos cen´arios 4 e 5, caracterizados por um n´ıvel mais elevado
+de interferˆencia, a probabilidade de sucesso aumentou em
+relac¸˜ao aos testes com sequˆencias menores, alcanc¸ando 0.35%
+e 0.55%, respectivamente. Esse crescimento, embora ainda
+modesto, indica que o uso de sequˆencias mais longas contribui
+para um melhor desempenho mesmo em ambientes adversos.
+Fig. 17. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits
+Os resultados indicam que a sequˆencia de 255 bits ´e a
+mais adequada dentro deste modelo para a gerac¸˜ao de uma
+chave privada utilizando o c´odigo de Hamming. O aumento
+do tamanho da sequˆencia permitiu uma melhora na robustez
+da reconciliac¸˜ao, especialmente nos cen´arios com maior inter-
+ferˆencia. No entanto, apesar do avanc¸o, as taxas de sucesso
+
+ainda s˜ao limitadas em ambientes de alto ru´ıdo, sugerindo
+a necessidade de t´ecnicas complementares, como c´odigos
+corretores de erro mais eficientes ou mecanismos de p´os-
+processamento, para aprimorar a confiabilidade do estabele-
+cimento de chaves criptogr´aficas.
+B. BCH
+As sequˆencias codificadas com BCH possuem caracter´ısticas
+semelhantes `as do c´odigo de Hamming, sendo compostas por k
+bits de informac¸˜ao e n bits na palavra-c´odigo. Como discutido
+na Sec¸˜ao IV, a variac¸˜ao no n´umero de bits de informac¸˜ao k
+impacta diretamente o tamanho do espac¸o amostral, influen-
+ciando os resultados no estabelecimento da chave. A seguir,
+s˜ao apresentados os resultados para diferentes tamanhos de
+sequˆencia codificadas com BCH.
+b.1) Para sequˆencias de 7 bits
+Fig. 18. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 7 Bits
+No caso das sequˆencias de 7 bits (n = 7), a configurac¸˜ao
+utilizada apresenta 4 bits de informac¸˜ao (k = 4) e 3 bits de
+paridade. A Figura 18 ilustra as probabilidades de sucesso no
+estabelecimento da chave para os diferentes cen´arios avaliados.
+Os resultados obtidos foram: 100% no melhor cen´ario, 10.64%
+no cen´ario de baixo ru´ıdo com canal unit´ario, 10.86% no
+cen´ario mais realista de baixo ru´ıdo com canal Rayleigh, 6.46%
+no cen´ario de alto ru´ıdo com canal unit´ario e 6.71% no pior
+cen´ario, de alto ru´ıdo com canal Rayleigh.
+Diferentemente de outras sequˆencias codificadas com BCH,
+a configurac¸˜ao de 7 bits possui apenas uma possibilidade para
+k, o que restringe a flexibilidade na escolha do tamanho da
+sequˆencia. Essa limitac¸˜ao pode comprometer a eficiˆencia do
+processo de reconciliac¸˜ao, pois impede ajustes para otimizar a
+robustez do c´odigo frente `as condic¸˜oes do canal. Al´em disso, os
+resultados evidenciam que, mesmo em cen´arios de baixo ru´ıdo,
+as taxas de sucesso s˜ao consideravelmente reduzidas quando
+comparadas ao c´odigo de Hamming, sugerindo a necessidade
+de utilizar sequˆencias de maior comprimento para obter um
+desempenho mais confi´avel no estabelecimento da chave.
+b.2) Para sequˆencias de 15 bits
+As sequˆencias de 15 bits (n = 15) no c´odigo BCH permitem
+diferentes configurac¸˜oes para o n´umero de bits de informac¸˜ao
+k, podendo assumir valores de 5, 7 ou 11 bits. Essa variac¸˜ao
+influencia diretamente o desempenho no estabelecimento da
+chave, conforme ilustrado nas Figuras 19, 20 e 21, respectiva-
+mente.
+Para a configurac¸˜ao com 5 bits de informac¸˜ao (k = 5), os
+resultados obtidos foram: 100% no cen´ario ideal (sem ru´ıdo
+e canal unit´ario), 41.53% no cen´ario de baixo ru´ıdo com
+canal unit´ario, 40.12% no cen´ario de baixo ru´ıdo com canal
+Rayleigh, 4.06% no cen´ario de alto ru´ıdo com canal unit´ario
+e 5.13% no cen´ario de alto ru´ıdo com canal Rayleigh.
+Fig. 19. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits com 5 bits de informac¸˜ao.
+Para a configurac¸˜ao com 7 bits de informac¸˜ao (k = 7), os
+resultados foram: 100% no cen´ario ideal, 45.56% no cen´ario
+de baixo ru´ıdo com canal unit´ario, 41.14% no cen´ario de baixo
+ru´ıdo com canal Rayleigh, 1.42% no cen´ario de alto ru´ıdo com
+canal unit´ario e 1.45% no cen´ario de alto ru´ıdo com canal
+Rayleigh.
+Fig. 20. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits com 7 bits de informac¸˜ao.
+Para a configurac¸˜ao com 11 bits de informac¸˜ao (k = 11),
+os resultados foram: 100% no cen´ario ideal, 6.59% no cen´ario
+de baixo ru´ıdo com canal unit´ario, 4.45% no cen´ario de baixo
+ru´ıdo com canal Rayleigh, 0.05% no cen´ario de alto ru´ıdo com
+canal unit´ario e 0.09% no cen´ario de alto ru´ıdo com canal
+Rayleigh.
+Fig. 21. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits com 11 bits de informac¸˜ao.
+Os resultados evidenciam que a probabilidade de sucesso
+no estabelecimento da chave criptogr´afica aumenta conforme
+o n´umero de bits de informac¸˜ao k diminui. Esse comporta-
+mento est´a diretamente relacionado ao aumento da quantidade
+de bits de paridade na palavra-c´odigo. Conforme discutido
+na Sec¸˜ao IV, c´odigos BCH com menos bits de informac¸˜ao
+possuem uma maior redundˆancia na forma de bits de paridade,
+
+o que melhora a correc¸˜ao de erros e, consequentemente, a taxa
+de sucesso na gerac¸˜ao da chave.
+b.3) Para sequˆencias de 127 bits
+Para as sequˆencias de 127 bits codificadas com BCH, os
+testes foram conduzidos considerando 64 bits de informac¸˜ao
+(k = 64), uma vez que essa configurac¸˜ao representa uma opc¸˜ao
+intermedi´aria entre a quantidade de bits de informac¸˜ao e bits
+de paridade dispon´ıveis. Como discutido anteriormente, tanto o
+tamanho do espac¸o amostral quanto a redundˆancia introduzida
+pelos bits de paridade influenciam diretamente os resultados
+no estabelecimento da chave criptogr´afica.
+Devido `a complexidade computacional envolvida, a an´alise
+completa do espac¸o amostral, originalmente de 264, seria
+invi´avel. Assim, seguindo a abordagem adotada nas sec¸˜oes an-
+teriores, o espac¸o amostral foi reduzido para 211, permitindo a
+realizac¸˜ao dos testes dentro de limites computacionais vi´aveis.
+Fig. 22. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 127
+Bits
+Os resultados obtidos, ilustrados na Figura 22 demonstram
+um desempenho significativamente superior em cen´arios de
+baixo ru´ıdo, com taxas de sucesso de 100% no cen´ario ideal,
+99.83% no cen´ario de baixo ru´ıdo com canal unit´ario e 99.58%
+no cen´ario de baixo ru´ıdo com canal Rayleigh. Entretanto, em
+ambientes mais adversos, a probabilidade de sucesso ainda se
+mant´em baixa, atingindo apenas 0.23% no cen´ario de alto ru´ıdo
+com canal unit´ario e 0.4% no cen´ario de alto ru´ıdo com canal
+Rayleigh.
+Embora esses resultados sejam promissores, especialmente
+em condic¸˜oes favor´aveis de transmiss˜ao, a an´alise evidencia
+que, para garantir um estabelecimento confi´avel da chave
+em cen´arios com alto ru´ıdo e desvanecimento, ´e necess´ario
+continuar ampliando o tamanho da sequˆencia. O aumento
+da quantidade de bits de informac¸˜ao, aliado a uma maior
+redundˆancia na codificac¸˜ao, pode contribuir para uma melhora
+na robustez do processo, reduzindo a vulnerabilidade da chave
+criptogr´afica a erros e interferˆencias.
+b.4) Para sequˆencias de 255 bits
+Para sequˆencias de 255 bits codificadas com BCH, foram
+realizados testes considerando duas configurac¸˜oes: 123 bits de
+informac¸˜ao (k = 123), uma opc¸˜ao intermedi´aria em relac¸˜ao ao
+total de bits da sequˆencia, e 247 bits de informac¸˜ao (k = 247),
+a configurac¸˜ao com a menor quantidade de bits de paridade
+poss´ıvel.
+Conforme ilustrado na Figura 23, para a configurac¸˜ao com
+123 bits de informac¸˜ao, os resultados obtidos foram: 100% nos
+cen´arios de baixo ru´ıdo, e 0.45% e 0.49% nos cen´arios 4 e 5,
+caracterizados por um aumento na interferˆencia.
+Fig. 23. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com 123 bits de informac¸˜ao
+Para a configurac¸˜ao com 247 bits de informac¸˜ao, os re-
+sultados seguiram um padr˜ao semelhante, como mostrado na
+Figura 24 com 100% de sucesso nos cen´arios de baixo ru´ıdo.
+Nos cen´arios 4 e 5, onde h´a maior interferˆencia, a probabilidade
+de sucesso cresceu para 0.33% e 0.68%, respectivamente.
+Fig. 24. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com 247 bits de informac¸˜ao
+Esses resultados indicam que, independentemente da quan-
+tidade de bits de paridade presentes na palavra-c´odigo, a
+probabilidade de estabelecimento da chave criptogr´afica se
+mant´em elevada em condic¸˜oes de baixo ru´ıdo. No entanto, `a
+medida que o ru´ıdo e o desvanecimento aumentam, a escolha
+do n´umero de bits de informac¸˜ao influencia diretamente a
+robustez da chave gerada. Notavelmente, o aumento no n´umero
+de bits de informac¸˜ao em uma sequˆencia de 255 bits n˜ao
+compromete significativamente a taxa de sucesso em cen´arios
+adversos, sugerindo que a configurac¸˜ao com maior k pode
+ser preferida, pois maximiza a taxa de informac¸˜ao sem uma
+penalizac¸˜ao expressiva na probabilidade de estabelecimento da
+chave.
+C. LDPC
+Como discutido na Sec¸˜ao IV, os c´odigos LDPC s˜ao definidos
+por dois parˆametros estruturais principais: o grau de vari´avel
+(dv) e o grau de verificac¸˜ao (dc). Esses parˆametros influen-
+ciam diretamente a configurac¸˜ao da sequˆencia de k bits e os
+resultados obtidos nos testes de reconciliac¸˜ao. Para que um
+c´odigo LDPC funcione corretamente, ´e necess´ario que o grau
+de verificac¸˜ao seja um divisor do tamanho da palavra-c´odigo
+n, enquanto o grau de vari´avel deve ser maior que 2 e menor
+que o grau de verificac¸˜ao.
+c.1) Para sequˆencias de 7 bits
+Para sequˆencias com comprimento de 7 bits e como 7 ´e um
+n´umero primo, a ´unica escolha vi´avel para satisfazer a restric¸˜ao
+do grau de verificac¸˜ao ´e utilizar dc = 7, ou seja, igual ao valor
+de n. Consequentemente, o grau de vari´avel foi definido como
+
+dv = 6. A Figura 25 apresenta os resultados obtidos para essa
+configurac¸˜ao.
+Fig. 25. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 7 Bits
+Os testes mostraram que a taxa de sucesso no estabeleci-
+mento da chave foi de 100% no melhor cen´ario, 14.58% no
+cen´ario de baixo ru´ıdo com canal unit´ario, 14.37% no cen´ario
+de baixo ru´ıdo com canal Rayleigh, 2.74% no cen´ario de alto
+ru´ıdo com canal unit´ario e 2.74% no cen´ario mais adverso,
+com alto ru´ıdo e canal Rayleigh.
+Esses resultados seguem um comportamento semelhante ao
+observado para sequˆencias de 7 bits nos c´odigos BCH e Ham-
+ming. A baixa taxa de sucesso nos cen´arios mais desafiadores
+reforc¸a a limitac¸˜ao do uso de sequˆencias curtas, tornando
+necess´ario o aumento do tamanho da sequˆencia para melhorar
+a confiabilidade do processo de reconciliac¸˜ao e aumentar a
+probabilidade de estabelecimento da chave criptogr´afica.
+c.2) Para sequˆencias de 15 bits
+Diferentemente do caso de 7 bits, o n´umero 15 n˜ao ´e primo,
+permitindo a escolha de diferentes valores para o grau de
+verificac¸˜ao (dc). Para este conjunto de testes, foram analisadas
+trˆes configurac¸˜oes: uma com o menor grau de verificac¸˜ao
+poss´ıvel (dc = 5) e o menor grau de vari´avel (dv = 3),
+outra com o maior grau de verificac¸˜ao (dc = 15) e o menor
+grau de vari´avel (dv = 3) e, por fim, uma configurac¸˜ao com
+o maior grau de verificac¸˜ao (dc = 15) e o maior grau de
+vari´avel poss´ıvel (dv = 14). Os resultados est˜ao apresentados
+nas Figuras 26, 27 e 28.
+No primeiro caso, os resultados obtidos foram: 100% no
+cen´ario ideal, 19.43% no cen´ario de baixo ru´ıdo com canal
+unit´ario, 18.45% no cen´ario mais realista de baixo ru´ıdo com
+canal Rayleigh, 0.74% no cen´ario de alto ru´ıdo com canal
+unit´ario e 1.15% no pior cen´ario, de alto ru´ıdo com canal
+Rayleigh.
+Fig. 26. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 15
+Bits com dc = 5 e dv = 3.
+No segundo caso, os resultados mostraram uma reduc¸˜ao
+significativa na taxa de sucesso, com 100% no melhor cen´ario,
+mas apenas 0.33% no cen´ario de baixo ru´ıdo com canal unit´ario
+e no cen´ario realista com canal Rayleigh. Em condic¸˜oes de alto
+ru´ıdo, os valores ca´ıram ainda mais, atingindo 0.01% e 0.02%
+nos cen´arios 4 e 5, respectivamente.
+Fig. 27. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 15
+Bits com dc = 15 e dv = 3
+No terceiro e ´ultimo caso, os resultados obtidos foram: 100%
+no melhor cen´ario, 0.86% no cen´ario de baixo ru´ıdo com canal
+unit´ario, 0.41% no cen´ario realista de baixo ru´ıdo com canal
+Rayleigh, e apenas 0.01% nos cen´arios mais adversos, de alto
+ru´ıdo com canal unit´ario e canal Rayleigh.
+Fig. 28. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 15
+Bits com dc = 15 e dv = 14
+Os resultados indicam um comportamento semelhante ao
+observado para sequˆencias de 15 bits no c´odigo BCH. `A
+medida que o grau de verificac¸˜ao diminui, a quantidade de
+bits de paridade aumenta, o que pode melhorar a taxa de
+sucesso na reconciliac¸˜ao. No entanto, esse efeito positivo se
+aplica apenas a sequˆencias curtas, como as de 15 bits. Em
+tamanhos maiores, o equil´ıbrio entre o n´umero de bits de
+informac¸˜ao e de paridade torna-se mais relevante para garantir
+um desempenho adequado, especialmente em cen´arios com
+ru´ıdo e desvanecimento.
+c.3) Para sequˆencias de 127 bits
+Para sequˆencias de 127 bits, a situac¸˜ao ´e semelhante `a
+observada para sequˆencias de 7 bits, pois 127 127 ´e um n´umero
+primo. Isso restringe a escolha do grau de verificac¸˜ao (dc) ao
+pr´oprio valor de n, ou seja, dc = 127. Consequentemente,
+o maior grau de vari´avel permitido para essa configurac¸˜ao ´e
+dv = 126. A Figura 29 apresenta os resultados obtidos para
+essa configurac¸˜ao.
+Os resultados demonstram um desempenho significativa-
+mente superior em relac¸˜ao `as sequˆencias menores analisadas.
+Em cen´arios de baixo ru´ıdo, as taxas de sucesso foram de 100%
+no melhor cen´ario, 95.99% no cen´ario de baixo ru´ıdo com
+canal unit´ario e 94.81% no cen´ario mais realista de baixo ru´ıdo
+com canal Rayleigh. No entanto, em ambientes de alto ru´ıdo, a
+
+Fig. 29. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 127
+Bits
+probabilidade de sucesso foi drasticamente reduzida, atingindo
+apenas 0.2% no cen´ario de alto ru´ıdo com canal unit´ario e
+0.33% no pior cen´ario, de alto ru´ıdo com canal Rayleigh.
+Embora esses resultados sejam promissores para cen´arios
+com condic¸˜oes favor´aveis de transmiss˜ao, os valores obti-
+dos em cen´arios adversos reforc¸am a necessidade de utilizar
+sequˆencias ainda maiores para aumentar a confiabilidade no
+estabelecimento da chave criptogr´afica. O uso de c´odigos
+LDPC com comprimentos mais extensos pode contribuir para
+uma maior resiliˆencia a ru´ıdos e desvanecimento, garantindo
+um desempenho mais consistente mesmo em ambientes menos
+favor´aveis.
+c.4) Para sequˆencias de 255 bits
+Diferentemente dos casos de 7 e 127 bits, o n´umero 255 n˜ao
+´e primo, permitindo a escolha de diferentes valores para o grau
+de verificac¸˜ao (dc). Assim, foram realizados trˆes testes para
+sequˆencias de 255 bits, variando os graus de verificac¸˜ao e de
+vari´avel das seguintes maneiras: (i) menor grau de verificac¸˜ao
+(dc = 5) e menor grau de vari´avel (dv = 3); (ii) maior
+grau de verificac¸˜ao (dc = 255) e menor grau de vari´avel
+(dv = 3); e (iii) maior grau de verificac¸˜ao (dc = 255) e
+maior grau de vari´avel (dv = 254). Os resultados obtidos para
+cada configurac¸˜ao est˜ao apresentados nas Figuras 30, 31 e 32,
+respectivamente.
+No primeiro caso, os resultados foram: 100% nos cen´arios de
+baixo ru´ıdo e, nos cen´arios 4 e 5, onde h´a maior interferˆencia,
+a probabilidade de sucesso cresceu para 0.36% e 0.65%,
+respectivamente.
+Fig. 30. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com dc = 5 e dv = 3
+No segundo caso, os resultados foram similares ao primeiro,
+com 100% nos cen´arios de baixo ru´ıdo e taxas de 0.34% e
+1.15% nos cen´arios 4 e 5, respectivamente.
+No terceiro caso, os resultados continuaram pr´oximos aos
+anteriores: 100% nos cen´arios de baixo ru´ıdo e 0.35% e 0.77%
+Fig. 31. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com dc = 255 e dv = 3
+nos cen´arios de alto ru´ıdo com canal unit´ario e Rayleigh,
+respectivamente.
+Fig. 32. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com dc = 255 e dv = 254
+Os resultados indicam que, para sequˆencias de 255 bits, os
+valores do grau de verificac¸˜ao e do grau de vari´avel tornam-
+se irrelevantes para o estabelecimento da chave. Isso ocorre
+porque, com o aumento do tamanho da sequˆencia, a influˆencia
+dos parˆametros estruturais do c´odigo LDPC ´e minimizada em
+relac¸˜ao ao efeito do ru´ıdo e da interferˆencia no canal. Assim,
+em sequˆencias longas, a escolha do grau de verificac¸˜ao e do
+grau de vari´avel n˜ao impacta significativamente o desempenho,
+sugerindo que a prioridade deve estar no aumento do tamanho
+da sequˆencia para garantir uma maior taxa de sucesso na
+reconciliac¸˜ao.
+D. Golay
+Como discutido na Sec¸˜ao IV sobre c´odigos corretores de
+erro, o c´odigo de Golay se diferencia dos demais por oferecer
+apenas duas configurac¸˜oes poss´ıveis para n bits: o c´odigo
+bin´ario de Golay (23,12) e o c´odigo bin´ario estendido de Golay
+(24,12). Ambos possuem 12 bits de informac¸˜ao, mas a vers˜ao
+estendida inclui um bit adicional de paridade, proporcionando
+maior robustez contra erros. Para este projeto, optou-se pelo
+uso do c´odigo bin´ario estendido (24,12), pois apresenta a maior
+sequˆencia de n, o que pode contribuir para um melhor desem-
+penho na reconciliac¸˜ao. A Figura 33 ilustra o desempenho do
+processo de reconciliac¸˜ao de chaves criptogr´aficas, nos cinco
+cen´arios aqui analisados.
+Os resultados foram: 100% no cen´ario ideal, 16.19% com
+canal unit´ario e baixo ru´ıdo, 14.77% no cen´ario mais realista
+com canal Rayleigh e baixo ru´ıdo, 0.06% com alto ru´ıdo e
+canal Rayleigh e 0.19% no pior cen´ario de alto ru´ıdo e canal
+Rayleigh.
+Os resultados obtidos com o c´odigo de Golay esten-
+dido foram significativamente superiores aos alcanc¸ados com
+
+Fig. 33. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 24
+Bits
+sequˆencias de 15 bits utilizando c´odigo Hamming, indicando
+que o aumento do tamanho da sequˆencia e a estrutura do
+c´odigo contribu´ıram para um melhor desempenho. No entanto,
+as taxas de sucesso permaneceram abaixo das obtidas com
+c´odigos BCH e LDPC de 15 bits, os quais apresentaram maior
+quantidade de bits de paridade, resultando em uma capacidade
+superior de correc¸˜ao de erros.
+Assim, embora o c´odigo de Golay estendido tenha demons-
+trado um desempenho relativamente bom em cen´arios de baixo
+ru´ıdo, sua efic´acia ´e limitada em ambientes adversos. Para
+garantir um processo de reconciliac¸˜ao mais robusto, a adoc¸˜ao
+de c´odigos com maior redundˆancia ou o uso de sequˆencias
+mais longas continua sendo uma abordagem necess´aria.
+VI. M´ETODO DE RECONCILIAC¸ ˜AO DO ARTIGO WIRELESS
+CHANNEL KEY GENERATION FOR MULTI-USER ACCESS
+SCENARIOS
+Nesta sec¸˜ao, o m´etodo de reconciliac¸˜ao de informac¸˜ao apre-
+sentado segue a abordagem descrita no artigo ”Wireless Chan-
+nel Key Generation for Multi-User Access Scenarios.” [20].
+O processo de estabelecimento de chaves criptogr´aficas nesse
+contexto tamb´em emprega c´odigos corretores de erros, para
+corrigir discrepˆancias entre as sequˆencias bin´arias extra´ıdas
+pelos dispositivos leg´ıtimos. O m´etodo assume que as duas
+entidades comunicantes derivam sequˆencias bin´arias correlaci-
+onadas a partir do canal de comunicac¸˜ao sem fio. No entanto,
+devido o ru´ıdo, interferˆencia e variac¸˜oes do canal, as chaves
+extra´ıdas, Ka e Kb podem conter pequenas diferenc¸as.
+A reconciliac¸˜ao comec¸a com o dispositivo A selecionando
+aleatoriamente uma palavra-c´odigo c de n bits do conjunto do
+espac¸o amostral do c´odigo corretor de erro. Em seguida, essa
+palavra-c´odigo ´e combinada com a chave Ka, gerada local-
+mente pelo dispositivo A atrav´es do processo de quantizac¸˜ao,
+utilizando a operac¸˜ao XOR (⊕), resultando na sequˆencia s tal
+como
+s = Ka ⊕c.
+(9)
+A sequˆencia resultante dessa operac¸˜ao ´e transmitido para o
+dispositivo B. Ao receber s, o dispositivo B realiza a operac¸˜ao
+XOR entre s e sua pr´opria chave gerada localmente, Kb,
+obtendo uma vers˜ao potencialmente corrompida da palavra-
+c´odigo original, sendo
+cb = s ⊕Kb.
+(10)
+Se a distˆancia de Hamming entre cb e c estiver dentro da
+capacidade de correc¸˜ao do c´odigo corretor, o dispositivo B
+poder´a decodificar cb corretamente para obter c. Com isso, ele
+consegue recuperar a chave original Ka realizando a seguinte
+operac¸˜ao
+Kb = s ⊕c →Ka.
+(11)
+Dessa forma, o dispositivo B tende a reconstruir a mesma
+chave gerada pelo dispositivo A, garantindo que ambos com-
+partilhem Ka como a chave secreta comum para comunicac¸˜ao
+segura [20].
+Este m´etodo de reconciliac¸˜ao baseado em c´odigos corretores
+de erros pode falhar quando h´a uma taxa de erro excessiva entre
+as chaves geradas pelos dispositivos leg´ıtimos, seja devido
+a alta interferˆencia, quantizac¸˜ao imprecisa, ru´ıdo impulsivo,
+assimetria do canal ou ataques ativos. De fato, o m´etodo
+assume que a distˆancia de Hamming entre Ka e Kb est´a dentro
+da capacidade de correc¸˜ao do c´odigo. No entanto, se o n´umero
+de bits discrepantes entre as chaves for maior do que o limite
+de correc¸˜ao do c´odigo, a reconciliac¸˜ao falha, pois o usu´ario B
+n˜ao conseguir´a recuperar a palavra-c´odigo correta.
+Para mitigar esses problemas, ´e essencial selecionar c´odigos
+de correc¸˜ao apropriados para o ambiente de comunicac¸˜ao,
+considerando a taxa de erro esperada e a distribuic¸˜ao dos
+erros ao longo da sequˆencia. Al´em disso, t´ecnicas como pr´e-
+processamento dos sinais para reduc¸˜ao de ru´ıdo, adaptac¸˜ao
+dinˆamica dos c´odigos corretivos e implementac¸˜ao de meca-
+nismos de detecc¸˜ao de ataques ativos podem ser adotadas para
+aumentar a robustez do sistema. Dessa forma, a efic´acia do
+processo de reconciliac¸˜ao pode ser aprimorada, garantindo que
+os dispositivos compartilhem uma chave segura e confi´avel,
+mesmo em cen´arios adversos [48].
+A Figura 34 ilustra o processo de reconciliac¸˜ao adotado no
+estudo de [20]. Nesta sec¸˜ao, s˜ao apresentados os resultados
+num´ericos obtidos com esse m´etodo, analisando seu impacto
+na taxa de gerac¸˜ao de chaves seguras e na eficiˆencia da
+correc¸˜ao de erros. A avaliac¸˜ao considera diferentes condic¸˜oes
+de desvanecimento e n´ıveis de ru´ıdo, conforme descrito na
+Sec¸˜ao IV, seguindo a mesma abordagem utilizada na Sec¸˜ao V
+na comparac¸˜ao dos desempenhos.
+Fig. 34. Modelo de Sistema para reconciliac¸˜ao de Chaves Criptogr´aficas [20]
+A. Hamming
+Nesta subsec¸˜ao, analisa-se o desempenho do c´odigo de
+Hamming no estabelecimento de chaves criptogr´aficas entre os
+dispositivos A e B, aplicando o m´etodo de reconciliac¸˜ao apre-
+sentado. Os testes foram conduzidos para diferentes tamanhos
+de sequˆencia, mantendo as mesmas caracter´ısticas de espac¸o
+amostral descritas na sec¸˜ao anterior.
+
+a.1) Para sequˆencias de 7 bits
+Os resultados obtidos para sequˆencias de 7 bits utilizando o
+c´odigo de Hamming demonstraram um desempenho superior
+ao observado no modelo da Sec¸˜ao V, apresentando taxas
+de sucesso no estabelecimento das chaves mais elevadas em
+praticamente todos os cen´arios. A taxa de estabelecimento
+de chaves foi de 100% no cen´ario ideal, 74.80% no cen´ario
+de canal unit´ario com baixo ru´ıdo, 59.80% no cen´ario mais
+realista, 8.05% no cen´ario de canal unit´ario com alto ru´ıdo e
+10.61% no cen´ario de canal Rayleigh com alto ru´ıdo.
+Fig. 35. Probabilidade do receptor B gerar Ka para uma sequˆencia de 7 bits.
+Esses valores indicam que este m´etodo de reconciliac¸˜ao
+proporciona ganhos significativos em cen´arios de baixo e
+m´edio ru´ıdo, melhorando a taxa de sucesso em relac¸˜ao `a
+abordagem anterior. Entretanto, em ambientes com altos n´ıveis
+de interferˆencia, os desafios permanecem, sugerindo a neces-
+sidade de sequˆencias mais longas para aumentar a robustez do
+processo.
+a.2) Para sequˆencias de 15 bits
+A Figura 36 apresenta os resultados obtidos para sequˆencias
+de 15 bits utilizando o c´odigo de Hamming com o novo m´etodo
+de reconciliac¸˜ao. As taxas de sucesso observadas foram: 100%
+no cen´ario ideal, 3.6% no cen´ario de canal unit´ario com
+baixo ru´ıdo, 3.76% no cen´ario mais realista, 0.05% no cen´ario
+de canal unit´ario com alto ru´ıdo e 0.09% no pior cen´ario,
+caracterizado por canal Rayleigh e alto ru´ıdo.
+Fig. 36. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits.
+Em comparac¸˜ao com as sequˆencias de 7 bits, observa-se
+uma reduc¸˜ao expressiva na taxa de sucesso, especialmente
+em cen´arios de baixo ru´ıdo, o que indica uma limitac¸˜ao no
+desempenho do c´odigo de Hamming para esse tamanho de
+sequˆencia dentro do novo m´etodo de reconciliac¸˜ao. Al´em
+disso, os valores obtidos em ambientes com maior interferˆencia
+permanecem extremamente baixos, sugerindo que a efic´acia
+do c´odigo em mitigar os efeitos do ru´ıdo ´e limitada para
+sequˆencias curtas.
+a.3) Para sequˆencias de 127 bits
+Os resultados obtidos para sequˆencias de 127 bits apre-
+sentaram um desempenho ligeiramente inferior ao observado
+no modelo de reconciliac¸˜ao anterior [19]. Como mostrado
+na Figura 37, a taxa de sucesso foi de 100% no cen´ario
+ideal, 97.52% no cen´ario de canal unit´ario com baixo ru´ıdo
+(uma reduc¸˜ao de aproximadamente 2% em relac¸˜ao ao modelo
+anterior), 94.11% no cen´ario mais realista (queda de 4.25% em
+relac¸˜ao ao primeiro modelo), 0.2% no cen´ario de canal unit´ario
+com alto ru´ıdo e 0.28% no cen´ario de canal Rayleigh com alto
+ru´ıdo.
+Fig. 37. Probabilidade do receptor B gerar Ka para uma sequˆencia de 127
+bits.
+Apesar da leve reduc¸˜ao na taxa de sucesso em relac¸˜ao ao
+modelo anterior, o desempenho do m´etodo de reconciliac¸˜ao
+permanece alto em condic¸˜oes favor´aveis. No entanto, nos
+cen´arios de alto ru´ıdo, os valores continuam muito baixos,
+evidenciando a limitac¸˜ao do c´odigo de Hamming para lidar
+com ambientes mais adversos.
+a.4) Para sequˆencias de 255 bits
+A Figura 38 apresenta os resultados para sequˆencias de 255
+bits, onde se observa um desempenho superior em comparac¸˜ao
+`as sequˆencias menores. O m´etodo de reconciliac¸˜ao atingiu
+100% de probabilidade de estabelecimento da chave nos
+cen´arios de baixo ru´ıdo, 0.26% no cen´ario de canal unit´ario
+com alto ru´ıdo e 0.61% no cen´ario de canal Rayleigh com alto
+ru´ıdo.
+Na Figura 38, observa-se que os resultados foram mais
+otimistas, com 100% de probabilidade de estabelecimento nos
+cen´arios de baixo ru´ıdo, 0.26% no cen´ario de canal unit´ario
+com alto ru´ıdo, e 0.61% no cen´ario de alto ru´ıdo e canal
+Rayleigh. Esse desempenho se deve ao fato de a cadeia de
+bits ser maior, demonstrando que quanto maior a sequˆencia,
+maior a probabilidade de estabelecimento da chave utilizando
+Hamming.
+Fig. 38. Probabilidade do receptor B gerar Ka para uma sequˆencia de 255
+bits.
+
+O desempenho mais otimista dessas sequˆencias pode ser
+atribu´ıdo ao maior comprimento da cadeia de bits, que aumenta
+a redundˆancia e melhora a confiabilidade do processo de
+reconciliac¸˜ao. Esse comportamento confirma a tendˆencia obser-
+vada em modelos anteriores: sequˆencias mais longas resultam
+em maior probabilidade de estabelecimento da chave, enquanto
+sequˆencias menores apresentam um desempenho mais limitado,
+especialmente em cen´arios com alto ru´ıdo.
+Por
+fim,
+a
+comparac¸˜ao
+entre
+os
+dois
+modelos
+de
+reconciliac¸˜ao utilizando c´odigo de Hamming indica que os
+resultados n˜ao apresentam diferenc¸as significativas. O com-
+portamento geral se mant´em, com uma menor taxa de sucesso
+para sequˆencias curtas e uma melhora progressiva `a medida que
+o tamanho da sequˆencia aumenta. Isso sugere que, embora o
+m´etodo de reconciliac¸˜ao influencie parcialmente os resultados,
+o impacto mais relevante sobre a taxa de sucesso est´a relaci-
+onado ao tamanho da sequˆencia e `as condic¸˜oes do canal de
+comunicac¸˜ao.
+B. BCH
+As caracter´ısticas das sequˆencias codificadas com BCH neste
+modelo de reconciliac¸˜ao s˜ao as mesmas descritas na Sec¸˜ao IV e
+utilizadas na an´alise anterior da Sec¸˜ao V. Foram consideradas
+as seguintes configurac¸˜oes: para sequˆencias de 7 bits, foram
+utilizados 4 bits de informac¸˜ao; para sequˆencias de 15 bits, 5,
+7 e 11 bits de informac¸˜ao; para sequˆencias de 127 bits, 64 bits
+de informac¸˜ao; e para sequˆencias de 255 bits, 123 e 247 bits
+de informac¸˜ao.
+b.1) Para sequˆencias de 7 bits
+Os resultados obtidos para sequˆencias de 7 bits utilizando
+BCH s˜ao apresentados na Figura 39. As taxas de sucesso
+foram: 100% no cen´ario ideal, 19.14% no cen´ario de baixo
+ru´ıdo com canal unit´ario, 18.81% no cen´ario de baixo ru´ıdo
+com canal Rayleigh, 7.13% no cen´ario de alto ru´ıdo com
+canal unit´ario e 7.28% no pior cen´ario, caracterizado por canal
+Rayleigh com alto ru´ıdo.
+Fig. 39. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 7 Bits
+Comparando com o modelo de reconciliac¸˜ao anterior,
+observa-se um leve aumento na taxa de sucesso, mantendo o
+mesmo comportamento esperado para diferentes condic¸˜oes do
+canal.
+b.2) Para sequˆencias de 15 bits
+A Figura 40 apresenta os resultados obtidos para sequˆencias
+de 15 bits com 5 bits de informac¸˜ao. As taxas de sucesso foram:
+100% no cen´ario ideal, 72.04% no cen´ario de baixo ru´ıdo com
+canal unit´ario, 71.54% no cen´ario de baixo ru´ıdo com canal
+Rayleigh, 4.9% no cen´ario de alto ru´ıdo com canal unit´ario
+e 5.66% no cen´ario de alto ru´ıdo com canal Rayleigh. Esse
+desempenho representa um aumento significativo nas taxas de
+sucesso em cen´arios de baixo ru´ıdo em comparac¸˜ao com o
+modelo do artigo [19].
+Fig. 40. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits com 5 bits de informac¸˜ao.
+J´a para 7 bits de informac¸˜ao, os resultados foram inferiores,
+como mostrado na Figura 41: 100% no cen´ario ideal, 8.57% no
+cen´ario de baixo ru´ıdo com canal unit´ario, 9.59% no cen´ario
+de baixo ru´ıdo com canal Rayleigh, 1.06% no cen´ario de alto
+ru´ıdo com canal unit´ario e 1.31% no cen´ario de alto ru´ıdo
+com canal Rayleigh. Esses valores representam uma queda
+expressiva em relac¸˜ao ao modelo anterior.
+Fig. 41. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits com 7 bits de informac¸˜ao.
+Por fim, para 11 bits de informac¸˜ao, os resultados foram
+ainda mais reduzidos, como ilustrado na Figura 42: 100% no
+cen´ario ideal, 3.49% no cen´ario de baixo ru´ıdo com canal
+unit´ario, 2.36% no cen´ario de baixo ru´ıdo com canal Rayleigh,
+0.09% no cen´ario de alto ru´ıdo com canal unit´ario e 0.12% no
+cen´ario de alto ru´ıdo com canal Rayleigh.
+Fig. 42. Probabilidade do receptor B gerar Ka para uma sequˆencia de 15
+bits com 11 bits de informac¸˜ao.
+Os resultados seguem o comportamento esperado, em que a
+probabilidade de sucesso na reconciliac¸˜ao aumenta conforme
+cresce a quantidade de bits de paridade. No entanto, esse efeito
+´e mais significativo para sequˆencias menores, como as de 15
+bits, e tende a se estabilizar em sequˆencias mais longas.
+
+b.3) Para sequˆencias de 127 bits
+Para sequˆencias de 127 bits com 64 bits de informac¸˜ao, os
+resultados obtidos foram: 100% no cen´ario ideal, 99.82% no
+cen´ario de baixo ru´ıdo com canal unit´ario, 98.93% no cen´ario
+de baixo ru´ıdo com canal Rayleigh, 0.21% no cen´ario de alto
+ru´ıdo com canal unit´ario e 0.32% no cen´ario de alto ru´ıdo com
+canal Rayleigh.
+Fig. 43. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 127
+Bits
+Os valores s˜ao bastante pr´oximos aos observados no modelo
+anterior, como visto na Figura 22, reforc¸ando a tendˆencia de
+que o aumento no tamanho da sequˆencia melhora a taxa de
+sucesso no estabelecimento da chave criptogr´afica.
+b.4) Para sequˆencias de 255 bits
+Os testes com 255 bits e 123 bits de informac¸˜ao, apresenta-
+ram os seguintes resultados conforme ilustrado na Figura 44:
+100% nos cen´arios de baixo ru´ıdo, 0.29% no cen´ario de alto
+ru´ıdo com canal unit´ario e 0.57% no cen´ario de alto ru´ıdo com
+canal Rayleigh.
+Fig. 44. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com 123 bits de informac¸˜ao
+J´a para 255 bits e 247 bits de informac¸˜ao, os valores foram
+similares, conforme visto na Figura 45: 100% nos cen´arios de
+baixo ru´ıdo, 0.41% no cen´ario de alto ru´ıdo com canal unit´ario
+e 0.43% no cen´ario de alto ru´ıdo com canal Rayleigh.
+Fig. 45. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com 247 bits de informac¸˜ao
+Os resultados, juntamente com os apresentados nas Figu-
+ras 23 e 24, indicam que o aumento do tamanho da sequˆencia
+(n) tem um impacto maior na taxa de sucesso do que o aumento
+da paridade. Isso sugere que, a partir de um certo ponto, a re-
+dundˆancia adicional proporcionada pelos bits de paridade deixa
+de ser um fator relevante para a melhoria dos resultados. Essa
+tendˆencia foi observada tanto no modelo anterior [19] quanto
+neste modelo [20], reforc¸ando a importˆancia do comprimento
+da sequˆencia no sucesso do processo de reconciliac¸˜ao.
+C. LDPC
+Os parˆametros de grau de verificac¸˜ao (dc) e grau de vari´avel
+(dv) adotados para este modelo de reconciliac¸˜ao s˜ao os mesmos
+utilizados na Sec¸˜ao V. Os resultados a seguir analisam o
+desempenho do c´odigo LDPC para diferentes tamanhos de
+sequˆencia, considerando os impactos desses parˆametros e a
+influˆencia do ru´ıdo no estabelecimento da chave, no processo
+de reconciliac¸˜ao apresentado em [20].
+c.1) Para sequˆencias de 7 bits
+A Figura 46 apresenta os resultados obtidos para sequˆencias
+de 7 bits utilizando LDPC. As taxas de sucesso foram: 100% no
+cen´ario ideal, 9.15% no cen´ario de canal unit´ario com baixo
+ru´ıdo, 9.21% no cen´ario mais realista, 1.85% no cen´ario de
+canal unit´ario com alto ru´ıdo e 2.51% no cen´ario de canal
+Rayleigh com alto ru´ıdo.
+Fig. 46. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 7 Bits
+Embora os resultados em cen´arios de baixo ru´ıdo apresentem
+uma leve queda em relac¸˜ao ao modelo anterior, o comporta-
+mento geral permaneceu semelhante, indicando que a taxa de
+sucesso ´e maior nessas condic¸˜oes e reduz-se significativamente
+com o aumento da interferˆencia.
+c.2) Para sequˆencias de 15 bits
+A Figura 47 apresenta os resultados para sequˆencias de 15
+bits com menor grau de verificac¸˜ao (d=5) e menor grau de
+vari´avel (dv = 3). Os valores observados foram: 100% no
+cen´ario ideal, 9.83% no cen´ario de canal unit´ario com baixo
+ru´ıdo, 7.5% no cen´ario mais realista, 0.42% no cen´ario de alto
+ru´ıdo com canal unit´ario e 0.59% no cen´ario de canal Rayleigh
+com alto ru´ıdo.
+A Figura 48 mostra os resultados para maior grau de
+verificac¸˜ao (dc = 15) e menor grau de vari´avel (dv = 3), que
+apresentaram uma queda significativa no desempenho: 100%
+no cen´ario ideal, 0.35% no cen´ario de canal unit´ario com baixo
+ru´ıdo, 0.31% no cen´ario mais realista e 0% nos cen´arios de alto
+ru´ıdo.
+
+Fig. 47. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 15
+Bits com dc = 5 e dv = 3
+Fig. 48. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 15
+Bits com dc = 15 e dv = 3
+J´a na Figura 49, com maior grau de verificac¸˜ao (dc = 15)
+e maior grau de vari´avel (dv = 14), os valores voltaram a
+crescer, mas ainda permaneceram baixos nos cen´arios com
+interferˆencia: 100% no cen´ario ideal, 2.42% no cen´ario de
+canal unit´ario com baixo ru´ıdo, 2.35% no cen´ario mais realista
+e 0.01% nos cen´arios de alto ru´ıdo.
+Fig. 49. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 15
+Bits com dc = 15 e dv = 14
+A comparac¸˜ao com os resultados da Sec¸˜ao V (Figuras 26,
+27 e 28) indica que os parˆametros dc e dv influenciam o esta-
+belecimento da chave, mas seu impacto ´e menos significativo
+quando comparado ao tamanho da sequˆencia.
+c.3) Para sequˆencias de 127 bits
+Os resultados obtidos para sequˆencias de 127 bits s˜ao
+apresentados na Figura 50. A taxa de sucesso atingiu 100% no
+cen´ario ideal, 99.82% no cen´ario de canal unit´ario com baixo
+ru´ıdo, 99.32% no cen´ario mais realista, 0.33% no cen´ario de
+canal unit´ario com alto ru´ıdo e 0.22% no cen´ario de canal
+Rayleigh com alto ru´ıdo.
+Apesar dos bons resultados em cen´arios favor´aveis, a queda
+expressiva nos cen´arios de alto ru´ıdo reforc¸a a necessidade de
+sequˆencias ainda maiores para garantir um estabelecimento de
+chave mais confi´avel.
+Fig. 50. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 127
+Bits
+c.4) Para sequˆencias de 255 bits
+Os testes com 255 bits e menor grau de verificac¸˜ao e
+vari´avel, dc = 5 e dv = 3, resultaram em 100% de sucesso
+nos cen´arios de baixo ru´ıdo e taxas de 0.32% e 0.95% nos
+cen´arios mais adversos, conforme reportado na Figura 51.
+Fig. 51. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com dc = 5 e dv = 3.
+Com maior grau de verificac¸˜ao (dc = 255) e menor grau
+de vari´avel (dv = 3), os resultados foram semelhantes, com
+100% de sucesso nos cen´arios de baixo ru´ıdo e probabilidades
+de 0.38% e 0.58% nos cen´arios mais cr´ıticos, ilustrado na
+Figura 52.
+Fig. 52. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com dc = 255 e dv = 3.
+Finalmente, com maior grau de verificac¸˜ao (dc = 255)
+e maior grau de vari´avel (dv = 254), as taxas de sucesso
+permaneceram est´aveis, atingindo 100% nos cen´arios de baixo
+ru´ıdo e 0.3% e 0.55% nos cen´arios de maior interferˆencia,
+apresentados na Figura 53.
+Tanto os resultados obtidos neste modelo de reconciliac¸˜ao
+quanto o abordado na Sec¸˜ao V indicam que o tamanho da
+sequˆencia tem um impacto significativamente maior na taxa
+de sucesso do que os valores de dc e dv. Essa tendˆencia
+fica evidente nas sequˆencias de 255 bits, onde a taxa de
+sucesso se mant´em em 100% independentemente da escolha
+dos parˆametros de verificac¸˜ao e vari´avel.
+
+Fig. 53. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 255
+Bits com dc = 255 e dv = 254.
+D. Golay
+Por fim, avalia-se o m´etodo de reconciliac¸˜ao com o c´odigo
+corretor de erro bin´ario estendido (24,12). A Figura 54 apre-
+senta os resultados obtidos para o c´odigo de Golay no processo
+de reconciliac¸˜ao. As taxas de sucesso observadas foram: 100%
+no cen´ario ideal, 16.52% no cen´ario de canal unit´ario com
+baixo ru´ıdo, 14.2% no cen´ario mais realista, 0.1% no cen´ario
+de canal unit´ario com alto ru´ıdo e 0.13% no cen´ario de canal
+Rayleigh com alto ru´ıdo.
+Fig. 54. Probabilidade do receptor B gerar Ka, para uma sequˆencia de 24
+Bits
+A comparac¸˜ao com os resultados obtidos no primeiro mo-
+delo de reconciliac¸˜ao apresentado na Sec¸˜ao V evidencia que o
+uso do c´odigo de Golay para o estabelecimento da chave crip-
+togr´afica apresenta limitac¸˜oes significativas. Especificamente,
+seus resultados foram inferiores aos das sequˆencias de 15 bits
+do c´odigo BCH com 5 bits de informac¸˜ao, conforme mostrado
+nas Figuras 19 e 40.
+Al´em do desempenho inferior, um fator cr´ıtico que restringe
+a viabilidade do c´odigo de Golay ´e seu tamanho fixo de 23 ou
+24 bits, o que impede a utilizac¸˜ao de sequˆencias mais longas
+para melhorar a eficiˆencia da reconciliac¸˜ao. Como demonstrado
+ao longo deste estudo, o aumento do tamanho da sequˆencia tem
+um impacto significativo na taxa de sucesso do estabelecimento
+da chave, tornando os c´odigos com tamanhos fixos menos
+flex´ıveis e menos eficientes para esse processo.
+VII. CONCLUS ˜AO
+Este estudo analisou a viabilidade do uso de propriedades
+f´ısicas do canal de comunicac¸˜ao sem fio para o estabeleci-
+mento de chaves criptogr´aficas em cen´arios de redes B5G. A
+abordagem proposta explora a aleatoriedade e reciprocidade do
+canal para gerar chaves secretas de maneira eficiente, reduzindo
+a necessidade de mecanismos complexos de distribuic¸˜ao de
+chaves.
+Foram investigados dois m´etodos de reconciliac¸˜ao de
+informac¸˜ao, utilizando diferentes c´odigos corretores de erro e
+considerando diversos cen´arios de propagac¸˜ao. Os resultados
+demonstraram que o aumento do tamanho das sequˆencias
+utilizadas para a gerac¸˜ao das chaves impacta significativamente
+a taxa de sucesso no processo de reconciliac¸˜ao da informac¸˜ao.
+Em cen´arios de baixo ru´ıdo, foram alcanc¸adas altas taxas de
+estabelecimento de chaves criptogr´aficas, enquanto em ambi-
+entes com alto n´ıvel de interferˆencia, a robustez do processo
+ainda apresenta desafios. Sequˆencias mais longas, combinadas
+com c´odigos corretores de erro eficientes, mostraram-se uma
+soluc¸˜ao promissora para mitigar os efeitos do desvanecimento
+e do ru´ıdo no canal.
+Com base nestes achados, recomenda-se a explorac¸˜ao
+de estrat´egias complementares para aprimorar a confiabili-
+dade do estabelecimento de chaves criptogr´aficas na camada
+f´ısica. T´ecnicas como o uso de pr´e-processamento dos sinais,
+codificac¸˜ao avanc¸ada e esquemas h´ıbridos de reconciliac¸˜ao po-
+dem contribuir para aumentar a seguranc¸a e a eficiˆencia desse
+m´etodo em aplicac¸˜oes futuras. Al´em disso, o desenvolvimento
+de soluc¸˜oes adaptativas, capazes de ajustar dinamicamente
+os parˆametros do sistema conforme as condic¸˜oes do canal,
+representa um caminho promissor para o avanc¸o da seguranc¸a
+em redes sem fio emergentes.
+REFERˆENCIAS
+[1]
+Statista. “Number of Internet of Things (IoT) connecti-
+ons worldwide from 2022 to 2023, with forecasts from
+2024 to 2033”. Em: Statista (2024).
+[2]
+IMD. “What is the internet of things (IoT) & why is it
+important?” Em: IMD (2024).
+[3]
+Team Nuspire. “The Ongoing Rise in IoT Attacks: What
+We’re Seeing in 2023”. Em: Security Boulevard (2023).
+[4]
+M. Nieles, K. Dempsey e V. Pillitteri. “An Introduction
+to Information Security”. Em: NIST Special Publication
+800.12 (2017), p. 101.
+[5]
+William Stallings. Criptografia e Seguranc¸a de Redes.
+Princ´ıpios e Pr´aticas. 2006.
+[6]
+M. B. Gracia, V. Malele, S. P. Ndlovu, T. E. Mathonsi,
+L. Maaka e T. Muchenje. “6G Security Challenges
+and Opportunities”. Em: IEEE 13th International Con-
+ference on Mechanical and Intelligent Manufacturing
+Technologies (ICMIMT). 2022, pp. 339–343.
+[7]
+K. Kaur e K. T. Joseph. “Security Challenges and
+Solutions in 5G Networks”. Em: IEEE International
+Conference on Interdisciplinary Approaches in Techno-
+logy and Management for Social Innovation (IATMSI).
+Vol. 2. 2024, pp. 1–5.
+[8]
+M. Ebrahim, S. Khan e U. B. Khalid. “Symmetric
+algorithm survey: a comparative analysis”. Em: arXiv
+preprint arXiv:1405.0398 (2014).
+[9]
+Mohammed Abdulhameed Al-Shabi. “A survey on sym-
+metric and asymmetric cryptography algorithms in infor-
+mation security”. Em: International Journal of Scientific
+and Research Publications (IJSRP) 9.3 (2019), pp. 576–
+589.
+
+[10]
+Nan Li. “Research on Diffie-Hellman key exchange
+protocol”. Em: 2010 2nd International Conference on
+Computer Engineering and Technology. Vol. 4. 2010,
+pp. V4-634-V4–637.
+[11]
+P. R. M. Sousa. “Aplicac¸˜oes de Criptografia Quˆantica
+de Chave P´ublica em Assinaturas de Mensagens”.
+Dissertac¸˜ao de Mestrado. Universidade Federal do
+Cear´a, 2013.
+[12]
+G. Rigolin e A. A. Rieznik. “Introduc¸˜ao `a criptografia
+quˆantica”. Em: Revista Brasileira de Ensino de F´ısica
+27 (2005), pp. 517–526.
+[13]
+T. Wang, Y. Liu e A. Vasilakos. “Survey on Channel
+Reciprocity Based Key Establishment Techniques for
+Wireless Systems”. Em: Wireless Networks 21 (2015),
+pp. 1835–1846.
+[14]
+Junqing Zhang, Trung Q. Duong, Alan Marshall e Roger
+Woods. “Key Generation From Wireless Channels: A
+Review”. Em: IEEE Access 4 (2016), pp. 614–626.
+[15]
+S. Dang, O. Amin, B. Shihada e M-S. Alouini. “What
+should 6G be?” Em: Nature Electronics 3.1 (2020),
+pp. 20–29.
+[16]
+N. Aldaghri e H. Mahdavifar. “Physical Layer Secret
+Key Generation in Static Environments”. Em: IEEE
+Transactions on Information Forensics and Security 15
+(2020), pp. 2692–2705.
+[17]
+Kui Ren, Hai Su e Qian Wang. “Secret key generation
+exploiting channel characteristics in wireless commu-
+nications”. Em: IEEE Wireless Communications 18.4
+(2011), pp. 6–12.
+[18]
+Chan Chen e Michael A. Jensen. “Secret Key Esta-
+blishment Using Temporally and Spatially Correlated
+Wireless Channel Coefficients”. Em: IEEE Transactions
+on Mobile Computing 10.2 (2011), pp. 205–215.
+[19]
+S. Mathur, R. Miller, A. Varshavsky, W. Trappe e N.
+Mandayam. “Proximate: Proximity-based Secure Pairing
+using Ambient Wireless Signals”. Em: 9th International
+Conference on Mobile Systems, Applications, and Ser-
+vices. 2011, pp. 211–224.
+[20]
+X. Yuan, Y. Jiang, A. Hu e C. Guo. “Wireless Channel
+Key Generation for Multi-User Access Scenarios”. Em:
+IEEE/CIC International Conference on Communications
+in China (ICCC). 2022, pp. 179–184.
+[21]
+M. Bottarelli, G. Epiphaniou, D. K. B. Ismail, P. Ka-
+radimas e H. Al-Khateeb. “Physical Characteristics of
+Wireless Communication Channels for Secret Key Esta-
+blishment: A Survey of the Research”. Em: Computers
+& Security 78 (2018), pp. 454–476.
+[22]
+Muhammad Usman, Saud Althunibat e Marwa Qaraqe.
+“A Channel Magnitude Based Key Generation Scheme
+for Static and Dynamic Environments”. Em: IEEE 26th
+International Workshop on Computer Aided Modeling
+and Design of Communication Links and Networks
+(CAMAD). 2021, pp. 1–5.
+[23]
+R. Oppliger. SSL and TLS: Theory and Practice. Artech
+House, 2023.
+[24]
+M. Conti, N. Dragoni e V. Lesyk. “A Survey of Man
+In The Middle Attacks”. Em: IEEE Communications
+Surveys & Tutorials 18.3 (2016), pp. 2027–2051.
+[25]
+H. Dhall, D. Dhall, S. Batra e P. Rani. “Implemen-
+tation of IPSec Protocol”. Em: Second International
+Conference on Advanced Computing & Communication
+Technologies. 2012, pp. 176–181.
+[26]
+W. B. Hsieh e J. S. Leu. “Anonymous authentication
+protocol based on elliptic curve Diffie–Hellman for wi-
+reless access networks”. Em: Wireless Communications
+and Mobile Computing 14.10 (2014), pp. 995–1006.
+[27]
+Naqash Azeem Khan, Azlan Awang e Samsul Ariffin
+Abdul Karim. “Security in Internet of Things: A Re-
+view”. Em: IEEE Access 10 (2022), pp. 104649–104670.
+[28]
+S. K. Chong e T. Hwang. “Quantum Key Agreement
+Protocol Based on BB84”. Em: Optics Communications
+283.6 (2010), pp. 1192–1195.
+[29]
+W. Heisenberg. “Heisenberg Uncertainty Principle”. Em:
+(1927).
+[30]
+G. Brassard, N. L¨utkenhaus, T. Mor e B. C. Sanders.
+“Limitations on Practical Quantum Cryptography”. Em:
+Physical review letters 85.6 (2000), p. 1330.
+[31]
+H. Kaur, M. Khosla e R. K. Sarin. “Channel Estimation
+in MIMO-OFDM System: A Review”. Em: Second In-
+ternational Conference on Electronics, Communication
+and Aerospace Technology (ICECA). 2018, pp. 974–980.
+[32]
+E. G. Larsson, O. Edfors, F. Tufvesson e T. L. Mar-
+zetta. “Massive MIMO for Next Generation Wireless
+Systems”. Em: IEEE Communications Magazine 52.2
+(2014), pp. 186–195.
+[33]
+J. F. Galdino. “Modulac¸˜ao adaptativa: princ´ıpios e ca-
+racter´ısticas de desempenho”. Em: Revista Militar de
+Ciencia e Tecnologia (), pp. 17–28.
+[34]
+W. Ding, W. Li, Z. Zhang, C. Wan, J. Duan e S.
+Lu. “Time-Varying Gaussian Markov Random Fields
+Learning for Multivariate Time Series Clustering”. Em:
+IEEE Transactions on Knowledge and Data Engineering
+35.11 (2023), pp. 11950–11966.
+[35]
+C. Chen, J. Zhang e Y. Chen. “Adaptive Quantization for
+Key Generation in Low-Power Wide-Area Networks”.
+Em: arXiv:2310.07853 (2023).
+[36]
+Micael Andrade Souza. “Reconciliac¸˜ao de chave do
+tipo CVQKD utilizando o protocolo CASCADE”. Em:
+(2019).
+[37]
+A. Sanenga, G. A. Mapunda, T. M. L. Jacob, L. Marata,
+B. Basutli e J. M. Chuma. “An Overview of Key
+Technologies in Physical Layer Security”. Em: Entropy
+22.11 (2020), p. 1261.
+[38]
+Qian Wang, Hai Su, Kui Ren e Kwangjo Kim. “Fast and
+scalable secret key generation exploiting channel phase
+randomness in wireless networks”. Em: Proceedings
+IEEE INFOCOM. 2011, pp. 1422–1430.
+[39]
+S. N. Premnath, S. Jana, J. Croft, P. L. Gowda, M.
+Clark, S. k. Kasera, N. Patwari e S. V. Krishnamurthy.
+“Secret Key Extraction from Wireless Signal Strength in
+Real Environments”. Em: IEEE Transactions on Mobile
+Computing 12.5 (2013), pp. 917–930.
+
+[40]
+Abhijit Ambekar, Mohamed Hassan e Hans D. Schot-
+ten. “Improving Channel Reciprocity for Effective Key
+Management Systems”. Em: International Symposium
+on Signals, Systems, and Electronics (ISSSE). 2012,
+pp. 1–4.
+[41]
+Yunchuan Wei, Kai Zeng e Prasant Mohapatra. “Adap-
+tive Wireless Channel Probing for Shared Key Genera-
+tion Based on PID Controller”. Em: IEEE Transactions
+on Mobile Computing 12.9 (2013), pp. 1842–1852.
+[42]
+L. Rayleigh. “XII. On the resultant of a large number of
+vibrations of the same pitch and of arbitrary phase”. Em:
+The London, Edinburgh, and Dublin Philosph. Mag. and
+J. of Sci. 10.60 (ago. de 1880), pp. 73–78.
+[43]
+R. W. Hamming. “Error detecting and error correcting
+codes”. Em: The Bell System Technical Journal 29.2
+(1950), pp. 147–160. DOI: 10.1002/j.1538-7305.1950.
+tb00463.x.
+[44]
+Elwyn R. Berlekamp. Algebraic coding theory. Editora
+Aegean Park Press, 1984.
+[45]
+Shu Lin e Daniel J. Costello. Error control coding:
+fundamentals and applications. New Jersey: Prentice
+Hall, 2003.
+[46]
+Arnold M.Michelson e Allen H. Levesque. Error-control
+techniques for digital communication. John Wiley &
+Sons Ltd, 1985.
+[47]
+W. Wesley Peterson e E.J. Weldon J´unior. Error-
+correcting codes. Editora Axcel Books do Brasil, 1972.
+[48]
+C. Ye, S. Mathur, A. Reznik, Y. Shah, W. Trappe
+e N. B. Mandayam. “Information-Theoretically Secret
+Key Generation for Fading Wireless Channels”. Em:
+IEEE Transactions on Information Forensics and Secu-
+rity 5.2 (2010), pp. 240–254.

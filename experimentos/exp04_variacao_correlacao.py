@@ -71,15 +71,14 @@ def experimento_variacao_correlacao(
     dados_todas_correlacoes = {}
     
     for rho in tqdm(correlacoes, desc="Testando ρ", colour="magenta"):
+        ber_rates = []
         kdr_rates = []
-        kdr_pos_rates = []
-        kdr_amplificacao_rates = []
         
         for variancia in tqdm(variancias_ruido,
                              desc=f"  ρ={rho:.2f}",
                              leave=False,
                              colour="green"):
-            kdr, kdr_pos, kdr_amp = extrair_kdr(
+            ber, kdr = extrair_kdr(
                 palavra_codigo,
                 rayleigh_param,
                 tamanho_cadeia_bits,
@@ -88,20 +87,18 @@ def experimento_variacao_correlacao(
                 media_ruido,
                 bch_codigo,
                 rho,  # Variando correlação
-                usar_amplificacao=True,
+                usar_amplificacao=False,
                 modulacao=modulacao,
                 erro_estimativa=0.0,
                 guard_band_sigma=0.0
             )
             
+            ber_rates.append(ber)
             kdr_rates.append(kdr)
-            kdr_pos_rates.append(kdr_pos)
-            kdr_amplificacao_rates.append(kdr_amp)
         
         dados_todas_correlacoes[rho] = {
-            'kdr_rates': kdr_rates,
-            'kdr_pos_rates': kdr_pos_rates,
-            'kdr_amplificacao_rates': kdr_amplificacao_rates
+            'ber_rates': ber_rates,
+            'kdr_rates': kdr_rates
         }
     
     # Prepara resultados
