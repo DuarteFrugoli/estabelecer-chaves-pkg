@@ -4,20 +4,6 @@ from ..codigos_corretores.bch import *
 
 def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, bch_codigo):
     """
-    Função para reconciliar chaves entre Alice e Bob usando code-offset (secure sketch).
-    
-    Algoritmo:
-    1. Alice escolhe um código aleatório C da tabela
-    2. Alice calcula S = Ka ⊕ C (syndrome)
-    3. Alice envia S para Bob (informação de reconciliação)
-    4. Bob calcula Cb = S ⊕ Kb = C ⊕ e (onde e = Ka ⊕ Kb é o vetor de erro)
-    5. Bob decodifica Cb para encontrar Ĉ (palavra-código mais próxima)
-    6. Bob calcula a chave reconciliada: K̂ = S ⊕ Ĉ
-    
-    Se peso(e) ≤ t (capacidade de correção do BCH), então Ĉ = C e Ka = K̂.
-    """
-def reconciliar_chaves(palavra_codigo_1, palavra_codigo_2, bch_codigo):
-    """
     Função para reconciliar chaves entre Alice e Bob usando code-offset com BCH.
     
     Algoritmo:

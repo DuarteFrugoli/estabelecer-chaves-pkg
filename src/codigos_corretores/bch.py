@@ -29,30 +29,6 @@ def decodificar_bch(bch, bits_codificados):
     """Decodifica uma palavra codificada usando o código BCH."""
     return bch.decode(bits_codificados).tolist()
 
-def gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao, tamanho_espaco_amostral=None):
-    """Gera uma tabela de códigos para todas as palavras de informação possíveis (sem repetições)."""
-    # Instancia o código BCH
-    bch = instanciar_codigo_bch(tamanho_cadeia_bits, tamanho_bits_informacao)
-
-    # Se o tamanho do espaço amostral não for especificado, calcula automaticamente
-    if tamanho_espaco_amostral is None:
-        tamanho_espaco_amostral = 2 ** tamanho_bits_informacao
-
-    # palavras_informacao: Lista de todas as palavras de informação possíveis (ou amostradas, se o espaço for grande)
-    if tamanho_cadeia_bits > 15:
-        palavras_informacao_set = set()
-        while len(palavras_informacao_set) < tamanho_espaco_amostral:
-            palavra = tuple(map(int, format(random.randint(0, 2**tamanho_bits_informacao - 1), f'0{tamanho_bits_informacao}b')))
-            palavras_informacao_set.add(palavra)
-        palavras_informacao = [list(p) for p in palavras_informacao_set]
-    else:
-        palavras_informacao = [list(map(int, format(i, f'0{tamanho_bits_informacao}b'))) for i in range(tamanho_espaco_amostral)]
-
-    # Codifica as palavras de informação do espaço amostral usando o código BCH
-    tabela_codigos = [codificar_bch(bch, bits_informacao) for bits_informacao in palavras_informacao]
-
-    return tabela_codigos
-
 def encontrar_codigo_mais_proximo(sinal_recebido, bch_codigo):
     """
     Encontra o código mais próximo usando decodificação BCH.
