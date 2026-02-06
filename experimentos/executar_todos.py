@@ -126,7 +126,7 @@ def executar_bateria_completa():
         print("\n--- 6A: Descorrelação Espacial ---")
         exp06a, kdr_bob, lambda_m = experimento_eve_espacial(
             quantidade_de_testes=1000,
-            distancias_eve=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]
+            distancias_eve_m=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]
         )
         
         # 6B: Descorrelação temporal

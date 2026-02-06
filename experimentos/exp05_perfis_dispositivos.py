@@ -63,7 +63,7 @@ def experimento_perfis_dispositivos(
     """
     
     print("\n" + "="*80)
-    print("EXPERIMENTO 7: PERFIS DE DISPOSITIVOS IoT")
+    print("EXPERIMENTO 5: PERFIS DE DISPOSITIVOS IoT")
     print("="*80)
     print(f"Tamanho código BCH: {tamanho_cadeia_bits}")
     print(f"Quantidade de testes: {quantidade_de_testes}")
@@ -178,9 +178,9 @@ def experimento_perfis_dispositivos(
                 break
         
         print(f"\nResumo {perfil_nome}:")
-        print(f"  - BER inicial (SNR={snr_db_range[0]:.1f}dB): {ber_rates[0]*100:.2f}%")
-        print(f"  - KDR inicial (SNR={snr_db_range[0]:.1f}dB): {kdr_rates[0]*100:.2f}%")
-        print(f"  - KDR final (SNR={snr_db_range[-1]:.1f}dB): {kdr_rates[-1]*100:.2f}%")
+        print(f"  - BER inicial (SNR={snr_db_range[0]:.1f}dB): {ber_rates[0]:.2f}%")
+        print(f"  - KDR inicial (SNR={snr_db_range[0]:.1f}dB): {kdr_rates[0]:.2f}%")
+        print(f"  - KDR final (SNR={snr_db_range[-1]:.1f}dB): {kdr_rates[-1]:.2f}%")
         if snr_min_viavel:
             print(f"  - SNR mínimo para KDR<1%: {snr_min_viavel:.1f} dB")
         else:
@@ -233,7 +233,7 @@ def experimento_perfis_dispositivos(
     ]
     salvar_resultado_csv(
         dados_csv,
-        f"exp05_perfis_dispositivos_{timestamp}",
+        "exp05_perfis_dispositivos",
         colunas_csv
     )
     
@@ -256,7 +256,8 @@ def experimento_perfis_dispositivos(
     # Salva JSON
     salvar_resultado_json(
         json_data,
-        f"exp05_perfis_dispositivos_{timestamp}"
+        "exp05_perfis_dispositivos",
+        "Perfis de dispositivos IoT"
     )
     
     # Cria gráfico comparativo

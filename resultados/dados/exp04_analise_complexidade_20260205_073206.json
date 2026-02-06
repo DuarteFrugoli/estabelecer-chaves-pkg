@@ -1,0 +1,91 @@
+{
+  "experimento": "exp04_analise_complexidade",
+  "descricao": "Análise de tempo de execução dos códigos BCH",
+  "timestamp": "20260205_073206",
+  "data_hora": "2026-02-05 07:32:06",
+  "dados": {
+    "parametros": {
+      "codigos_bch": [
+        [
+          7,
+          4
+        ],
+        [
+          15,
+          7
+        ],
+        [
+          127,
+          64
+        ],
+        [
+          255,
+          139
+        ]
+      ],
+      "repeticoes": 1000
+    },
+    "resultados": {
+      "BCH(7,4)": {
+        "n": 7,
+        "k": 4,
+        "t": 1,
+        "taxa_codigo": 0.5714285714285714,
+        "tempos": {
+          "encode_media": 0.04203369654715061,
+          "encode_std": 0.017924586236326708,
+          "decode_limpo_media": 0.07684369827620685,
+          "decode_limpo_std": 0.08287529463798528,
+          "decode_erros_media": 0.12549789692275226,
+          "decode_erros_std": 0.10293383210885193,
+          "total_media": 0.16753159346990287
+        }
+      },
+      "BCH(15,7)": {
+        "n": 15,
+        "k": 7,
+        "t": 2,
+        "taxa_codigo": 0.4666666666666667,
+        "tempos": {
+          "encode_media": 0.06141019915230572,
+          "encode_std": 0.005413023809265313,
+          "decode_limpo_media": 0.07712099957279861,
+          "decode_limpo_std": 0.0658887348690415,
+          "decode_erros_media": 0.16282910434529185,
+          "decode_erros_std": 0.11817595999318227,
+          "total_media": 0.22423930349759758
+        }
+      },
+      "BCH(127,64)": {
+        "n": 127,
+        "k": 64,
+        "t": 10,
+        "taxa_codigo": 0.5039370078740157,
+        "tempos": {
+          "encode_media": 0.06080749956890941,
+          "encode_std": 0.014124369743578868,
+          "decode_limpo_media": 0.12308169947937131,
+          "decode_limpo_std": 0.1430548605837971,
+          "decode_erros_media": 0.42785899760201573,
+          "decode_erros_std": 0.2589493735699177,
+          "total_media": 0.48866649717092514
+        }
+      },
+      "BCH(255,139)": {
+        "n": 255,
+        "k": 139,
+        "t": 15,
+        "taxa_codigo": 0.5450980392156862,
+        "tempos": {
+          "encode_media": 0.051684000762179494,
+          "encode_std": 0.005619704032199087,
+          "decode_limpo_media": 1.4409157973714173,
+          "decode_limpo_std": 42.588115465674036,
+          "decode_erros_media": 0.44738760381005704,
+          "decode_erros_std": 0.15451221956004788,
+          "total_media": 0.49907160457223654
+        }
+      }
+    }
+  }
+}

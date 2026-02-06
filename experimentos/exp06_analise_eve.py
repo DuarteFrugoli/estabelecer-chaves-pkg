@@ -98,7 +98,7 @@ def experimento_eve_espacial(
     """
     
     print("\n" + "="*80)
-    print("EXPERIMENTO 9A: DESCORRELAÇÃO ESPACIAL DE EVE")
+    print("EXPERIMENTO 6A: DESCORRELAÇÃO ESPACIAL DE EVE")
     print("="*80)
     print(f"Distância Alice-Bob: {distancia_alice_bob_m}m")
     print(f"Distâncias Eve (lateral): {distancias_eve_m} m")
@@ -170,8 +170,8 @@ def experimento_eve_espacial(
         guard_band_sigma=guard_band_sigma
     )
     
-    print(f"[OK] BER Bob: {ber_bob*100:.2f}%")
-    print(f"[OK] KDR Bob (pós-BCH): {kdr_bob_valor*100:.2f}%\n")
+    print(f"[OK] BER Bob: {ber_bob:.2f}%")
+    print(f"[OK] KDR Bob (pós-BCH): {kdr_bob_valor:.2f}%\n")
     
     # Loop sobre distâncias de Eve
     for dist_eve in tqdm(distancias_eve_m, desc="Testando distâncias de Eve"):
@@ -231,7 +231,7 @@ def experimento_eve_temporal(
     """
     
     print("\n" + "="*80)
-    print("EXPERIMENTO 9B: DESCORRELAÇÃO TEMPORAL DE EVE")
+    print("EXPERIMENTO 6B: DESCORRELAÇÃO TEMPORAL DE EVE")
     print("="*80)
     print(f"Distância Eve (fixa): {distancia_eve_m}m")
     print(f"Atrasos de Eve: {atrasos_ms} ms")
@@ -375,7 +375,8 @@ def criar_graficos(resultados_espacial, resultados_temporal, kdr_bob, lambda_cm,
     plt.tight_layout()
     
     # Salvar
-    caminho_figura = os.path.join('resultados', 'figuras', f'exp06_analise_eve_{timestamp}.png')
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    caminho_figura = os.path.join(base_dir, 'resultados', 'figuras', f'exp06_analise_eve_{timestamp}.png')
     os.makedirs(os.path.dirname(caminho_figura), exist_ok=True)
     plt.savefig(caminho_figura, dpi=300, bbox_inches='tight')
     print(f"\n[OK] Grafico salvo: {caminho_figura}")
@@ -390,7 +391,7 @@ if __name__ == "__main__":
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
-    # ===== EXPERIMENTO 9A: ESPACIAL =====
+    # ===== EXPERIMENTO 6A: ESPACIAL =====
     resultados_espacial, kdr_bob, lambda_m = experimento_eve_espacial(
         tamanho_cadeia_bits=127,
         quantidade_de_testes=1000,
@@ -400,7 +401,7 @@ if __name__ == "__main__":
         perfil_dispositivo='pessoa_andando'
     )
     
-    # ===== EXPERIMENTO 9B: TEMPORAL =====
+    # ===== EXPERIMENTO 6B: TEMPORAL =====
     resultados_temporal = experimento_eve_temporal(
         tamanho_cadeia_bits=127,
         quantidade_de_testes=1000,
@@ -433,7 +434,7 @@ if __name__ == "__main__":
                         'correlacao_h_alice_bob', 'correlacao_h_alice_eve']
     salvar_resultado_csv(
         csv_dados_espacial,
-        f'exp06_eve_espacial_{timestamp}',
+        'exp06_eve_espacial',
         colunas_espacial
     )
     
@@ -453,7 +454,7 @@ if __name__ == "__main__":
                         'kdr_bob', 'correlacao_h_alice_bob', 'correlacao_h_alice_eve']
     salvar_resultado_csv(
         csv_dados_temporal,
-        f'exp06_eve_temporal_{timestamp}',
+        'exp06_eve_temporal',
         colunas_temporal
     )
     
@@ -472,7 +473,7 @@ if __name__ == "__main__":
     
     salvar_resultado_json(
         dados_completos,
-        f'exp06_analise_eve_{timestamp}',
+        'exp06_analise_eve',
         'Análise de segurança contra espionagem (Eve)'
     )
     
