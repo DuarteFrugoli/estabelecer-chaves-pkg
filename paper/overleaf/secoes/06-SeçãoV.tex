@@ -44,11 +44,14 @@ A Tabela~\ref{tab:exp02_modulacao} apresenta a comparação entre as duas modula
 
 \begin{table}[htbp]
 \centering
+\small
 \caption{Comparação de desempenho entre modulação BPSK e QPSK.}
 \label{tab:exp02_modulacao}
-\begin{tabular}{ccccc}
+\begin{tabular}{c|cc|cc}
 \hline
-\textbf{SNR (dB)} & \textbf{BPSK BER (\%)} & \textbf{QPSK BER (\%)} & \textbf{BPSK KDR (\%)} & \textbf{QPSK KDR (\%)} \\
+\multirow{2}{*}{\textbf{SNR (dB)}} & \multicolumn{2}{c|}{\textbf{BER (\%)}} & \multicolumn{2}{c}{\textbf{KDR (\%)}} \\
+\cline{2-5}
+ & \textbf{BPSK} & \textbf{QPSK} & \textbf{BPSK} & \textbf{QPSK} \\
 \hline
 $8.82$ & $5.55$ & $5.47$ & $2.93$ & $3.37$ \\
 $11.18$ & $3.40$ & $3.33$ & $0.15$ & $0.20$ \\
