@@ -1,1 +1,38 @@
-% Seção 05 - Seção IV
+\section{Resultados Numéricos}
+\label{sec:results}
+
+Foram conduzidos seis experimentos sistemáticos para avaliar o desempenho do
+sistema sob diferentes condições operacionais. Cada experimento foi projetado
+para isolar o impacto de um parâmetro específico sobre o \ac{KDR}.
+
+\subsection{Experimento 1: Impacto da Relação Sinal-Ruído}
+
+Este experimento investiga o impacto da \ac{SNR} sobre a \ac{KDR}. Para isso, a \ac{SNR} é variada de $-10$ dB a $30$ dB em 18 pontos logaritmicamente espaçados. Mantêm-se fixos o parâmetro do canal Rayleigh $\sigma = 1/\sqrt{2}$, o esquema de modulação \ac{BPSK} e o código corretor \ac{BCH}(127,64,10). Espera-se que o \ac{KDR} diminua monotonicamente com o aumento da \ac{SNR}, uma vez que a melhoria na qualidade do sinal reduz discrepâncias nas observações do canal e, consequentemente, na quantização dos bits gerados, resultando em sequências reconciliadas, ou seja, a chave simétrica, iguais com maior frequência .
+
+\subsection{Experimento 2: Influência do Parâmetro Rayleigh}
+
+Este experimento analisa o efeito do parâmetro de escala $\sigma$ no desvanecimento Rayleigh, considerando valores $\sigma \in \{0.5, 1/\sqrt{2}, 1.0, 2.0\}$. A \ac{SNR} é mantida fixa em 15 dB. Como $\sigma$ controla a variância dos coeficientes do canal, valores maiores implicam maior dispersão estatística nas amplitudes do desvanecimento, podendo impactar diretamente a entropia extraída e a taxa de discordância entre as chaves geradas.
+
+\subsection{Experimento 3: Comparação entre \ac{BPSK} e \ac{QPSK}}
+
+Este experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1 bit/símbolo) e \ac{QPSK} (2 bits/símbolo) em termos de \ac{KDR}. Mantém-se $\sigma = 1/\sqrt{2}$, enquanto a \ac{SNR} é variada conforme o Experimento 1. Espera-se que a modulação \ac{QPSK} apresente uma taxa de discordância ligeiramente superior em regimes de baixa \ac{SNR}, devido à maior sensibilidade a ruído e erros de fase, embora possa oferecer maior eficiência espectral.
+
+\subsection{Experimento 4: Variação da Correlação entre Canais Legítimos}
+
+Este experimento investiga o impacto do coeficiente de correlação $\rho$ entre os canais observados por Alice e Bob, testando valores $\rho \in \{0.7, 0.8, 0.9, 0.95\}$. Valores de $\rho$ próximos de 1 indicam canais altamente correlacionados, condição ideal para geração eficiente de chaves. Por outro lado, valores menores simulam efeitos como separação espacial, imperfeições de estimação ou variações temporais que reduzem a similaridade entre as observações, aumentando o \ac{KDR}.
+
+\subsection{Experimento 5: Comparação de Códigos \ac{BCH}}
+
+Neste experimento, avalia-se o desempenho de diferentes códigos \ac{BCH} na etapa de reconciliação da informação, considerando as configurações (7,4,1), (15,7,2), (127,64,10) e (255,139,15). Códigos com maior capacidade de correção ($t$ maior) tendem a reduzir o \ac{KDR} em cenários com maior taxa de erro, ao custo de aumento na complexidade computacional e maior vazamento potencial de informação pública durante a reconciliação.
+
+\subsection{Experimento 6: Análise de Complexidade Computacional}
+
+Por fim, este experimento avalia o tempo de execução das principais operações do sistema, incluindo modulação, codificação e decodificação \ac{BCH}, bem como a aplicação da função hash na amplificação de privacidade. O objetivo é analisar como a complexidade computacional varia em função do comprimento do código e verificar a viabilidade prática do sistema em dispositivos \ac{IoT} com recursos limitados de processamento e energia.
+
+Todos os experimentos foram executados com 1000 realizações de Monte Carlo no
+modo completo, garantindo significância estatística dos resultados. Os dados
+foram salvos em formato JSON para análise posterior, e gráficos em alta resolução (300 DPI) foram gerados utilizando Matplotlib.
+
+A próxima seção apresenta os resultados numéricos obtidos a partir desses
+experimentos, analisando o comportamento do \ac{KDR} em diferentes cenários e
+avaliando a viabilidade prática do sistema proposto.

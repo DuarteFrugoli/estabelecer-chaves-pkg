@@ -1,22 +1,22 @@
 %\acsetup{foreign-format = {\emph}}
-% 
 
 %%% Numbers
 
 \DeclareAcronym{5G}{
 	short = 5G,
-	long  = Quinta Geração de Rede Móvel Celular,
+	long  = Quinta Geração de Redes Móveis Celulares,
 }
 
 \DeclareAcronym{6G}{
 	short = 6G,
-	long  = Sexta Geração de Rede Móvel Celular,
+	long  = Sexta Geração de Redes Móveis Celulares,
 }
 
 %%% A
+
 \DeclareAcronym{AC}{
 	short = AC,
-	long  = Autentidade certificadora,
+	long  = Autoridade Certificadora,
 	foreign = {\emph{Certification Authority}},
 }
 
@@ -27,15 +27,15 @@
 
 \DeclareAcronym{AWGN}{
 	short = AWGN,
-	long  = {Ruído Gaussiano Branco Aditivo},
-    foreign = {\emph{Additive white Gaussian noise}},
+	long  = Ruído Gaussiano Branco Aditivo,
+	foreign = {\emph{Additive White Gaussian Noise}},
 }
 
-
 %%% B
+
 \DeclareAcronym{B5G}{
 	short = B5G,
-	long  = 5G a Além,
+	long  = 5G e Além,
 	foreign = {\emph{5G and Beyond}},
 }
 
@@ -47,100 +47,107 @@
 
 \DeclareAcronym{BPSK}{
 	short = BPSK,
-	long  = Chaveamento de Fase Binário,
+	long  = Chaveamento por Deslocamento de Fase Binária,
 	foreign = {\emph{Binary Phase Shift Keying}},
 }
 
 \DeclareAcronym{BCH}{
 	short = BCH,
-	long  = Bose-Chaudhuri-Hocquenghem,
+	long  = Bose--Chaudhuri--Hocquenghem,
 }
-
 
 %%% C
+
 \DeclareAcronym{CIA}{
-	short = CIA,
-	long  = Confidencialidade Integridade Disponibilidade,
-	foreign = {\emph{Confidentiality Integrity Availability}},
+  short = CIA,
+  long  = {Confidencialidade, Integridade e Disponibilidade},
+  foreign = {\emph{Confidentiality, Integrity and Availability}},
 }
 
+
 %%% D
+
 \DeclareAcronym{DDoS}{
 	short = DDoS,
 	long  = Ataque Distribuído de Negação de Serviço,
 	foreign = {\emph{Distributed Denial of Service}},
 }
 
+\DeclareAcronym{DES}{
+	short = DES,
+	long  = Data Encryption Standard,
+}
+
+\DeclareAcronym{TDES}{
+	short = TDES,
+	long  = Triple Data Encryption Standard,
+}
+
 %%% E
+
 \DeclareAcronym{ECDH}{
 	short = ECDH,
-	long  = {\emph{Elliptic Curve Diffie-Hellman}},
+	long  = {\emph{Elliptic Curve Diffie--Hellman}},
 }
 
 %%% F
+
 \DeclareAcronym{FDP}{
 	short = FDP,
 	long  = Função Densidade de Probabilidade,
 }
 
-%%% G
-
-
-%%% H
-
-
 %%% I
-\DeclareAcronym{IPSec}{
-	short = IPSec,
-	long  = Segurança de protocolo de internet,
+
+\DeclareAcronym{IPsec}{
+	short = IPsec,
+	long  = Segurança do Protocolo Internet,
 	foreign = {\emph{Internet Protocol Security}},
 }
 
 \DeclareAcronym{IKE}{
 	short = IKE,
-	long  = Troca de chaves pela internet,
+	long  = Troca de Chaves pela Internet,
 	foreign = {\emph{Internet Key Exchange}},
 }
+
 \DeclareAcronym{IoT}{
 	short = IoT,
 	long  = Internet das Coisas,
 	foreign = {\emph{Internet of Things}},
 }
+
 \DeclareAcronym{ICV}{
 	short = ICV,
-	long  = Valor de confirmação de integridade,
-	foreign = {\emph{Integrity check value}},
+	long  = Valor de Verificação de Integridade,
+	foreign = {\emph{Integrity Check Value}},
 }
 
-
-
-%%% J
-
-
 %%% K
+
 \DeclareAcronym{KDR}{
 	short = KDR,
 	long  = Taxa de Discordância de Chaves,
 	foreign = {\emph{Key Disagreement Rate}},
 }
 
-
 %%% L
+
 \DeclareAcronym{LDPC}{
 	short = LDPC,
 	long  = Low-Density Parity-Check,
 }
 
-
 %%% M
+
 \DeclareAcronym{MIMO}{
 	short = MIMO,
-	long  = Múltiplas Entradas Múltiplas Saídas,
+	long  = Múltiplas Entradas e Múltiplas Saídas,
 	foreign = {\emph{Multiple-Input Multiple-Output}},
 }
 
-
 %%% N
+
 \DeclareAcronym{NIST}{
 	short = NIST,
 	long  = Instituto Nacional de Padrões e Tecnologia,
@@ -153,20 +160,17 @@
 	foreign = {\emph{Non-Line-of-Sight}},
 }
 
-%%% O
-
-
 %%% P
 
 \DeclareAcronym{PKG}{
 	short = PKG,
-	long  = Geração de Chaves em Camada Física,
+	long  = Geração de Chaves na Camada Física,
 	foreign = {\emph{Physical Layer Key Generation}},
 }
 
 \DeclareAcronym{PKI}{
 	short = PKI,
-	long  = Infraestrutura de chave pública,
+	long  = Infraestrutura de Chave Pública,
 	foreign = {\emph{Public Key Infrastructure}},
 }
 
@@ -177,32 +181,34 @@
 }
 
 %%% Q
+
 \DeclareAcronym{QKD}{
-    short = QKD,
-    long = Distribuição quântica de chaves,
-    foreign = {\emph{Quantum Key Distribution}},
+	short = QKD,
+	long  = Distribuição Quântica de Chaves,
+	foreign = {\emph{Quantum Key Distribution}},
 }
 
 \DeclareAcronym{QPSK}{
 	short = QPSK,
-	long  = Chaveamento de Fase Quadratura,
+	long  = Chaveamento por Deslocamento de Fase em Quadratura,
 	foreign = {\emph{Quadrature Phase Shift Keying}},
 }
 
 %%% R
+
 \DeclareAcronym{RSSI}{
 	short = RSSI,
-	long  = Indicador de Força de Sinal Recebido,
+	long  = Indicador da Intensidade do Sinal Recebido,
 	foreign = {\emph{Received Signal Strength Indicator}},
 }
 
 \DeclareAcronym{RSA}{
 	short = RSA,
-	long  = {\emph{Rivest-Shamir-Adleman}},
+	long  = {\emph{Rivest--Shamir--Adleman}},
 }
 
-
 %%% S
+
 \DeclareAcronym{SHA}{
 	short = SHA,
 	long  = Algoritmo de Hash Seguro,
@@ -211,72 +217,44 @@
 
 \DeclareAcronym{SNR}{
 	short = SNR,
-	long  = Relação Sinal-Ruído,
+	long  = Relação Sinal--Ruído,
 	foreign = {\emph{Signal-to-Noise Ratio}},
 }
 
-
 %%% T
+
 \DeclareAcronym{TLS}{
 	short = TLS,
-	long  = Segurança da camada de transporte,
+	long  = Segurança da Camada de Transporte,
 	foreign = {\emph{Transport Layer Security}},
 }
 
+\DeclareAcronym{TDD}{
+	short = TDD,
+	long  = Duplexação por Divisão no Tempo,
+	foreign = {\emph{Time Division Duplex}},
+}
+
 %%% U
+
 \DeclareAcronym{UAV}{
 	short = UAV,
-	long  = \emph{Unmanned Aerial Vehicle},
+	long  = Veículo Aéreo Não Tripulado,
+	foreign = {\emph{Unmanned Aerial Vehicle}},
 }
 
 %%% V
+
 \DeclareAcronym{VPN}{
-	short = VNP,
-	long  = Rede virtual privada,
+	short = VPN,
+	long  = Rede Virtual Privada,
 	foreign = {\emph{Virtual Private Network}},
 }
 
-%%% W
-
-
 %%% X
+
 \DeclareAcronym{XOR}{
 	short = XOR,
-	long  = Ou exclusivo,
-	foreign = {\emph{Exclusively-OR}},
- }
-
-%%% Y
-
-
-%%% Z
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	long  = Ou Exclusivo,
+	foreign = {\emph{Exclusive OR}},
+}
