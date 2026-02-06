@@ -1,0 +1,1 @@
+os gráficos do experimento 5 estão meio esquisitos, tenho que dar uma olhada neles.
