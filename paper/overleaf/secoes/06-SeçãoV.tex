@@ -118,21 +118,23 @@ O quinto experimento valida a aplicabilidade do sistema em cinco perfis represen
 \hline
 \textbf{Perfil} & \textbf{Velocidade} & \textbf{Frequência} & \textbf{$\rho_{\text{temporal}}$} & \textbf{SNR$_{\text{min}}$ (dB)} \\
 \hline
-Sensor estático & 0~km/h & 870~MHz & 1.000 & 13 \\
-Pessoa andando & 5~km/h & 2.4~GHz & 0.940 & 15 \\
-Veículo urbano & 60~km/h & 5.9~GHz & 0.160 & 13 \\
-Drone & 40~km/h & 2.4~GHz & 0.609 & 13 \\
-NB-IoT & 10~km/h & 900~MHz & 0.955 & 13 \\
+Sensor estático & 0~km/h & 868~MHz & 1.000 & 9 \\
+Pessoa andando & 5~km/h & 2.4~GHz & 0.940 & 11 \\
+Veículo urbano & 60~km/h & 5.9~GHz & 0.160 & 11 \\
+Drone & 40~km/h & 2.4~GHz & 0.609 & 11 \\
+NB-IoT & 10~km/h & 900~MHz & 0.955 & 11 \\
 \hline
 \end{tabular}
 \end{table}
+
+Observa-se que o perfil de sensor estático apresenta o melhor desempenho, atingindo \ac{KDR}~$<1\%$ em apenas $9$~dB devido à correlação temporal perfeita ($\rho=1.0$) e erro de estimação baixo ($8\%$). Os demais perfis convergem para \ac{KDR}~$<1\%$ em $11$~dB, e todos alcançam \ac{KDR} nula em $13$~dB.
 
 Um resultado notável é a operação bem-sucedida do sistema no cenário de veículo urbano ($60$~km/h, $\rho_{\text{temporal}} = 0.16$), demonstrando que o erro de estimação de canal controlado ($\leq 30\%$) é mais crítico para a viabilidade do sistema do que a correlação temporal propriamente dita. Esse insight sugere que estratégias de estimação robusta de canal são fundamentais para extensão do sistema a cenários de alta mobilidade.
 
 \begin{figure}[htbp]
 \centering
 % \includegraphics[width=0.8\textwidth]{figuras/exp05_perfis_dispositivos.png}
-\caption{Desempenho do sistema em cinco perfis de dispositivos IoT. Todos os perfis atingem KDR nula em SNR entre 13--15~dB, demonstrando ampla aplicabilidade.}
+\caption{Desempenho do sistema em cinco perfis de dispositivos IoT. \ac{KDR} inferior a 1\% é alcançada em SNR entre 9--11~dB, com \ac{KDR} nula atingida em 13~dB para todos os perfis.}
 \label{fig:exp05_perfis}
 \end{figure}
 

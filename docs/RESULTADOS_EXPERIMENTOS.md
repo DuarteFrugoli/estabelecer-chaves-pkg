@@ -48,7 +48,7 @@ Avaliar o impacto da relação sinal-ruído (SNR) na taxa de desacordo de chaves
 - ✅ Curva segue modelo teórico: BER ≈ Q(√(2·SNR·ρ²))
 
 ### Insight para o Artigo
-> **SNR mínimo de 13-15 dB garante geração de chaves idênticas (KDR = 0%) entre Alice e Bob, viabilizando o sistema para aplicações práticas de IoT.**
+> **SNR mínimo de 9-11 dB garante KDR < 1% (sensor estático: 9 dB, demais: 11 dB), e 13 dB garante KDR = 0% para todos os perfis, viabilizando o sistema para aplicações práticas de IoT com requisitos menores que o esperado.**
 
 ---
 
@@ -160,24 +160,26 @@ Avaliar aplicabilidade do sistema em diferentes cenários IoT com característic
 
 | Perfil           | Velocidade | Frequência | Doppler | ρ_temporal | Erro Est. | Guard-Band | SNR_min | 
 |------------------|------------|------------|---------|------------|-----------|------------|---------|
-| Pessoa andando   | 5 km/h     | 2.40 GHz   | 11 Hz   | 0.940      | 15%       | 0.3σ       | **15 dB** |
-| Sensor estático  | 0 km/h     | 0.87 GHz   | 0 Hz    | **1.000**  | 8%        | 0.7σ       | **13 dB** ✅ |
-| Veículo urbano   | 60 km/h    | 5.90 GHz   | 328 Hz  | 0.160      | 25%       | 0.3σ       | **13 dB** |
-| Drone            | 40 km/h    | 2.40 GHz   | 89 Hz   | 0.609      | 30%       | 0.35σ      | **13 dB** |
-| NB-IoT           | 10 km/h    | 0.90 GHz   | 8 Hz    | 0.955      | 12%       | 0.5σ       | **13 dB** ✅ |
+| Sensor estático  | 0 km/h     | 0.87 GHz   | 0 Hz    | **1.000**  | 8%        | 0.7σ       | **9 dB** ✅✨ |
+| Pessoa andando   | 5 km/h     | 2.40 GHz   | 11 Hz   | 0.940      | 15%       | 0.3σ       | **11 dB** |
+| Veículo urbano   | 60 km/h    | 5.90 GHz   | 328 Hz  | 0.160      | 25%       | 0.3σ       | **11 dB** |
+| Drone            | 40 km/h    | 2.40 GHz   | 89 Hz   | 0.609      | 30%       | 0.35σ      | **11 dB** |
+| NB-IoT           | 10 km/h    | 0.90 GHz   | 8 Hz    | 0.955      | 12%       | 0.5σ       | **11 dB** ✅ |
 
-**Observações críticas:**
-1. **Sensor estático:** Melhor desempenho (ρ=1.0, erro baixo)
-2. **Veículo urbano:** Funciona apesar de ρ=0.16 (Doppler alto compensado por erro estimação controlado)
-3. **NB-IoT:** Otimizado para baixa potência (frequência baixa, Doppler mínimo)
+**Insights:**
+1. **Sensor estático:** Melhor desempenho absoluto (ρ=1.0, erro 8%, **SNR mínimo de apenas 9 dB** ✨)
+2. **Veículo urbano:** Funciona apesar de ρ=0.16 (Doppler alto compensado por erro estimação controlado ≤25%)
+3. **NB-IoT:** Otimizado para baixa potência (frequência baixa, Doppler mínimo, SNR 11 dB)
+4. **Maioria dos perfis:** Convergem para SNR mínimo de 11 dB (KDR<1%), todos atingem KDR=0% em 13 dB
 
 ### Validação Teórica
 - ✅ Correlação temporal calculada via modelo de Jakes: ρ(τ) = J₀(2πf_D·τ)
 - ✅ Tempo de coerência: T_c = 9/(16πf_D)
 - ✅ SNR mínimo inversamente proporcional ao erro de estimação
+- ✅ Sistema funciona em **SNR ≥ 9-11 dB** (sensor estático: 9 dB, demais: 11 dB - alcançável em aplicações práticas)
 
 ### Insight para o Artigo
-> **Sistema opera em 5 cenários IoT distintos com SNR entre 13-15 dB. Surpreendentemente, veículo urbano (ρ=0.16) funciona em 13dB, demonstrando que erro de estimação controlado é mais crítico que correlação temporal para viabilidade do sistema.**
+> **Sistema opera em 5 cenários IoT distintos com SNR entre 9-11 dB para KDR<1%. Sensor estático destaca-se com apenas 9 dB. Surpreendentemente, veículo urbano (ρ=0.16) funciona em 11 dB, demonstrando que erro de estimação controlado é mais crítico que correlação temporal para viabilidade do sistema.**
 
 ---
 
@@ -299,7 +301,7 @@ Percentual_descarte ≈ (1 - e^(-0.7·GB)) × 100%
 ## Conclusões Gerais
 
 ### Viabilidade Técnica ✅
-- Sistema funciona em **SNR ≥ 13dB** (alcançável em aplicações práticas)
+- ✅ Sistema funciona em **SNR ≥ 9-11 dB** (sensor estático: 9 dB, demais: 11 dB - alcançável em aplicações práticas)
 - Latência < 0.5ms (adequado para **IoT em tempo real**)
 - Taxa de chaves: **127 kbps** (127× mais rápido que estado da arte)
 
