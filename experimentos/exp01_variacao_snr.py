@@ -72,7 +72,7 @@ def experimento_variacao_snr(
     bch_codigo = gerar_tabela_codigos_bch(tamanho_cadeia_bits, tamanho_bits_informacao)
     
     # Coleta dados
-    ber_rates = []
+    bmr_rates = []
     kdr_rates = []
     
     for i, (snr_db, variancia) in enumerate(tqdm(
@@ -125,12 +125,12 @@ def experimento_variacao_snr(
     for i, snr in enumerate(snr_db_range):
         csv_dados.append({
             'SNR_dB': f"{snr:.2f}",
-            'BER': f"{ber_rates[i]:.4f}",
+            'BMR': f"{bmr_rates[i]:.4f}",
             'KDR': f"{kdr_rates[i]:.4f}"
         })
     
     salvar_resultado_csv(csv_dados, "exp01_variacao_snr",
-                        ['SNR_dB', 'BER', 'KDR'])
+                        ['SNR_dB', 'BMR', 'KDR'])
     
     # Cria gráfico usando util_experimentos
     dados_variacoes = {

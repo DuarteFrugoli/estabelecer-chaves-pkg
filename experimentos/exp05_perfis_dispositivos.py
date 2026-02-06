@@ -134,7 +134,7 @@ def experimento_perfis_dispositivos(
         print()
         
         # Coleta dados para este perfil
-        ber_rates = []
+        bmr_rates = []
         kdr_rates = []
         
         for i, (snr_db, variancia) in enumerate(tqdm(

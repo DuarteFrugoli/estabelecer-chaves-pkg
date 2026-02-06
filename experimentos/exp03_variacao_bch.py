@@ -76,7 +76,7 @@ def experimento_variacao_bch(
         palavra_codigo = [random.randint(0, 1) for _ in range(n)]
         bch_codigo = gerar_tabela_codigos_bch(n, k)
         
-        ber_rates = []
+        bmr_rates = []
         kdr_rates = []
         
         for variancia in tqdm(variancias_ruido,
@@ -132,32 +132,32 @@ def experimento_variacao_bch(
     for i, snr in enumerate(snr_db_range):
         linha = {'SNR_dB': f"{snr:.2f}"}
         for codigo_str in dados_todos_codigos.keys():
-            linha[f'{codigo_str}_BER'] = f"{dados_todos_codigos[codigo_str]['ber_rates'][i]:.4f}"
+            linha[f'{codigo_str}_BMR'] = f"{dados_todos_codigos[codigo_str]['bmr_rates'][i]:.4f}"
             linha[f'{codigo_str}_KDR'] = f"{dados_todos_codigos[codigo_str]['kdr_rates'][i]:.4f}"
         csv_dados.append(linha)
     
-    colunas = ['SNR_dB'] + [f'{c}_{tipo}' for c in dados_todos_codigos.keys() for tipo in ['BER', 'KDR']]
+    colunas = ['SNR_dB'] + [f'{c}_{tipo}' for c in dados_todos_codigos.keys() for tipo in ['BMR', 'KDR']]
     salvar_resultado_csv(csv_dados, "exp03_variacao_bch", colunas)
     
     # Cria gráfico comparativo
     import matplotlib.pyplot as plt
     
     fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    fig.suptitle(f'Impacto do Código BCH no BER/KDR\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})',
+    fig.suptitle(f'Impacto do Código BCH no BMR/KDR\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})',
                 fontsize=14, fontweight='bold')
     
     cores = plt.cm.tab10(np.linspace(0, 1, len(dados_todos_codigos)))
-    titulos = ['BER Antes da Reconciliação', 'KDR Após Reconciliação BCH']
-    metricas = ['ber_rates', 'kdr_rates']
+    titulos = ['BMR Antes da Reconciliação', 'KDR Após Reconciliação BCH']
+    metricas = ['bmr_rates', 'kdr_rates']
     
     for i, (ax, titulo, metrica) in enumerate(zip(axes, titulos, metricas)):
         for j, (codigo_str, dados_codigo) in enumerate(dados_todos_codigos.items()):
-            ax.plot(snr_db_range, [x*100 for x in dados_codigo[metrica]],
+            ax.plot(snr_db_range, dados_codigo[metrica],
                    marker='o', linestyle='-', linewidth=2,
                    color=cores[j], label=f"{codigo_str} (t={dados_codigo['t']})")
         
         ax.set_xlabel('SNR (dB)')
-        ax.set_ylabel('BER/KDR (%)')
+        ax.set_ylabel('BMR/KDR (%)')
         ax.set_title(titulo)
         ax.grid(True, alpha=0.3)
         ax.legend()
