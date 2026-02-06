@@ -71,13 +71,13 @@ def experimento_comparacao_modulacao(
     for modulacao in ['bpsk', 'qpsk']:
         print(f"\n--- Testando {modulacao.upper()} ---")
         
-        ber_rates = []
+        bmr_rates = []
         kdr_rates = []
         
         for variancia in tqdm(variancias_ruido,
                              desc=f"  {modulacao.upper()}",
                              colour="cyan"):
-            ber, kdr = extrair_kdr(
+            bmr, kdr = extrair_kdr(
                 palavra_codigo,
                 rayleigh_param,
                 tamanho_cadeia_bits,
@@ -92,11 +92,11 @@ def experimento_comparacao_modulacao(
                 guard_band_sigma=0.0
             )
             
-            ber_rates.append(ber)
+            bmr_rates.append(bmr)
             kdr_rates.append(kdr)
         
         dados_modulacoes[modulacao] = {
-            'ber_rates': ber_rates,
+            'bmr_rates': bmr_rates,
             'kdr_rates': kdr_rates
         }
     
@@ -124,14 +124,14 @@ def experimento_comparacao_modulacao(
     for i, snr in enumerate(snr_db_range):
         csv_dados.append({
             'SNR_dB': f"{snr:.2f}",
-            'BPSK_BER': f"{dados_modulacoes['bpsk']['ber_rates'][i]:.4f}",
+            'BPSK_BMR': f"{dados_modulacoes['bpsk']['bmr_rates'][i]:.4f}",
             'BPSK_KDR': f"{dados_modulacoes['bpsk']['kdr_rates'][i]:.4f}",
-            'QPSK_BER': f"{dados_modulacoes['qpsk']['ber_rates'][i]:.4f}",
+            'QPSK_BMR': f"{dados_modulacoes['qpsk']['bmr_rates'][i]:.4f}",
             'QPSK_KDR': f"{dados_modulacoes['qpsk']['kdr_rates'][i]:.4f}"
         })
     
     salvar_resultado_csv(csv_dados, "exp02_comparacao_modulacao",
-                        ['SNR_dB', 'BPSK_BER', 'BPSK_KDR', 'QPSK_BER', 'QPSK_KDR'])
+                        ['SNR_dB', 'BPSK_BMR', 'BPSK_KDR', 'QPSK_BMR', 'QPSK_KDR'])
     
     # Cria gráfico comparativo
     import matplotlib.pyplot as plt
@@ -140,20 +140,20 @@ def experimento_comparacao_modulacao(
     fig.suptitle(f'Comparação BPSK vs QPSK\n(σ={rayleigh_param:.4f}, ρ={correlacao_canal})',
                 fontsize=14, fontweight='bold')
     
-    titulos = ['BER Antes da Reconciliação', 'KDR Após Reconciliação BCH']
-    metricas = ['ber_rates', 'kdr_rates']
+    titulos = ['BMR Antes da Reconciliação', 'KDR Após Reconciliação BCH']
+    metricas = ['bmr_rates', 'kdr_rates']
     
     for i, (ax, titulo, metrica) in enumerate(zip(axes, titulos, metricas)):
-        ax.plot(snr_db_range, [x*100 for x in dados_modulacoes['bpsk'][metrica]],
+        ax.plot(snr_db_range, dados_modulacoes['bpsk'][metrica],
                marker='o', linestyle='-', linewidth=2, color='blue',
                label='BPSK')
         
-        ax.plot(snr_db_range, [x*100 for x in dados_modulacoes['qpsk'][metrica]],
+        ax.plot(snr_db_range, dados_modulacoes['qpsk'][metrica],
                marker='s', linestyle='--', linewidth=2, color='red',
                label='QPSK')
         
         ax.set_xlabel('SNR (dB)')
-        ax.set_ylabel('BER/KDR (%)')
+        ax.set_ylabel('BMR/KDR (%)')
         ax.set_title(titulo)
         ax.grid(True, alpha=0.3)
         ax.legend()
@@ -166,7 +166,7 @@ def experimento_comparacao_modulacao(
     for modulacao in ['bpsk', 'qpsk']:
         print(f"\n--- Resultados para {modulacao.upper()} ---")
         imprimir_sumario_resultados({
-            'BER': dados_modulacoes[modulacao]['ber_rates'],
+            'BMR': dados_modulacoes[modulacao]['bmr_rates'],
             'KDR': dados_modulacoes[modulacao]['kdr_rates']
         })
     

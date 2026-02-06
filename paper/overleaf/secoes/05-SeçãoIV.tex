@@ -103,7 +103,7 @@ O \ac{KDR} mede a taxa de discordância após a reconciliação \ac{BCH}:
 \text{KDR} = \frac{\text{número de bits diferentes após reconciliação}}{\text{número total de bits}} \times 100\%.
 \end{equation}
 
-Idealmente, espera-se \ac{BER} proporcional à \ac{SNR} do canal e à correlação espacial, e \ac{KDR} $= 0\%$ após reconciliação bem-sucedida, desde que o número de erros não exceda a capacidade de correção do código \ac{BCH} ($t=10$ erros). Para avaliação de segurança, mede-se também a \ac{BER} de um atacante passivo (Eve) localizado a diferentes distâncias, esperando-se \ac{BER} $\approx 50\%$ quando Eve está descorrelacionado espacialmente ($\rho_{\text{espacial}} \approx 0$).
+Idealmente, espera-se \ac{BMR} proporcional à \ac{SNR} do canal e à correlação espacial, e \ac{KDR} $= 0\%$ após reconciliação bem-sucedida, desde que o número de erros não exceda a capacidade de correção do código \ac{BCH} ($t=10$ erros). Para avaliação de segurança, mede-se também a \ac{BER} de um atacante passivo (Eve) localizado a diferentes distâncias, esperando-se \ac{BER} $\approx 50\%$ quando Eve está descorrelacionado espacialmente ($\rho_{\text{espacial}} \approx 0$).
 
 \subsection{Experimentos Conduzidos}
 
@@ -111,15 +111,15 @@ Sete experimentos sistemáticos foram realizados para validação abrangente do 
 
 \subsubsection{Experimento 1: Impacto da Relação Sinal-Ruído}
 
-O primeiro experimento investiga o impacto da \ac{SNR} sobre a \ac{BER} inicial e o \ac{KDR} após reconciliação. A \ac{SNR} é variada logaritmicamente de $-10$~dB a $30$~dB em 18 pontos, mantendo-se fixos a correlação espacial $\rho = 0.9$, a modulação \ac{BPSK}, e o código \ac{BCH}(127,64,10). O objetivo é identificar o \ac{SNR} mínimo necessário para operação confiável do sistema, caracterizado por \ac{KDR} $= 0\%$ entre Alice e Bob.
+O primeiro experimento investiga o impacto da \ac{SNR} sobre a \ac{BMR} inicial e o \ac{KDR} após reconciliação. A \ac{SNR} é variada logaritmicamente de $-10$~dB a $30$~dB em 18 pontos, mantendo-se fixos a correlação espacial $\rho = 0.9$, a modulação \ac{BPSK}, e o código \ac{BCH}(127,64,10). O objetivo é identificar o \ac{SNR} mínimo necessário para operação confiável do sistema, caracterizado por \ac{KDR} $= 0\%$ entre Alice e Bob.
 
 \subsubsection{Experimento 2: Comparação entre BPSK e QPSK}
 
-Este experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1 bit/símbolo) e \ac{QPSK} (2 bits/símbolo) em termos de \ac{BER} e \ac{KDR}. Mantém-se correlação espacial $\rho = 0.9$ e varia-se a \ac{SNR} conforme o Experimento~1. A modulação \ac{QPSK}, embora ofereça maior eficiência espectral, apresenta maior sensibilidade a ruído e erros de fase, o que pode aumentar ligeiramente o \ac{KDR} em regimes de baixa \ac{SNR}.
+Este experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1 bit/símbolo) e \ac{QPSK} (2 bits/símbolo) em termos de \ac{BMR} e \ac{KDR}. Mantém-se correlação espacial $\rho = 0.9$ e varia-se a \ac{SNR} conforme o Experimento~1. A modulação \ac{QPSK}, embora ofereça maior eficiência espectral, apresenta maior sensibilidade a ruído e erros de fase, o que pode aumentar ligeiramente o \ac{KDR} em regimes de baixa \ac{SNR}.
 
 \subsubsection{Experimento 3: Variação do Código BCH}
 
-Avalia-se o desempenho de diferentes códigos \ac{BCH} na etapa de reconciliação: \ac{BCH}(7,4,1), \ac{BCH}(15,7,2) e \ac{BCH}(127,64,10). Códigos com maior capacidade de correção ($t$ maior) tendem a reduzir o \ac{KDR} em cenários com maior \ac{BER} inicial, ao custo de redução na taxa de código ($R = k/n$) e maior complexidade computacional. O experimento identifica o código que oferece melhor compromisso entre robustez e eficiência.
+Avalia-se o desempenho de diferentes códigos \ac{BCH} na etapa de reconciliação: \ac{BCH}(7,4,1), \ac{BCH}(15,7,2) e \ac{BCH}(127,64,10). Códigos com maior capacidade de correção ($t$ maior) tendem a reduzir o \ac{KDR} em cenários com maior \ac{BMR} inicial, ao custo de redução na taxa de código ($R = k/n$) e maior complexidade computacional. O experimento identifica o código que oferece melhor compromisso entre robustez e eficiência.
 
 \subsubsection{Experimento 4: Análise de Complexidade Computacional}
 

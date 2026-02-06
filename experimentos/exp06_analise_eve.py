@@ -155,7 +155,7 @@ def experimento_eve_espacial(
     
     # Teste Alice-Bob primeiro (referência de KDR legítimo)
     print("Testando Alice-Bob (referência)...")
-    ber_bob, kdr_bob_valor = extrair_kdr(
+    bmr_bob, kdr_bob_valor = extrair_kdr(
         palavra_codigo=palavra_codigo,
         rayleigh_param=rayleigh_param,
         tamanho_cadeia_bits=tamanho_cadeia_bits,
@@ -170,7 +170,7 @@ def experimento_eve_espacial(
         guard_band_sigma=guard_band_sigma
     )
     
-    print(f"[OK] BER Bob: {ber_bob:.2f}%")
+    print(f"[OK] BMR Bob: {bmr_bob:.2f}%")
     print(f"[OK] KDR Bob (pós-BCH): {kdr_bob_valor:.2f}%\n")
     
     # Loop sobre distâncias de Eve

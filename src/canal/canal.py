@@ -433,12 +433,12 @@ def extrair_kdr(palavra_codigo, rayleigh_param, tamanho_cadeia_bits, quantidade_
             chave_bob_amplificada = amplificacao_privacidade(chave)
         
     # Calcula taxas de erro
-    ber = 100.0 * total_erros_raw / total_bits  # BER: antes reconciliação
+    bmr = 100.0 * total_erros_raw / total_bits  # BMR: antes reconciliação (Bit Mismatch Rate)
     kdr = 100.0 * total_erros_pos_reconciliacao / total_bits  # KDR: após reconciliação
     
-    # Retorna sempre (ber, kdr) independente de usar_amplificacao
+    # Retorna sempre (bmr, kdr) independente de usar_amplificacao
     # Amplificação é aplicada internamente mas não retorna métrica separada
-    return ber, kdr
+    return bmr, kdr
 
 
 def gerar_chave_do_canal(h_estimado, guard_band_sigma=0.0, limiar=None):

@@ -81,7 +81,7 @@ def experimento_variacao_snr(
         desc="Testando SNR",
         colour="green"
     )):
-        ber, kdr = extrair_kdr(
+        bmr, kdr = extrair_kdr(
             palavra_codigo,
             rayleigh_param,
             tamanho_cadeia_bits,
@@ -96,7 +96,7 @@ def experimento_variacao_snr(
             guard_band_sigma=0.0
         )
         
-        ber_rates.append(ber)
+        bmr_rates.append(bmr)
         kdr_rates.append(kdr)
     
     # Prepara resultados
@@ -112,7 +112,7 @@ def experimento_variacao_snr(
             'snr_pontos': snr_pontos
         },
         'snr_db': snr_db_range.tolist(),
-        'ber_rates': ber_rates,
+        'bmr_rates': bmr_rates,
         'kdr_rates': kdr_rates
     }
     
@@ -135,7 +135,7 @@ def experimento_variacao_snr(
     # Cria gráfico usando util_experimentos
     dados_variacoes = {
         'Padrão': {
-            'ber_rates': ber_rates,
+            'bmr_rates': bmr_rates,
             'kdr_rates': kdr_rates
         }
     }
@@ -144,14 +144,14 @@ def experimento_variacao_snr(
     criar_grafico_comparativo_kdr(
         snr_db=snr_db_range,
         dados_variacoes=dados_variacoes,
-        titulo=f"Impacto da SNR no BER/KDR (σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})",
+        titulo=f"Impacto da SNR no BMR/KDR (σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})",
         xlabel="SNR (dB)",
         nome_arquivo="exp01_variacao_snr"
     )
     
     # Sumário
     imprimir_sumario_resultados({
-        'BER': ber_rates,
+        'BMR': bmr_rates,
         'KDR': kdr_rates
     })
     

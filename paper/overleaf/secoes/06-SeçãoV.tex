@@ -5,7 +5,7 @@ Esta seção apresenta os resultados dos sete experimentos sistemáticos conduzi
 
 \subsection{Experimento 1: Impacto da Relação Sinal-Ruído}
 
-O primeiro experimento investiga o impacto da \ac{SNR} sobre a \ac{BER} inicial e o \ac{KDR} após reconciliação. A \ac{SNR} foi variada logaritmicamente de $-10$~dB a $30$~dB em 18 pontos, mantendo fixos a correlação espacial $\rho = 0.9$, a modulação \ac{BPSK}, e o código \ac{BCH}(127,64,10).
+O primeiro experimento investiga o impacto da \ac{SNR} sobre a \ac{BMR} inicial e o \ac{KDR} após reconciliação. A \ac{SNR} foi variada logaritmicamente de $-10$~dB a $30$~dB em 18 pontos, mantendo fixos a correlação espacial $\rho = 0.9$, a modulação \ac{BPSK}, e o código \ac{BCH}(127,64,10).
 
 A Figura~\ref{fig:exp01_snr} apresenta a curva característica do \ac{KDR} em função da \ac{SNR}. Observa-se que o \ac{KDR} decresce exponencialmente com o aumento da \ac{SNR}, atingindo valores próximos a zero a partir de aproximadamente $13$--$15$~dB. A Tabela~\ref{tab:exp01_snr} apresenta os valores numéricos obtidos para pontos selecionados da curva.
 
@@ -22,7 +22,7 @@ A Figura~\ref{fig:exp01_snr} apresenta a curva característica do \ac{KDR} em fu
 \label{tab:exp01_snr}
 \begin{tabular}{cccc}
 \hline
-\textbf{SNR (dB)} & \textbf{BER (\%)} & \textbf{KDR (\%)} & \textbf{Status} \\
+\textbf{SNR (dB)} & \textbf{BMR (\%)} & \textbf{KDR (\%)} & \textbf{Status} \\
 \hline
 $-10.00$ & $44.45$ & $47.49$ & Canal ruidoso \\
 $0.00$ & $24.56$ & $37.12$ & Insuficiente \\
@@ -40,7 +40,7 @@ Os resultados demonstram que um \ac{SNR} mínimo de $13$--$15$~dB é necessário
 
 O segundo experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1~bit/símbolo) e \ac{QPSK} (2~bits/símbolo). Manteve-se correlação espacial $\rho = 0.9$ e variou-se a \ac{SNR} conforme o Experimento~1.
 
-A Tabela~\ref{tab:exp02_modulacao} apresenta a comparação entre as duas modulações para valores selecionados de \ac{SNR}. Os resultados indicam desempenho muito similar entre \ac{BPSK} e \ac{QPSK}, com diferenças marginais de \ac{BER} e \ac{KDR} que se tornam desprezíveis em regime de alta \ac{SNR}.
+A Tabela~\ref{tab:exp02_modulacao} apresenta a comparação entre as duas modulações para valores selecionados de \ac{SNR}. Os resultados indicam desempenho muito similar entre \ac{BPSK} e \ac{QPSK}, com diferenças marginais de \ac{BMR} e \ac{KDR} que se tornam desprezíveis em regime de alta \ac{SNR}.
 
 \begin{table}[htbp]
 \centering
@@ -49,7 +49,7 @@ A Tabela~\ref{tab:exp02_modulacao} apresenta a comparação entre as duas modula
 \label{tab:exp02_modulacao}
 \begin{tabular}{c|cc|cc}
 \hline
-\multirow{2}{*}{\textbf{SNR (dB)}} & \multicolumn{2}{c|}{\textbf{BER (\%)}} & \multicolumn{2}{c}{\textbf{KDR (\%)}} \\
+\multirow{2}{*}{\textbf{SNR (dB)}} & \multicolumn{2}{c|}{\textbf{BMR (\%)}} & \multicolumn{2}{c}{\textbf{KDR (\%)}} \\
 \cline{2-5}
  & \textbf{BPSK} & \textbf{QPSK} & \textbf{BPSK} & \textbf{QPSK} \\
 \hline

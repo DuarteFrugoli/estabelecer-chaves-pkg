@@ -92,7 +92,7 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
                                    nome_arquivo, 
                                    legenda_template=None):
     """
-    Cria gráfico comparativo de BER e KDR para diferentes variações de parâmetro
+    Cria gráfico comparativo de BMR e KDR para diferentes variações de parâmetro
     
     Args:
         snr_db: Array com valores de SNR
@@ -108,11 +108,11 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
     cores = plt.cm.tab10(np.linspace(0, 1, len(dados_variacoes)))
     
     titulos_subplots = [
-        'BER (antes da reconciliação)',
+        'BMR (antes da reconciliação)',
         'KDR (após reconciliação BCH)'
     ]
     
-    metricas = ['ber_rates', 'kdr_rates']
+    metricas = ['bmr_rates', 'kdr_rates']
     
     for i, (metrica, titulo_sub) in enumerate(zip(metricas, titulos_subplots)):
         ax = axes[i]
@@ -128,7 +128,7 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
                    color=cores[j], label=label)
         
         ax.set_xlabel(xlabel)
-        ylabel = 'BER (%)' if metrica == 'ber_rates' else 'KDR (%)'
+        ylabel = 'BMR (%)' if metrica == 'bmr_rates' else 'KDR (%)'
         ax.set_ylabel(ylabel)
         ax.set_title(titulo_sub)
         ax.grid(True, alpha=0.3)

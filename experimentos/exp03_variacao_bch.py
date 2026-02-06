@@ -83,7 +83,7 @@ def experimento_variacao_bch(
                              desc=f"  BCH({n},{k})",
                              leave=False,
                              colour="green"):
-            ber, kdr = extrair_kdr(
+            bmr, kdr = extrair_kdr(
                 palavra_codigo,
                 rayleigh_param,
                 n,
@@ -98,12 +98,12 @@ def experimento_variacao_bch(
                 guard_band_sigma=0.0
             )
             
-            ber_rates.append(ber)
+            bmr_rates.append(bmr)
             kdr_rates.append(kdr)
         
         codigo_str = f"BCH({n},{k})"
         dados_todos_codigos[codigo_str] = {
-            'ber_rates': ber_rates,
+            'bmr_rates': bmr_rates,
             'kdr_rates': kdr_rates,
             'n': n,
             'k': k,

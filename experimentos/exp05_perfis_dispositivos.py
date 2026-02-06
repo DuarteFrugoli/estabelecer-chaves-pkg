@@ -143,7 +143,7 @@ def experimento_perfis_dispositivos(
             desc=f"SNR {perfil_nome}",
             colour="cyan"
         )):
-            ber, kdr = extrair_kdr(
+            bmr, kdr = extrair_kdr(
                 palavra_codigo,
                 rayleigh_param,
                 tamanho_cadeia_bits,
@@ -158,7 +158,7 @@ def experimento_perfis_dispositivos(
                 guard_band_sigma=guard_band_sigma  # Usa guard band do perfil
             )
             
-            ber_rates.append(ber)
+            bmr_rates.append(bmr)
             kdr_rates.append(kdr)
         
         # Armazena resultados
@@ -166,7 +166,7 @@ def experimento_perfis_dispositivos(
             'config': config,
             'params_canal': params_canal,
             'snr_db': snr_db_range.tolist(),
-            'ber_rates': ber_rates,
+            'bmr_rates': bmr_rates,
             'kdr_rates': kdr_rates,
         }
         
@@ -198,7 +198,7 @@ def experimento_perfis_dispositivos(
         'freq_doppler_hz': [],
         'correlacao_temporal': [],
         'snr_db': [],
-        'ber': [],
+        'bmr': [],
         'kdr': [],
     }
     
@@ -206,9 +206,9 @@ def experimento_perfis_dispositivos(
         config = resultado['config']
         params = resultado['params_canal']
         
-        for snr, ber, kdr in zip(
+        for snr, bmr, kdr in zip(
             resultado['snr_db'],
-            resultado['ber_rates'],
+            resultado['bmr_rates'],
             resultado['kdr_rates']
         ):
             csv_data['perfil'].append(perfil_nome)
@@ -220,7 +220,7 @@ def experimento_perfis_dispositivos(
             csv_data['freq_doppler_hz'].append(params['freq_doppler_hz'])
             csv_data['correlacao_temporal'].append(params['correlacao_temporal'])
             csv_data['snr_db'].append(snr)
-            csv_data['ber'].append(ber)
+            csv_data['bmr'].append(bmr)
             csv_data['kdr'].append(kdr)
     
     # Salva CSV
@@ -349,12 +349,12 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
         'nb_iot': 'NB-IoT (10 km/h, ρ≈0.95)'
     }
     
-    # Plot 1: BER (antes da reconciliação)
+    # Plot 1: BMR (antes da reconciliação)
     for perfil, dados in dados_grafico.items():
-        # CORREÇÃO: BER já está em porcentagem (0-100), não precisa multiplicar
+        # CORREÇÃO: BMR já está em porcentagem (0-100), não precisa multiplicar
         axes[0].plot(
             dados['snr_db'],
-            dados['ber_rates'],  # Já está em %
+            dados['bmr_rates'],  # Já está em %
             marker='o',
             linewidth=2.5,
             markersize=6,
@@ -364,15 +364,15 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
         )
     
     axes[0].set_xlabel('SNR (dB)', fontsize=13, fontweight='bold')
-    axes[0].set_ylabel('BER (%)', fontsize=13, fontweight='bold')
-    axes[0].set_title('BER Antes da Reconciliação BCH', fontsize=14, fontweight='bold')
+    axes[0].set_ylabel('BMR (%)', fontsize=13, fontweight='bold')
+    axes[0].set_title('BMR Antes da Reconciliação BCH', fontsize=14, fontweight='bold')
     axes[0].legend(loc='upper right', fontsize=9, framealpha=0.95)
     axes[0].grid(True, alpha=0.3, linestyle='--')
     axes[0].set_xlim([min(dados_grafico[list(dados_grafico.keys())[0]]['snr_db']), 
                       max(dados_grafico[list(dados_grafico.keys())[0]]['snr_db'])])
-    # Ajusta ylim automaticamente se BER > 50%
-    max_ber = max(max(d['ber_rates']) for d in dados_grafico.values())
-    axes[0].set_ylim([0, min(60, max_ber * 1.1)])
+    # Ajusta ylim automaticamente se BMR > 50%
+    max_bmr = max(max(d['bmr_rates']) for d in dados_grafico.values())
+    axes[0].set_ylim([0, min(60, max_bmr * 1.1)])
     
     # Plot 2: KDR (após reconciliação BCH)
     for perfil, dados in dados_grafico.items():

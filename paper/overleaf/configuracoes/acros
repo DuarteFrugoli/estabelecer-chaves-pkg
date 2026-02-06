@@ -45,6 +45,12 @@
 	foreign = {\emph{Bit Error Rate}},
 }
 
+\DeclareAcronym{BMR}{
+	short = BMR,
+	long  = Taxa de Discrepância de Bits,
+	foreign = {\emph{Bit Mismatch Rate}},
+}
+
 \DeclareAcronym{BPSK}{
 	short = BPSK,
 	long  = Chaveamento por Deslocamento de Fase Binária,

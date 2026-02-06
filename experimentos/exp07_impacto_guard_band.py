@@ -76,7 +76,7 @@ def experimento_impacto_guard_band(
     resultados = {
         'guard_band': [],
         'kdr_bob': [],
-        'ber_bob': [],
+        'bmr_bob': [],
         'ber_eve_raw': [],
         'ber_eve_pos_bch': [],
         'taxa_bits_bps': [],
@@ -89,7 +89,7 @@ def experimento_impacto_guard_band(
     for gb in tqdm(guard_bands, desc="Guard-band"):
         
         # ===== TESTE ALICE-BOB (LEGÍTIMO) =====
-        ber_bob, kdr_bob = extrair_kdr(
+        bmr_bob, kdr_bob = extrair_kdr(
             palavra_codigo=palavra_codigo,
             rayleigh_param=rayleigh_param,
             tamanho_cadeia_bits=tamanho_cadeia_bits,
@@ -141,7 +141,7 @@ def experimento_impacto_guard_band(
         # Armazenar
         resultados['guard_band'].append(gb)
         resultados['kdr_bob'].append(kdr_bob)
-        resultados['ber_bob'].append(ber_bob)
+        resultados['bmr_bob'].append(bmr_bob)
         resultados['ber_eve_raw'].append(ber_eve_raw)
         resultados['ber_eve_pos_bch'].append(ber_eve_pos_bch)
         resultados['taxa_bits_bps'].append(taxa_bits_bps)
@@ -164,7 +164,7 @@ def experimento_impacto_guard_band(
         dados_csv.append({
             'guard_band_sigma': resultados['guard_band'][i],
             'kdr_bob': resultados['kdr_bob'][i],
-            'ber_bob': resultados['ber_bob'][i],
+            'bmr_bob': resultados['bmr_bob'][i],
             'ber_eve_raw': resultados['ber_eve_raw'][i],
             'ber_eve_pos_bch': resultados['ber_eve_pos_bch'][i],
             'taxa_bits_bps': resultados['taxa_bits_bps'][i],
@@ -173,7 +173,7 @@ def experimento_impacto_guard_band(
             'correlacao_h_eve': resultados['corr_h_eve'][i]
         })
     
-    colunas_csv = ['guard_band_sigma', 'kdr_bob', 'ber_bob', 'ber_eve_raw', 
+    colunas_csv = ['guard_band_sigma', 'kdr_bob', 'bmr_bob', 'ber_eve_raw', 
                    'ber_eve_pos_bch', 'taxa_bits_bps', 'percentual_descartado',
                    'correlacao_h_bob', 'correlacao_h_eve']
     
