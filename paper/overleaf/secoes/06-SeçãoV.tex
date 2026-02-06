@@ -1,38 +1,213 @@
 \section{Resultados e Discussão}
 \label{sec:results}
 
-Foram conduzidos seis experimentos sistemáticos para avaliar o desempenho do
-sistema sob diferentes condições operacionais. Cada experimento foi projetado
-para isolar o impacto de um parâmetro específico sobre o \ac{KDR}.
+Esta seção apresenta os resultados dos sete experimentos sistemáticos conduzidos para validação do sistema de geração de chaves em camada física. Os experimentos cobrem aspectos de desempenho, segurança, complexidade computacional e aplicabilidade prática em diferentes cenários \ac{IoT}. Todas as simulações empregaram análise de Monte Carlo com 1000 realizações independentes, garantindo significância estatística dos resultados.
 
 \subsection{Experimento 1: Impacto da Relação Sinal-Ruído}
 
-Este experimento investiga o impacto da \ac{SNR} sobre a \ac{KDR}. Para isso, a \ac{SNR} é variada de $-10$ dB a $30$ dB em 18 pontos logaritmicamente espaçados. Mantêm-se fixos o parâmetro do canal Rayleigh $\sigma = 1/\sqrt{2}$, o esquema de modulação \ac{BPSK} e o código corretor \ac{BCH}(127,64,10). Espera-se que o \ac{KDR} diminua monotonicamente com o aumento da \ac{SNR}, uma vez que a melhoria na qualidade do sinal reduz discrepâncias nas observações do canal e, consequentemente, na quantização dos bits gerados, resultando em sequências reconciliadas, ou seja, a chave simétrica, iguais com maior frequência .
+O primeiro experimento investiga o impacto da \ac{SNR} sobre a \ac{BER} inicial e o \ac{KDR} após reconciliação. A \ac{SNR} foi variada logaritmicamente de $-10$~dB a $30$~dB em 18 pontos, mantendo fixos a correlação espacial $\rho = 0.9$, a modulação \ac{BPSK}, e o código \ac{BCH}(127,64,10).
 
-\subsection{Experimento 2: Influência do Parâmetro Rayleigh}
+A Figura~\ref{fig:exp01_snr} apresenta a curva característica do \ac{KDR} em função da \ac{SNR}. Observa-se que o \ac{KDR} decresce exponencialmente com o aumento da \ac{SNR}, atingindo valores próximos a zero a partir de aproximadamente $13$--$15$~dB. A Tabela~\ref{tab:exp01_snr} apresenta os valores numéricos obtidos para pontos selecionados da curva.
 
-Este experimento analisa o efeito do parâmetro de escala $\sigma$ no desvanecimento Rayleigh, considerando valores $\sigma \in \{0.5, 1/\sqrt{2}, 1.0, 2.0\}$. A \ac{SNR} é mantida fixa em 15 dB. Como $\sigma$ controla a variância dos coeficientes do canal, valores maiores implicam maior dispersão estatística nas amplitudes do desvanecimento, podendo impactar diretamente a entropia extraída e a taxa de discordância entre as chaves geradas.
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.8\textwidth]{figuras/exp01_variacao_snr.png}
+\caption{Taxa de Desacordo de Chaves (KDR) em função da Relação Sinal-Ruído (SNR). A curva mostra decaimento exponencial, atingindo KDR nula a partir de 13--15~dB.}
+\label{fig:exp01_snr}
+\end{figure}
 
-\subsection{Experimento 3: Comparação entre \ac{BPSK} e \ac{QPSK}}
+\begin{table}[htbp]
+\centering
+\caption{Desempenho do sistema para valores selecionados de SNR.}
+\label{tab:exp01_snr}
+\begin{tabular}{cccc}
+\hline
+\textbf{SNR (dB)} & \textbf{BER (\%)} & \textbf{KDR (\%)} & \textbf{Status} \\
+\hline
+$-10.00$ & $44.45$ & $47.49$ & Canal ruidoso \\
+$0.00$ & $24.56$ & $37.12$ & Insuficiente \\
+$8.82$ & $5.40$ & $2.79$ & Limiar de operação \\
+$11.18$ & $3.38$ & $0.03$ & Operacional \\
+$13.53$ & $2.06$ & $0.00$ & Ideal \\
+$\geq 15.88$ & $\leq 1.27$ & $0.00$ & Ideal \\
+\hline
+\end{tabular}
+\end{table}
 
-Este experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1 bit/símbolo) e \ac{QPSK} (2 bits/símbolo) em termos de \ac{KDR}. Mantém-se $\sigma = 1/\sqrt{2}$, enquanto a \ac{SNR} é variada conforme o Experimento 1. Espera-se que a modulação \ac{QPSK} apresente uma taxa de discordância ligeiramente superior em regimes de baixa \ac{SNR}, devido à maior sensibilidade a ruído e erros de fase, embora possa oferecer maior eficiência espectral.
+Os resultados demonstram que um \ac{SNR} mínimo de $13$--$15$~dB é necessário para operação confiável do sistema, caracterizada por \ac{KDR} nula entre Alice e Bob. Esse requisito é plenamente alcançável em aplicações práticas de \ac{IoT}, sendo compatível com enlaces de comunicação típicos em ambientes internos e urbanos.
 
-\subsection{Experimento 4: Variação da Correlação entre Canais Legítimos}
+\subsection{Experimento 2: Comparação entre BPSK e QPSK}
 
-Este experimento investiga o impacto do coeficiente de correlação $\rho$ entre os canais observados por Alice e Bob, testando valores $\rho \in \{0.7, 0.8, 0.9, 0.95\}$. Valores de $\rho$ próximos de 1 indicam canais altamente correlacionados, condição ideal para geração eficiente de chaves. Por outro lado, valores menores simulam efeitos como separação espacial, imperfeições de estimação ou variações temporais que reduzem a similaridade entre as observações, aumentando o \ac{KDR}.
+O segundo experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1~bit/símbolo) e \ac{QPSK} (2~bits/símbolo). Manteve-se correlação espacial $\rho = 0.9$ e variou-se a \ac{SNR} conforme o Experimento~1.
 
-\subsection{Experimento 5: Comparação de Códigos \ac{BCH}}
+A Tabela~\ref{tab:exp02_modulacao} apresenta a comparação entre as duas modulações para valores selecionados de \ac{SNR}. Os resultados indicam desempenho muito similar entre \ac{BPSK} e \ac{QPSK}, com diferenças marginais de \ac{BER} e \ac{KDR} que se tornam desprezíveis em regime de alta \ac{SNR}.
 
-Neste experimento, avalia-se o desempenho de diferentes códigos \ac{BCH} na etapa de reconciliação da informação, considerando as configurações (7,4,1), (15,7,2), (127,64,10) e (255,139,15). Códigos com maior capacidade de correção ($t$ maior) tendem a reduzir o \ac{KDR} em cenários com maior taxa de erro, ao custo de aumento na complexidade computacional e maior vazamento potencial de informação pública durante a reconciliação.
+\begin{table}[htbp]
+\centering
+\caption{Comparação de desempenho entre modulação BPSK e QPSK.}
+\label{tab:exp02_modulacao}
+\begin{tabular}{ccccc}
+\hline
+\textbf{SNR (dB)} & \textbf{BPSK BER (\%)} & \textbf{QPSK BER (\%)} & \textbf{BPSK KDR (\%)} & \textbf{QPSK KDR (\%)} \\
+\hline
+$8.82$ & $5.55$ & $5.47$ & $2.93$ & $3.37$ \\
+$11.18$ & $3.40$ & $3.33$ & $0.15$ & $0.20$ \\
+$13.53$ & $2.00$ & $2.03$ & $0.00$ & $0.03$ \\
+$30.00$ & $0.06$ & $0.05$ & $0.00$ & $0.00$ \\
+\hline
+\end{tabular}
+\end{table}
 
-\subsection{Experimento 6: Análise de Complexidade Computacional}
+A equivalência de desempenho entre \ac{BPSK} e \ac{QPSK} para geração de chaves em camada física é um resultado relevante, indicando que a escolha da modulação pode ser guiada por outros requisitos do sistema (eficiência espectral, simplicidade de implementação) sem impacto significativo na qualidade das chaves geradas.
 
-Por fim, este experimento avalia o tempo de execução das principais operações do sistema, incluindo modulação, codificação e decodificação \ac{BCH}, bem como a aplicação da função hash na amplificação de privacidade. O objetivo é analisar como a complexidade computacional varia em função do comprimento do código e verificar a viabilidade prática do sistema em dispositivos \ac{IoT} com recursos limitados de processamento e energia.
+\subsection{Experimento 3: Variação do Código BCH}
 
-Todos os experimentos foram executados com 1000 realizações de Monte Carlo no
-modo completo, garantindo significância estatística dos resultados. Os dados
-foram salvos em formato JSON para análise posterior, e gráficos em alta resolução (300 DPI) foram gerados utilizando Matplotlib.
+O terceiro experimento avalia o desempenho de diferentes códigos \ac{BCH} na etapa de reconciliação: \ac{BCH}(7,4,1), \ac{BCH}(15,7,2) e \ac{BCH}(127,64,10). A Tabela~\ref{tab:exp03_bch} apresenta os resultados obtidos para \ac{SNR} de $11.18$~dB.
 
-A próxima seção apresenta os resultados numéricos obtidos a partir desses
-experimentos, analisando o comportamento do \ac{KDR} em diferentes cenários e
-avaliando a viabilidade prática do sistema proposto.
+\begin{table}[htbp]
+\centering
+\caption{Comparação de desempenho entre diferentes códigos BCH (SNR = 11.18~dB).}
+\label{tab:exp03_bch}
+\begin{tabular}{cccccc}
+\hline
+\textbf{Código} & \textbf{n} & \textbf{k} & \textbf{t} & \textbf{Taxa} & \textbf{KDR (\%)} \\
+\hline
+BCH(7,4) & 7 & 4 & 1 & 0.57 & 0.77 \\
+BCH(15,7) & 15 & 7 & 2 & 0.47 & 0.21 \\
+BCH(127,64) & 127 & 64 & 10 & 0.50 & \textbf{0.09} \\
+\hline
+\end{tabular}
+\end{table}
+
+Os resultados confirmam que o código \ac{BCH}(127,64,10), com capacidade de correção de até $t=10$ erros, oferece o melhor compromisso entre robustez e eficiência (taxa de código $R = 0.50$), justificando sua escolha para o sistema proposto.
+
+\subsection{Experimento 4: Análise de Complexidade Computacional}
+
+O quarto experimento mede o tempo de execução das principais operações do sistema para diferentes códigos \ac{BCH}. A Tabela~\ref{tab:exp04_complexidade} apresenta os tempos médios de codificação, decodificação e processamento total.
+
+\begin{table}[htbp]
+\centering
+\caption{Análise de complexidade computacional para diferentes códigos BCH.}
+\label{tab:exp04_complexidade}
+\begin{tabular}{cccc}
+\hline
+\textbf{Código} & \textbf{Codificação (ms)} & \textbf{Decodificação (ms)} & \textbf{Total (ms)} \\
+\hline
+BCH(7,4) & 0.042 & 0.126 & 0.168 \\
+BCH(15,7) & 0.061 & 0.163 & 0.224 \\
+BCH(127,64) & 0.061 & 0.428 & \textbf{0.489} \\
+BCH(255,139) & 0.052 & 0.447 & 0.499 \\
+\hline
+\end{tabular}
+\end{table}
+
+O tempo de processamento de $0.489$~ms para o código \ac{BCH}(127,64) corresponde a uma capacidade teórica de aproximadamente $2044$ operações por segundo, demonstrando a viabilidade do sistema para aplicações de \ac{IoT} em tempo real, mesmo em dispositivos de baixo custo operando em software.
+
+\subsection{Experimento 5: Perfis de Dispositivos IoT}
+
+O quinto experimento valida a aplicabilidade do sistema em cinco perfis representativos de dispositivos \ac{IoT}, cada um caracterizado por parâmetros físicos realistas de mobilidade, frequência de operação e condições de canal. A Tabela~\ref{tab:exp05_perfis} apresenta os parâmetros e resultados para cada perfil.
+
+\begin{table}[htbp]
+\centering
+\caption{Perfis de dispositivos IoT e SNR mínimo operacional.}
+\label{tab:exp05_perfis}
+\begin{tabular}{lcccc}
+\hline
+\textbf{Perfil} & \textbf{Velocidade} & \textbf{Frequência} & \textbf{$\rho_{\text{temporal}}$} & \textbf{SNR$_{\text{min}}$ (dB)} \\
+\hline
+Sensor estático & 0~km/h & 870~MHz & 1.000 & 13 \\
+Pessoa andando & 5~km/h & 2.4~GHz & 0.940 & 15 \\
+Veículo urbano & 60~km/h & 5.9~GHz & 0.160 & 13 \\
+Drone & 40~km/h & 2.4~GHz & 0.609 & 13 \\
+NB-IoT & 10~km/h & 900~MHz & 0.955 & 13 \\
+\hline
+\end{tabular}
+\end{table}
+
+Um resultado notável é a operação bem-sucedida do sistema no cenário de veículo urbano ($60$~km/h, $\rho_{\text{temporal}} = 0.16$), demonstrando que o erro de estimação de canal controlado ($\leq 30\%$) é mais crítico para a viabilidade do sistema do que a correlação temporal propriamente dita. Esse insight sugere que estratégias de estimação robusta de canal são fundamentais para extensão do sistema a cenários de alta mobilidade.
+
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.8\textwidth]{figuras/exp05_perfis_dispositivos.png}
+\caption{Desempenho do sistema em cinco perfis de dispositivos IoT. Todos os perfis atingem KDR nula em SNR entre 13--15~dB, demonstrando ampla aplicabilidade.}
+\label{fig:exp05_perfis}
+\end{figure}
+
+\subsection{Experimento 6: Análise de Segurança contra Espionagem Passiva}
+
+O sexto experimento investiga a segurança do sistema contra um atacante passivo (Eve) que observa o canal a partir de posições espaciais e temporais distintas. Foram avaliadas duas configurações: descorrelação espacial e descorrelação temporal.
+
+\subsubsection{Descorrelação Espacial}
+
+A Tabela~\ref{tab:exp06_espacial} apresenta a correlação espacial de Eve em relação a Alice e a correspondente \ac{BER} observada por Eve para diferentes distâncias laterais. A frequência de operação foi fixada em $2.4$~GHz ($\lambda = 12.5$~cm) e a \ac{SNR} em $9$~dB (cenário de teste de estresse em condições moderadamente ruidosas).
+
+\begin{table}[htbp]
+\centering
+\caption{Segurança contra espionagem em função da descorrelação espacial.}
+\label{tab:exp06_espacial}
+\begin{tabular}{cccc}
+\hline
+\textbf{Distância Eve (m)} & \textbf{$\lambda/2$} & \textbf{$\rho_{\text{espacial}}$} & \textbf{BER Eve (\%)} \\
+\hline
+0.10 & 1.6 & 0.210 & 48.46 \\
+0.20 & 3.2 & 0.020 & 48.46 \\
+0.50 & 8.0 & 0.002 & 48.65 \\
+$\geq 1.00$ & $\geq 16$ & $\approx 0$ & $\approx 48.5$ \\
+\hline
+\end{tabular}
+\end{table}
+
+Os resultados demonstram que para distâncias superiores a $0.2$~m (aproximadamente $3.2\lambda/2$), a correlação espacial torna-se desprezível ($\rho < 0.02$), garantindo \ac{BER} de Eve próxima a $50\%$, equivalente a uma tentativa de adivinhação aleatória. Esse comportamento valida experimentalmente o modelo de Clarke~\cite{clarke_1968} e confirma a segurança física do sistema contra espionagem passiva.
+
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.8\textwidth]{figuras/exp06_analise_eve.png}
+\caption{Correlação espacial e BER de Eve em função da distância lateral. Descorrelação espacial superior a 20~cm garante segurança equivalente a chute aleatório (BER $\approx 50\%$).}
+\label{fig:exp06_eve}
+\end{figure}
+
+\subsubsection{Descorrelação Temporal}
+
+A análise de descorrelação temporal, realizada mantendo Eve a uma distância fixa de $0.5$~m (já descorrelacionada espacialmente), demonstrou que a correlação temporal é irrelevante para a segurança quando a descorrelação espacial é suficiente. Mesmo com atrasos temporais variando de $0$ a $10$~ms, a correlação total $\rho_{\text{total}} = \rho_{\text{espacial}} \times \rho_{\text{temporal}}$ permaneceu próxima a zero devido ao termo espacial dominante.
+
+\subsection{Experimento 7: Impacto do Guard-Band}
+
+O sétimo e último experimento avalia o impacto da limiarização adaptativa (\textit{guard-band}) sobre a eficiência e segurança do sistema. Variou-se o parâmetro de \textit{guard-band} de $0.0$ (sem zona morta) a $1.0$ (zona morta ampla, em múltiplos de $\sigma_n$), mantendo \ac{SNR} fixa em $15$~dB.
+
+A Tabela~\ref{tab:exp07_guardband} apresenta os resultados obtidos. Observa-se que o sistema apresenta \ac{BER} de Eve próxima a $50\%$ mesmo sem utilização de \textit{guard-band} (GB $= 0$), indicando que o sistema é naturalmente seguro devido à descorrelação espacial. Surpreendentemente, valores elevados de \textit{guard-band} (GB $\geq 0.5$) não apenas reduzem drasticamente a taxa efetiva de geração de chaves (devido ao descarte de bits próximos ao limiar), mas também podem introduzir viés estatístico que degrada ligeiramente a segurança (BER Eve $= 46.82\%$ para GB $= 1.0$).
+
+\begin{table}[htbp]
+\centering
+\caption{Impacto do guard-band na eficiência e segurança do sistema.}
+\label{tab:exp07_guardband}
+\begin{tabular}{ccccc}
+\hline
+\textbf{GB ($\sigma$)} & \textbf{KDR Bob (\%)} & \textbf{BER Eve (\%)} & \textbf{Taxa (kbps)} & \textbf{Descarte (\%)} \\
+\hline
+0.0 & 0.03 & 49.67 & 127.0 & 0.0 \\
+0.1 & 0.00 & 49.92 & 118.4 & 6.8 \\
+0.3 & 0.03 & 50.07 & 102.9 & 18.9 \\
+0.5 & 0.02 & 49.91 & 89.5 & 29.5 \\
+1.0 & 0.03 & 46.82 & 63.1 & 50.3 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{figure}[htbp]
+\centering
+% \includegraphics[width=0.8\textwidth]{figuras/exp07_impacto_guard_band.png}
+\caption{Trade-off entre eficiência e segurança em função do parâmetro de guard-band. O sistema é naturalmente seguro sem guard-band (BER Eve $\approx 50\%$), e valores elevados (GB $> 0.5$) são contraproducentes.}
+\label{fig:exp07_guardband}
+\end{figure}
+
+Esse resultado é particularmente relevante, pois demonstra que técnicas de limiarização adaptativa complexa, frequentemente propostas na literatura, não são necessárias para garantir a segurança do sistema quando a descorrelação espacial é adequadamente explorada. Recomenda-se operar o sistema com GB $= 0$ ou GB $\leq 0.1\sigma$ para maximizar a taxa de geração de chaves sem comprometer a segurança.
+
+\subsection{Discussão Geral e Comparação com Estado da Arte}
+
+Os resultados experimentais demonstram a viabilidade técnica do sistema proposto para geração de chaves criptográficas em camada física em cenários práticos de \ac{IoT}. O \ac{SNR} mínimo de $13$--$15$~dB identificado no Experimento~1 é plenamente alcançável em aplicações reais, sendo compatível com enlaces de comunicação típicos em redes celulares \ac{5G} e \ac{NB-IoT}.
+
+A complexidade computacional de $0.489$~ms (Experimento~4) viabiliza a implementação em dispositivos de baixo custo operando em software, sem necessidade de hardware dedicado (FPGA, USRP), distinguindo este trabalho de abordagens anteriores que requerem plataformas especializadas~\cite{yuan_fast_2013}.
+
+A validação em cinco perfis de dispositivos \ac{IoT} (Experimento~5) demonstra a ampla aplicabilidade do sistema, cobrindo desde sensores estáticos até veículos urbanos a $60$~km/h. O funcionamento em cenários de alta mobilidade ($\rho_{\text{temporal}} = 0.16$) sugere que o erro de estimação de canal, quando controlado adequadamente, é mais crítico que a correlação temporal, um insight relevante para projeto de sistemas práticos.
+
+A análise de segurança (Experimento~6) confirma a proteção contra espionagem passiva a partir de distâncias de $20$~cm, validando experimentalmente o modelo teórico de Clarke~\cite{clarke_1968}. Finalmente, a demonstração de que \textit{guard-band} não é necessário (Experimento~7) representa uma contribuição original, simplificando a implementação prática do sistema sem comprometer a segurança.
