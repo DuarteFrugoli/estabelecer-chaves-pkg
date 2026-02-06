@@ -173,7 +173,7 @@ def experimento_perfis_dispositivos(
         # Encontra SNR mínimo para KDR < 1%
         snr_min_viavel = None
         for snr, kdr in zip(snr_db_range, kdr_rates):
-            if kdr < 0.01:  # 1%
+            if kdr < 1.0:  # 1%
                 snr_min_viavel = snr
                 break
         
@@ -184,11 +184,9 @@ def experimento_perfis_dispositivos(
         if snr_min_viavel:
             print(f"  - SNR mínimo para KDR<1%: {snr_min_viavel:.1f} dB")
         else:
-            print(f"  - SNR mínimo para KDR<1%: Não alcançado (>25dB)")
+            print(f"  - SNR mínimo para KDR<1%: Não alcançado (>{snr_db_range[-1]:.1f}dB)")
     
     # Salva resultados
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
     # Prepara dados para CSV
     csv_data = {
         'perfil': [],
@@ -231,16 +229,19 @@ def experimento_perfis_dispositivos(
         {col: csv_data[col][i] for col in colunas_csv}
         for i in range(len(csv_data['perfil']))
     ]
-    salvar_resultado_csv(
+    csv_filepath = salvar_resultado_csv(
         dados_csv,
         "exp05_perfis_dispositivos",
         colunas_csv
     )
     
+    # Extrai timestamp do arquivo CSV salvo
+    import re
+    match = re.search(r'_(\d{8}_\d{6})\.csv$', csv_filepath)
+    timestamp = match.group(1) if match else datetime.now().strftime("%Y%m%d_%H%M%S")
+    
     # Prepara dados para JSON
     json_data = {
-        'experimento': 'exp05_perfis_dispositivos',
-        'timestamp': timestamp,
         'configuracao': {
             'tamanho_cadeia_bits': tamanho_cadeia_bits,
             'quantidade_de_testes': quantidade_de_testes,
@@ -295,7 +296,7 @@ def experimento_perfis_dispositivos(
         # Encontra SNR mínimo
         snr_min_viavel = "N/A"
         for snr, kdr in zip(resultado['snr_db'], resultado['kdr_rates']):
-            if kdr < 0.01:
+            if kdr < 1.0:  # 1%
                 snr_min_viavel = f"{snr:.1f}"
                 break
         
@@ -307,9 +308,8 @@ def experimento_perfis_dispositivos(
     print("\n" + "="*80)
     print("EXPERIMENTO CONCLUÍDO!")
     print("="*80)
-    print(f"Resultados salvos com timestamp: {timestamp}")
-    print(f"  - CSV: resultados/dados/exp05_perfis_dispositivos_{timestamp}.csv")
-    print(f"  - JSON: resultados/dados/exp05_perfis_dispositivos_{timestamp}.json")
+    print(f"Resultados salvos:")
+    print(f"  - CSV: {csv_filepath}")
     print(f"  - Gráfico: resultados/figuras/exp05_perfis_dispositivos_{timestamp}.png")
     print("="*80 + "\n")
     
@@ -329,62 +329,77 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
     
     # Configurações do gráfico
     plt.style.use('seaborn-v0_8-darkgrid')
-    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
     
-    # Cores para cada perfil
+    # Cores para cada perfil (paleta categórica distinta)
     cores = {
-        'pessoa_andando': '#1f77b4',
-        'sensor_estatico': '#2ca02c',
-        'veiculo_urbano': '#d62728',
-        'drone': '#ff7f0e',
-        'nb_iot': '#9467bd'
+        'pessoa_andando': '#1f77b4',    # Azul
+        'sensor_estatico': '#2ca02c',   # Verde
+        'veiculo_urbano': '#d62728',    # Vermelho
+        'drone': '#ff7f0e',             # Laranja
+        'nb_iot': '#9467bd'             # Roxo
     }
     
-    # Labels bonitos
+    # Labels bonitos com correlação temporal
     labels = {
-        'pessoa_andando': 'Pessoa Andando (5 km/h)',
-        'sensor_estatico': 'Sensor Estático (0 km/h)',
-        'veiculo_urbano': 'Veículo Urbano (60 km/h)',
-        'drone': 'Drone (40 km/h)',
-        'nb_iot': 'NB-IoT (10 km/h)'
+        'pessoa_andando': 'Pessoa Andando (5 km/h, ρ≈0.94)',
+        'sensor_estatico': 'Sensor Estático (0 km/h, ρ=1.00)',
+        'veiculo_urbano': 'Veículo Urbano (60 km/h, ρ≈0.16)',
+        'drone': 'Drone (40 km/h, ρ≈0.61)',
+        'nb_iot': 'NB-IoT (10 km/h, ρ≈0.95)'
     }
     
     # Plot 1: BER (antes da reconciliação)
     for perfil, dados in dados_grafico.items():
+        # CORREÇÃO: BER já está em porcentagem (0-100), não precisa multiplicar
         axes[0].plot(
             dados['snr_db'],
-            [b * 100 for b in dados['ber_rates']],
+            dados['ber_rates'],  # Já está em %
             marker='o',
-            linewidth=2,
-            label=labels[perfil],
-            color=cores[perfil]
+            linewidth=2.5,
+            markersize=6,
+            label=labels.get(perfil, perfil),
+            color=cores.get(perfil, None),
+            alpha=0.8
         )
     
-    axes[0].set_xlabel('SNR (dB)', fontsize=12)
-    axes[0].set_ylabel('BER (%)', fontsize=12)
-    axes[0].set_title('BER Antes da Reconciliação', fontsize=14, fontweight='bold')
-    axes[0].legend(loc='upper right', fontsize=10)
-    axes[0].grid(True, alpha=0.3)
-    axes[0].set_ylim([0, 50])
+    axes[0].set_xlabel('SNR (dB)', fontsize=13, fontweight='bold')
+    axes[0].set_ylabel('BER (%)', fontsize=13, fontweight='bold')
+    axes[0].set_title('BER Antes da Reconciliação BCH', fontsize=14, fontweight='bold')
+    axes[0].legend(loc='upper right', fontsize=9, framealpha=0.95)
+    axes[0].grid(True, alpha=0.3, linestyle='--')
+    axes[0].set_xlim([min(dados_grafico[list(dados_grafico.keys())[0]]['snr_db']), 
+                      max(dados_grafico[list(dados_grafico.keys())[0]]['snr_db'])])
+    # Ajusta ylim automaticamente se BER > 50%
+    max_ber = max(max(d['ber_rates']) for d in dados_grafico.values())
+    axes[0].set_ylim([0, min(60, max_ber * 1.1)])
     
     # Plot 2: KDR (após reconciliação BCH)
     for perfil, dados in dados_grafico.items():
+        # CORREÇÃO: KDR já está em porcentagem (0-100), não precisa multiplicar
         axes[1].plot(
             dados['snr_db'],
-            [k * 100 for k in dados['kdr_rates']],
+            dados['kdr_rates'],  # Já está em %
             marker='s',
-            linewidth=2,
-            label=labels[perfil],
-            color=cores[perfil]
+            linewidth=2.5,
+            markersize=6,
+            label=labels.get(perfil, perfil),
+            color=cores.get(perfil, None),
+            alpha=0.8
         )
     
-    axes[1].set_xlabel('SNR (dB)', fontsize=12)
-    axes[1].set_ylabel('KDR (%)', fontsize=12)
-    axes[1].set_title('KDR Após Reconciliação (BCH)', fontsize=14, fontweight='bold')
-    axes[1].legend(loc='upper right', fontsize=10)
-    axes[1].grid(True, alpha=0.3)
-    axes[1].axhline(y=1.0, color='r', linestyle='--', linewidth=1, label='Limiar 1%')
-    axes[1].set_ylim([0, 20])
+    axes[1].set_xlabel('SNR (dB)', fontsize=13, fontweight='bold')
+    axes[1].set_ylabel('KDR (%)', fontsize=13, fontweight='bold')
+    axes[1].set_title('KDR Após Reconciliação BCH(127,64,10)', fontsize=14, fontweight='bold')
+    axes[1].legend(loc='upper right', fontsize=9, framealpha=0.95)
+    axes[1].grid(True, alpha=0.3, linestyle='--')
+    axes[1].axhline(y=1.0, color='red', linestyle='--', linewidth=2, 
+                    label='Limiar 1% (aceitável)', zorder=1)
+    axes[1].set_xlim([min(dados_grafico[list(dados_grafico.keys())[0]]['snr_db']), 
+                      max(dados_grafico[list(dados_grafico.keys())[0]]['snr_db'])])
+    # Ajusta ylim automaticamente
+    max_kdr = max(max(d['kdr_rates']) for d in dados_grafico.values())
+    axes[1].set_ylim([0, min(25, max_kdr * 1.2)])
     
     plt.tight_layout()
     
@@ -392,7 +407,7 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
     dir_figuras = os.path.join(base_dir, 'resultados', 'figuras')
     os.makedirs(dir_figuras, exist_ok=True)
     caminho = os.path.join(dir_figuras, f'{nome_arquivo}.png')
-    plt.savefig(caminho, dpi=300, bbox_inches='tight')
+    plt.savefig(caminho, dpi=300, bbox_inches='tight', facecolor='white')
     print(f"Gráfico salvo: {caminho}")
     plt.close()
 
