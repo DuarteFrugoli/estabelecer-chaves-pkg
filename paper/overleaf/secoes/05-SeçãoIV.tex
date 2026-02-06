@@ -9,6 +9,57 @@ As simulações foram implementadas integralmente em Python 3.12, devido à sua 
 
 Todas as simulações foram executadas em ambiente local, em um computador equipado com processador Intel Core i7 de 11ª geração com 16 \textit{threads}, assegurando capacidade computacional adequada para a realização dos experimentos numéricos. O gerenciamento de dependências e dos ambientes virtuais foi realizado por meio do \textit{Poetry}, uma ferramenta moderna para controle e reprodutibilidade de projetos em Python. A estrutura modular do código foi organizada em pacotes independentes: \texttt{canal/} para simulação de canais Rayleigh com correlação espacial e modulação \ac{BPSK}/\ac{QPSK}; \texttt{codigos\_corretores/} para codificação e decodificação \ac{BCH}; \texttt{pilares/} para reconciliação \textit{code-offset} e amplificação de privacidade via \ac{SHA}-256; e \texttt{visualizacao/} para geração de gráficos.
 
+\subsubsection{Trechos de Código Representativos}
+
+Para ilustrar a implementação prática do sistema, apresentam-se três trechos de código representativos das operações centrais: geração de canais correlacionados espacialmente, protocolo de reconciliação \textit{code-offset}, e cálculo da correlação espacial segundo o modelo de Clarke.
+
+A geração de canais correlacionados espacialmente, implementando a relação $h_B = \rho h_A + \sqrt{1-\rho^2} h_{\text{ind}}$, é realizada conforme o Código~\ref{code:canais_correlacionados}:
+
+\begin{lstlisting}[language=Python, caption={Geração de canais Rayleigh correlacionados espacialmente.}, label=code:canais_correlacionados, basicstyle=\small\ttfamily, breaklines=true]
+def gerar_canais_correlacionados(rho, n_amostras):
+    """Gera canais h_A e h_B correlacionados espacialmente."""
+    h_A = (np.random.randn(n_amostras) + 
+           1j * np.random.randn(n_amostras)) / np.sqrt(2)
+    h_ind = (np.random.randn(n_amostras) + 
+             1j * np.random.randn(n_amostras)) / np.sqrt(2)
+    h_B = rho * h_A + np.sqrt(1 - rho**2) * h_ind
+    return h_A, h_B
+\end{lstlisting}
+
+O protocolo \textit{code-offset} para reconciliação de chaves, descrito teoricamente na Seção~II, é implementado conforme o Código~\ref{code:code_offset}:
+
+\begin{lstlisting}[language=Python, caption={Protocolo code-offset para reconciliação BCH.}, label=code:code_offset, basicstyle=\small\ttfamily, breaklines=true]
+def reconciliar_code_offset(b_A, b_B, bch):
+    """Reconcilia sequencias binarias via code-offset BCH."""
+    k = bch.k  # Bits de informacao
+    # Bob: gera r, codifica, transmite sindrome
+    r = np.random.randint(0, 2, k)
+    c = bch.encode(r)
+    sindrome = b_B ^ c  # XOR bit a bit
+    
+    # Alice: recebe sindrome, reconcilia
+    c_prime = sindrome ^ b_A
+    c_hat = bch.decode(c_prime)
+    b_A_rec = sindrome ^ c_hat
+    return b_A_rec, b_B
+\end{lstlisting}
+
+Finalmente, o cálculo da correlação espacial segundo o modelo de Clarke, utilizando a função de Bessel de primeira espécie de ordem zero $J_0(\cdot)$, é implementado conforme o Código~\ref{code:clarke}:
+
+\begin{lstlisting}[language=Python, caption={Cálculo da correlação espacial via modelo de Clarke.}, label=code:clarke, basicstyle=\small\ttfamily, breaklines=true]
+from scipy.special import jv  # Funcao de Bessel
+
+def correlacao_espacial_clarke(distancia, freq_hz):
+    """Calcula correlacao espacial rho = J_0(2*pi*d/lambda)."""
+    c = 3e8  # Velocidade da luz (m/s)
+    lambda_m = c / freq_hz  # Comprimento de onda (m)
+    arg = 2 * np.pi * distancia / lambda_m
+    rho = jv(0, arg)  # J_0(2*pi*d/lambda)
+    return rho
+\end{lstlisting}
+
+Esses trechos de código demonstram a simplicidade da implementação e facilitam a reprodutibilidade dos resultados por outros pesquisadores.
+
 \subsection{Modelagem do Canal e Correlação Espacial}
 
 O canal sem fio é modelado como desvanecimento Rayleigh plano, representado por coeficientes complexos $h \sim \mathcal{CN}(0,1)$, cujo módulo segue distribuição Rayleigh e a fase é uniformemente distribuída em $[0,2\pi]$. Esse modelo captura condições de propagação multipercurso sem linha de visada direta (\ac{NLoS}), típicas de ambientes internos e urbanos densos.

@@ -51,16 +51,6 @@ Nesse regime, mesmo que Eve conheça toda a informação pública trocada durant
 
 \subsection{Justificativa do Modelo: Correlação Espacial vs. Temporal}
 
-Este trabalho adota o modelo de correlação espacial (dispositivos próximos observando canais \textit{downlink} correlacionados) em detrimento do modelo de reciprocidade temporal tradicional (exploração da reciprocidade do canal em sistemas TDD). A escolha justifica-se pelos seguintes fatores:
-
-\begin{itemize}
-    \item \textbf{Compatibilidade com 5G/IoT}: Sistemas \ac{5G} e \ac{NB-IoT} frequentemente operam em modo FDD ou utilizam bandas assimétricas, impossibilitando exploração direta de reciprocidade temporal. O modelo espacial aplica-se independentemente da duplex;
-    
-    \item \textbf{Simplicidade de implementação}: Não requer sincronização temporal precisa nem transmissão de pilotos por Alice e Bob, apenas recepção de sinais \textit{downlink} já disponíveis para estimação de canal em protocolos celulares padrão;
-    
-    \item \textbf{Escalabilidade}: Múltiplos pares de dispositivos próximos podem gerar chaves simultaneamente sem interferência, utilizando os mesmos sinais de referência da estação base;
-    
-    \item \textbf{Segurança intrínseca}: A descorrelação espacial garante segurança física contra atacantes distantes sem necessidade de suposições adicionais sobre o comportamento temporal do canal.
-\end{itemize}
+Este trabalho adota o modelo de correlação espacial (dispositivos próximos observando canais \textit{downlink} correlacionados) em detrimento do modelo de reciprocidade temporal tradicional (exploração da reciprocidade do canal em sistemas TDD). A escolha justifica-se por quatro fatores principais. Primeiramente, a compatibilidade com sistemas \ac{5G} e \ac{NB-IoT} que frequentemente operam em modo FDD ou utilizam bandas assimétricas, impossibilitando exploração direta de reciprocidade temporal; o modelo espacial aplica-se independentemente da duplex. Em segundo lugar, a simplicidade de implementação: não é necessária sincronização temporal precisa nem transmissão de pilotos por Alice e Bob, bastando a recepção de sinais \textit{downlink} já disponíveis para estimação de canal em protocolos celulares padrão. Adicionalmente, a escalabilidade é naturalmente garantida, uma vez que múltiplos pares de dispositivos próximos podem gerar chaves simultaneamente sem interferência, utilizando os mesmos sinais de referência da estação base. Finalmente, a descorrelação espacial garante segurança física intrínseca contra atacantes distantes sem necessidade de suposições adicionais sobre o comportamento temporal do canal.
 
 Adicionalmente, o modelo pode ser estendido para cenários \textit{Device-to-Device} (\ac{D2D}), nos quais dispositivos próximos observam canais correlacionados espacialmente em relação a uma fonte transmissora comum (que pode ser outro dispositivo \ac{D2D} ou a própria estação base operando como âncora).

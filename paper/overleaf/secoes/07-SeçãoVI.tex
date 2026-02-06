@@ -4,19 +4,15 @@ Este trabalho apresentou um sistema completo de geração de chaves criptográfi
 
 \subsection{Principais Contribuições}
 
-Os resultados experimentais demonstram a viabilidade técnica e operacional do sistema proposto. Os principais achados incluem:
+Os resultados experimentais demonstram a viabilidade técnica e operacional do sistema proposto. Cinco achados principais emergiram da análise sistemática conduzida.
 
-\begin{itemize}
-    \item \textbf{Requisitos operacionais alcançáveis}: O sistema requer \ac{SNR} mínima de $13$--$15$~dB para operação confiável (KDR nula), valor plenamente alcançável em enlaces de comunicação típicos de redes celulares \ac{5G} e \ac{NB-IoT};
-    
-    \item \textbf{Baixa complexidade computacional}: O tempo de processamento de $0.489$~ms para reconciliação via código \ac{BCH}(127,64,10) e amplificação de privacidade via \ac{SHA}-256 viabiliza implementação em dispositivos de baixo custo operando em software, sem necessidade de hardware dedicado (FPGA, USRP), com capacidade teórica superior a $2000$ operações por segundo;
-    
-    \item \textbf{Ampla aplicabilidade em cenários IoT}: O sistema foi validado em cinco perfis representativos de dispositivos \ac{IoT} — sensor estático, \textit{wearable}/pessoa andando, veículo urbano ($60$~km/h), drone ($40$~km/h) e dispositivo NB-IoT — demonstrando operação bem-sucedida em condições diversas de mobilidade e frequência. Notavelmente, o cenário de veículo urbano funciona adequadamente mesmo com correlação temporal relativamente baixa ($\rho = 0.16$), confirmando que o erro de estimação de canal, quando controlado ($\leq 30\%$), é mais crítico para a viabilidade do sistema do que a correlação temporal propriamente dita;
-    
-    \item \textbf{Segurança física intrínseca}: A análise de segurança contra espionagem passiva confirma que distâncias laterais superiores a $20$~cm (aproximadamente $3.2\lambda/2$ em frequências de $2.4$~GHz) garantem descorrelação espacial suficiente para que um atacante passivo (Eve) observe \ac{BER} próxima a $50\%$, equivalente a uma tentativa de adivinhação aleatória. Os resultados validam experimentalmente o modelo teórico de Clarke~\cite{clarke_1968} e demonstram que a descorrelação espacial é suficiente para proteção, sendo a sincronização temporal do atacante irrelevante;
-    
-    \item \textbf{Dispensa de guard-band}: Uma contribuição original deste trabalho é a demonstração experimental de que técnicas de limiarização adaptativa (\textit{guard-band}) não são necessárias para garantir a segurança do sistema. O sistema opera de forma naturalmente segura sem \textit{guard-band} (GB $= 0$), apresentando \ac{BER} de Eve próxima a $50\%$. Valores elevados de \textit{guard-band} (GB $> 0.5\sigma$) são contraproducentes, reduzindo drasticamente a taxa efetiva de geração de chaves (descarte superior a $30\%$ dos bits) sem ganho de segurança, e em alguns casos introduzindo viés estatístico que pode degradar ligeiramente a proteção contra espionagem.
-\end{itemize}
+Primeiramente, os requisitos operacionais são plenamente alcançáveis: o sistema requer \ac{SNR} mínima de $13$--$15$~dB para operação confiável (KDR nula), valor compatível com enlaces de comunicação típicos de redes celulares \ac{5G} e \ac{NB-IoT}. Em segundo lugar, a baixa complexidade computacional viabiliza implementação prática em dispositivos de baixo custo. O tempo de processamento de $0.489$~ms para reconciliação via código \ac{BCH}(127,64,10) e amplificação de privacidade via \ac{SHA}-256 permite operação em software sem necessidade de hardware dedicado (FPGA, USRP), com capacidade teórica superior a $2000$ operações por segundo.
+
+O terceiro achado refere-se à ampla aplicabilidade em cenários \ac{IoT}: o sistema foi validado em cinco perfis representativos — sensor estático, \textit{wearable}/pessoa andando, veículo urbano ($60$~km/h), drone ($40$~km/h) e dispositivo NB-IoT — demonstrando operação bem-sucedida em condições diversas de mobilidade e frequência. Notavelmente, o cenário de veículo urbano funciona adequadamente mesmo com correlação temporal relativamente baixa ($\rho = 0.16$), confirmando que o erro de estimação de canal, quando controlado ($\leq 30\%$), é mais crítico para a viabilidade do sistema do que a correlação temporal propriamente dita.
+
+Quanto à segurança física intrínseca, a análise de segurança contra espionagem passiva confirma que distâncias laterais superiores a $20$~cm (aproximadamente $3.2\lambda/2$ em frequências de $2.4$~GHz) garantem descorrelação espacial suficiente para que um atacante passivo (Eve) observe \ac{BER} próxima a $50\%$, equivalente a uma tentativa de adivinhação aleatória. Os resultados validam experimentalmente o modelo teórico de Clarke~\cite{clarke_1968} e demonstram que a descorrelação espacial é suficiente para proteção, sendo a sincronização temporal do atacante irrelevante.
+
+Finalmente, uma contribuição original deste trabalho é a demonstração experimental de que técnicas de limiarização adaptativa (\textit{guard-band}) não são necessárias para garantir a segurança do sistema. O sistema opera de forma naturalmente segura sem \textit{guard-band} (GB $= 0$), apresentando \ac{BER} de Eve próxima a $50\%$. Valores elevados de \textit{guard-band} (GB $> 0.5\sigma$) são contraproducentes, reduzindo drasticamente a taxa efetiva de geração de chaves (descarte superior a $30\%$ dos bits) sem ganho de segurança, e em alguns casos introduzindo viés estatístico que pode degradar ligeiramente a proteção contra espionagem.
 
 \subsection{Diferencial em Relação ao Estado da Arte}
 
@@ -28,33 +24,15 @@ Finalmente, a análise sistemática do impacto do \textit{guard-band} (Experimen
 
 \subsection{Limitações Identificadas}
 
-Algumas limitações do sistema foram identificadas durante os experimentos:
-
-\begin{itemize}
-    \item \textbf{Requisito mínimo de SNR}: Embora alcançável em aplicações práticas, o \ac{SNR} mínimo de $13$--$15$~dB pode ser desafiador em ambientes extremamente ruidosos ou em dispositivos operando com potência muito limitada. Cenários com \ac{SNR} inferior a $10$~dB apresentam \ac{KDR} superior a $2\%$, comprometendo a eficiência da reconciliação;
-    
-    \item \textbf{Sensibilidade ao erro de estimação}: O desempenho do sistema é fortemente dependente da qualidade da estimação de canal. Erros de estimação superiores a $30\%$ podem degradar significativamente o \ac{KDR}, especialmente em cenários de alta mobilidade. Estratégias robustas de estimação de canal são essenciais para extensão do sistema a condições adversas;
-    
-    \item \textbf{Validação em simulação}: Todos os experimentos foram conduzidos por meio de simulações numéricas de Monte Carlo. Embora os modelos adotados (desvanecimento Rayleigh, correlação espacial de Clarke, ruído \ac{AWGN}) sejam amplamente aceitos e validados na literatura, uma validação experimental em ambiente real com dispositivos físicos é necessária para confirmar os resultados obtidos e identificar eventuais efeitos não capturados pela simulação.
-\end{itemize}
+Algumas limitações do sistema foram identificadas durante os experimentos. Embora alcançável em aplicações práticas, o \ac{SNR} mínimo de $13$--$15$~dB pode ser desafiador em ambientes extremamente ruidosos ou em dispositivos operando com potência muito limitada; cenários com \ac{SNR} inferior a $10$~dB apresentam \ac{KDR} superior a $2\%$, comprometendo a eficiência da reconciliação. Adicionalmente, o desempenho do sistema é fortemente dependente da qualidade da estimação de canal: erros de estimação superiores a $30\%$ podem degradar significativamente o \ac{KDR}, especialmente em cenários de alta mobilidade, indicando que estratégias robustas de estimação de canal são essenciais para extensão do sistema a condições adversas. Finalmente, todos os experimentos foram conduzidos por meio de simulações numéricas de Monte Carlo; embora os modelos adotados (desvanecimento Rayleigh, correlação espacial de Clarke, ruído \ac{AWGN}) sejam amplamente aceitos e validados na literatura, uma validação experimental em ambiente real com dispositivos físicos é necessária para confirmar os resultados obtidos e identificar eventuais efeitos não capturados pela simulação.
 
 \subsection{Trabalhos Futuros}
 
-Diversas direções de pesquisa podem ser exploradas como extensão deste trabalho:
+Diversas direções de pesquisa podem ser exploradas como extensão deste trabalho. A validação experimental do sistema em dispositivos \ac{IoT} comerciais (ESP32, Raspberry Pi, módulos NB-IoT) operando em redes celulares reais (\ac{5G}, \ac{NB-IoT}) é fundamental para confirmar os resultados de simulação e identificar desafios práticos de implementação. Paralelamente, a investigação de cenários adicionais não cobertos neste trabalho — incluindo dispositivos aéreos de alta velocidade (aeronaves não tripuladas, UAVs), aplicações submarinas, e dispositivos operando em bandas milimétricas (mmWave) típicas de redes \ac{5G} — expandiria significativamente o escopo de aplicabilidade.
 
-\begin{itemize}
-    \item \textbf{Implementação em plataforma real}: Validação experimental do sistema em dispositivos \ac{IoT} comerciais (ESP32, Raspberry Pi, módulos NB-IoT) operando em redes celulares reais (\ac{5G}, \ac{NB-IoT}), visando confirmar os resultados de simulação e identificar desafios práticos de implementação;
-    
-    \item \textbf{Expansão para novos perfis de dispositivos}: Investigação de cenários adicionais não cobertos neste trabalho, incluindo dispositivos aéreos de alta velocidade (aeronaves não tripuladas, UAVs), aplicações submarinas, e dispositivos operando em bandas milimétricas (mmWave) típicas de redes \ac{5G};
-    
-    \item \textbf{Análise de segurança contra ataques ativos}: Extensão da análise de segurança para considerar atacantes ativos capazes de manipular ou injetar mensagens no canal público durante a reconciliação, avaliando a necessidade de mecanismos adicionais de autenticação;
-    
-    \item \textbf{Otimização adaptativa de parâmetros}: Desenvolvimento de algoritmos para ajuste dinâmico de parâmetros do sistema (código \ac{BCH}, modulação, \textit{guard-band}) em função das condições instantâneas do canal, visando otimizar o compromisso entre taxa de geração de chaves, robustez e eficiência energética;
-    
-    \item \textbf{Extensão para comunicação Device-to-Device (D2D)}: Investigação da aplicabilidade do modelo de correlação espacial em cenários de comunicação direta entre dispositivos (D2D), explorando a correlação de canais em relação a fontes transmissoras comuns ou a múltiplas estações base em cenários de cooperação;
-    
-    \item \textbf{Integração com protocolos criptográficos}: Desenvolvimento de protocolos completos de estabelecimento de sessão segura integrando o sistema de geração de chaves em camada física com primitivas criptográficas padrão (AES, autenticação via HMAC), avaliando o impacto na latência total e na segurança do sistema end-to-end.
-\end{itemize}
+A extensão da análise de segurança para considerar atacantes ativos capazes de manipular ou injetar mensagens no canal público durante a reconciliação é relevante para avaliar a necessidade de mecanismos adicionais de autenticação. Complementarmente, o desenvolvimento de algoritmos para ajuste dinâmico de parâmetros do sistema (código \ac{BCH}, modulação, \textit{guard-band}) em função das condições instantâneas do canal poderia otimizar o compromisso entre taxa de geração de chaves, robustez e eficiência energética.
+
+A investigação da aplicabilidade do modelo de correlação espacial em cenários de comunicação direta entre dispositivos (\ac{D2D}), explorando a correlação de canais em relação a fontes transmissoras comuns ou a múltiplas estações base em cenários de cooperação, constitui outra direção promissora. Finalmente, o desenvolvimento de protocolos completos de estabelecimento de sessão segura integrando o sistema de geração de chaves em camada física com primitivas criptográficas padrão (AES, autenticação via HMAC) permitiria avaliar o impacto na latência total e na segurança do sistema \textit{end-to-end}.
 
 \subsection{Considerações Finais}
 
