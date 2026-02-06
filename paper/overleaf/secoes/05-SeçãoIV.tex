@@ -1,38 +1,93 @@
-\section{Resultados Numéricos}
-\label{sec:results}
+\section{Metodologia Experimental}
+\label{sec:metodos}
 
-Foram conduzidos seis experimentos sistemáticos para avaliar o desempenho do
-sistema sob diferentes condições operacionais. Cada experimento foi projetado
-para isolar o impacto de um parâmetro específico sobre o \ac{KDR}.
+Esta seção apresenta a metodologia empregada na implementação e validação experimental do sistema de geração de chaves criptográficas em camada física. Descrevem-se o ambiente de desenvolvimento, a modelagem do canal sem fio com correlação espacial, e os sete experimentos sistemáticos conduzidos para avaliar o desempenho, a segurança e a viabilidade prática do sistema proposto em diferentes cenários de operação.
 
-\subsection{Experimento 1: Impacto da Relação Sinal-Ruído}
+\subsection{Ambiente de Desenvolvimento e Implementação}
 
-Este experimento investiga o impacto da \ac{SNR} sobre a \ac{KDR}. Para isso, a \ac{SNR} é variada de $-10$ dB a $30$ dB em 18 pontos logaritmicamente espaçados. Mantêm-se fixos o parâmetro do canal Rayleigh $\sigma = 1/\sqrt{2}$, o esquema de modulação \ac{BPSK} e o código corretor \ac{BCH}(127,64,10). Espera-se que o \ac{KDR} diminua monotonicamente com o aumento da \ac{SNR}, uma vez que a melhoria na qualidade do sinal reduz discrepâncias nas observações do canal e, consequentemente, na quantização dos bits gerados, resultando em sequências reconciliadas, ou seja, a chave simétrica, iguais com maior frequência .
+As simulações foram implementadas integralmente em Python 3.12, devido à sua flexibilidade e à ampla disponibilidade de bibliotecas científicas voltadas ao processamento numérico e à análise de sinais. As principais dependências incluem \textbf{NumPy}, utilizado para geração de amostras complexas e operações matriciais; \textbf{SciPy}, empregado em funções estatísticas, incluindo a função de Bessel $J_0$ para cálculo de correlação espacial; \textbf{Matplotlib}, destinado à visualização e geração de gráficos de desempenho; \textbf{Galois}, utilizado na implementação de códigos \ac{BCH} aplicados na etapa de reconciliação da informação; \textbf{hashlib}, responsável pela implementação do algoritmo \ac{SHA}-256 empregado na amplificação de privacidade; e \textbf{tqdm}, utilizado para exibição de barras de progresso durante execuções de longa duração.
 
-\subsection{Experimento 2: Influência do Parâmetro Rayleigh}
+Todas as simulações foram executadas em ambiente local, em um computador equipado com processador Intel Core i7 de 11ª geração com 16 \textit{threads}, assegurando capacidade computacional adequada para a realização dos experimentos numéricos. O gerenciamento de dependências e dos ambientes virtuais foi realizado por meio do \textit{Poetry}, uma ferramenta moderna para controle e reprodutibilidade de projetos em Python. A estrutura modular do código foi organizada em pacotes independentes: \texttt{canal/} para simulação de canais Rayleigh com correlação espacial e modulação \ac{BPSK}/\ac{QPSK}; \texttt{codigos\_corretores/} para codificação e decodificação \ac{BCH}; \texttt{pilares/} para reconciliação \textit{code-offset} e amplificação de privacidade via \ac{SHA}-256; e \texttt{visualizacao/} para geração de gráficos.
 
-Este experimento analisa o efeito do parâmetro de escala $\sigma$ no desvanecimento Rayleigh, considerando valores $\sigma \in \{0.5, 1/\sqrt{2}, 1.0, 2.0\}$. A \ac{SNR} é mantida fixa em 15 dB. Como $\sigma$ controla a variância dos coeficientes do canal, valores maiores implicam maior dispersão estatística nas amplitudes do desvanecimento, podendo impactar diretamente a entropia extraída e a taxa de discordância entre as chaves geradas.
+\subsection{Modelagem do Canal e Correlação Espacial}
 
-\subsection{Experimento 3: Comparação entre \ac{BPSK} e \ac{QPSK}}
+O canal sem fio é modelado como desvanecimento Rayleigh plano, representado por coeficientes complexos $h \sim \mathcal{CN}(0,1)$, cujo módulo segue distribuição Rayleigh e a fase é uniformemente distribuída em $[0,2\pi]$. Esse modelo captura condições de propagação multipercurso sem linha de visada direta (\ac{NLoS}), típicas de ambientes internos e urbanos densos.
 
-Este experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1 bit/símbolo) e \ac{QPSK} (2 bits/símbolo) em termos de \ac{KDR}. Mantém-se $\sigma = 1/\sqrt{2}$, enquanto a \ac{SNR} é variada conforme o Experimento 1. Espera-se que a modulação \ac{QPSK} apresente uma taxa de discordância ligeiramente superior em regimes de baixa \ac{SNR}, devido à maior sensibilidade a ruído e erros de fase, embora possa oferecer maior eficiência espectral.
+No cenário considerado, Alice e Bob recebem sinais \textit{downlink} provenientes de uma mesma estação rádio base, que transmite um sinal de referência $x$. Os sinais recebidos são modelados como
+\begin{equation}
+y_A = h_A \, x + n_A, \quad y_B = h_B \, x + n_B,
+\end{equation}
+em que $h_A$ e $h_B$ denotam os coeficientes de canal entre a estação base e cada dispositivo, e $n_A, n_B \sim \mathcal{CN}(0,\sigma^2_n)$ representam ruído \ac{AWGN} independente em cada receptor.
 
-\subsection{Experimento 4: Variação da Correlação entre Canais Legítimos}
+Devido à proximidade espacial entre Alice e Bob, os canais $h_A$ e $h_B$ apresentam correlação estatística significativa, modelada por
+\begin{equation}
+h_B = \rho \, h_A + \sqrt{1-\rho^2} \, h_{\text{ind}},
+\end{equation}
+em que $\rho \in [0,1]$ é o coeficiente de correlação espacial e $h_{\text{ind}} \sim \mathcal{CN}(0,1)$ é uma componente independente. O valor de $\rho$ é determinado pela separação física $d$ entre os dispositivos segundo a função de Bessel de ordem zero descrita na Seção~II, sendo $\rho = 0.9$ o valor típico adotado neste trabalho para dispositivos próximos.
 
-Este experimento investiga o impacto do coeficiente de correlação $\rho$ entre os canais observados por Alice e Bob, testando valores $\rho \in \{0.7, 0.8, 0.9, 0.95\}$. Valores de $\rho$ próximos de 1 indicam canais altamente correlacionados, condição ideal para geração eficiente de chaves. Por outro lado, valores menores simulam efeitos como separação espacial, imperfeições de estimação ou variações temporais que reduzem a similaridade entre as observações, aumentando o \ac{KDR}.
+A variância do ruído é calculada a partir da \ac{SNR} desejada como $\sigma^2_n = 10^{-\text{SNR}_{\text{dB}}/10}$, permitindo controle preciso das condições do canal nos experimentos. Todas as simulações empregam análise de Monte Carlo com 1000 realizações independentes por configuração, garantindo significância estatística dos resultados.
 
-\subsection{Experimento 5: Comparação de Códigos \ac{BCH}}
+\subsection{Fluxo de Processamento do Sistema}
 
-Neste experimento, avalia-se o desempenho de diferentes códigos \ac{BCH} na etapa de reconciliação da informação, considerando as configurações (7,4,1), (15,7,2), (127,64,10) e (255,139,15). Códigos com maior capacidade de correção ($t$ maior) tendem a reduzir o \ac{KDR} em cenários com maior taxa de erro, ao custo de aumento na complexidade computacional e maior vazamento potencial de informação pública durante a reconciliação.
+O processamento completo do sistema para geração de uma chave compartilhada segue o fluxo:
+\begin{enumerate}
+    \item Geração dos canais correlacionados espacialmente: $h_A \sim \mathcal{CN}(0,1)$ e $h_B$ correlacionado via modelo de Clarke;
+    \item Recepção dos sinais \textit{downlink}: $y_A = h_A x + n_A$ e $y_B = h_B x + n_B$;
+    \item Estimação dos coeficientes de canal com erro controlado (tipicamente 10--30\% dependendo do perfil);
+    \item Quantização das observações utilizando modulação \ac{BPSK} ($\pm 1$) ou \ac{QPSK} (símbolos $\pm 1 \pm j$), com limiarização adaptativa opcional (\textit{guard-band});
+    \item Reconciliação das sequências binárias via protocolo \textit{code-offset} com código \ac{BCH}(127,64,10);
+    \item Amplificação de privacidade aplicando \ac{SHA}-256 para obtenção da chave final de 256 bits;
+    \item Cálculo das métricas de desempenho: \ac{BER} antes da reconciliação e \ac{KDR} após reconciliação.
+\end{enumerate}
 
-\subsection{Experimento 6: Análise de Complexidade Computacional}
+\subsection{Métricas de Desempenho}
 
-Por fim, este experimento avalia o tempo de execução das principais operações do sistema, incluindo modulação, codificação e decodificação \ac{BCH}, bem como a aplicação da função hash na amplificação de privacidade. O objetivo é analisar como a complexidade computacional varia em função do comprimento do código e verificar a viabilidade prática do sistema em dispositivos \ac{IoT} com recursos limitados de processamento e energia.
+O desempenho do sistema é avaliado por meio de duas métricas principais. A \ac{BER} quantifica a taxa de erro de bits entre as sequências obtidas por Alice e Bob imediatamente após a quantização, antes da aplicação do protocolo de reconciliação:
+\begin{equation}
+\text{BER} = \frac{\text{número de bits diferentes entre } \mathbf{b}_A \text{ e } \mathbf{b}_B}{\text{número total de bits}} \times 100\%.
+\end{equation}
 
-Todos os experimentos foram executados com 1000 realizações de Monte Carlo no
-modo completo, garantindo significância estatística dos resultados. Os dados
-foram salvos em formato JSON para análise posterior, e gráficos em alta resolução (300 DPI) foram gerados utilizando Matplotlib.
+O \ac{KDR} mede a taxa de discordância após a reconciliação \ac{BCH}:
+\begin{equation}
+\text{KDR} = \frac{\text{número de bits diferentes após reconciliação}}{\text{número total de bits}} \times 100\%.
+\end{equation}
 
-A próxima seção apresenta os resultados numéricos obtidos a partir desses
-experimentos, analisando o comportamento do \ac{KDR} em diferentes cenários e
-avaliando a viabilidade prática do sistema proposto.
+Idealmente, espera-se \ac{BER} proporcional à \ac{SNR} do canal e à correlação espacial, e \ac{KDR} $= 0\%$ após reconciliação bem-sucedida, desde que o número de erros não exceda a capacidade de correção do código \ac{BCH} ($t=10$ erros). Para avaliação de segurança, mede-se também a \ac{BER} de um atacante passivo (Eve) localizado a diferentes distâncias, esperando-se \ac{BER} $\approx 50\%$ quando Eve está descorrelacionado espacialmente ($\rho_{\text{espacial}} \approx 0$).
+
+\subsection{Experimentos Conduzidos}
+
+Sete experimentos sistemáticos foram realizados para validação abrangente do sistema proposto, cobrindo aspectos de desempenho, segurança, complexidade computacional e aplicabilidade em cenários práticos de \ac{IoT}.
+
+\subsubsection{Experimento 1: Impacto da Relação Sinal-Ruído}
+
+O primeiro experimento investiga o impacto da \ac{SNR} sobre a \ac{BER} inicial e o \ac{KDR} após reconciliação. A \ac{SNR} é variada logaritmicamente de $-10$~dB a $30$~dB em 18 pontos, mantendo-se fixos a correlação espacial $\rho = 0.9$, a modulação \ac{BPSK}, e o código \ac{BCH}(127,64,10). O objetivo é identificar o \ac{SNR} mínimo necessário para operação confiável do sistema, caracterizado por \ac{KDR} $= 0\%$ entre Alice e Bob.
+
+\subsubsection{Experimento 2: Comparação entre BPSK e QPSK}
+
+Este experimento compara o desempenho dos esquemas de modulação \ac{BPSK} (1 bit/símbolo) e \ac{QPSK} (2 bits/símbolo) em termos de \ac{BER} e \ac{KDR}. Mantém-se correlação espacial $\rho = 0.9$ e varia-se a \ac{SNR} conforme o Experimento~1. A modulação \ac{QPSK}, embora ofereça maior eficiência espectral, apresenta maior sensibilidade a ruído e erros de fase, o que pode aumentar ligeiramente o \ac{KDR} em regimes de baixa \ac{SNR}.
+
+\subsubsection{Experimento 3: Variação do Código BCH}
+
+Avalia-se o desempenho de diferentes códigos \ac{BCH} na etapa de reconciliação: \ac{BCH}(7,4,1), \ac{BCH}(15,7,2) e \ac{BCH}(127,64,10). Códigos com maior capacidade de correção ($t$ maior) tendem a reduzir o \ac{KDR} em cenários com maior \ac{BER} inicial, ao custo de redução na taxa de código ($R = k/n$) e maior complexidade computacional. O experimento identifica o código que oferece melhor compromisso entre robustez e eficiência.
+
+\subsubsection{Experimento 4: Análise de Complexidade Computacional}
+
+Este experimento mede o tempo de execução das principais operações do sistema: codificação e decodificação \ac{BCH}, e aplicação da função hash \ac{SHA}-256. O objetivo é verificar a viabilidade prática do sistema em dispositivos \ac{IoT} com recursos limitados de processamento. Compara-se o tempo de execução para diferentes códigos \ac{BCH}, incluindo \ac{BCH}(127,64) e \ac{BCH}(255,139), avaliando a escalabilidade do sistema.
+
+\subsubsection{Experimento 5: Perfis de Dispositivos IoT}
+
+O quinto experimento valida a aplicabilidade do sistema em cinco perfis representativos de dispositivos \ac{IoT}, cada um caracterizado por parâmetros físicos realistas de mobilidade, frequência de operação e condições de canal. Os perfis incluem: (i)~sensor estático (0~km/h, 870~MHz); (ii)~\textit{wearable}/pessoa andando (5~km/h, 2.4~GHz); (iii)~veículo urbano (60~km/h, 5.9~GHz); (iv)~drone (40~km/h, 2.4~GHz); (v)~dispositivo NB-IoT (10~km/h, 900~MHz).
+
+Para cada perfil, a correlação temporal do canal é calculada via modelo de Jakes, $\rho_{\text{temporal}} = J_0(2\pi f_D \tau)$, onde $f_D$ é o \textit{Doppler spread} e $\tau$ o intervalo de amostragem. Adicionalmente, incorpora-se erro de estimação de canal proporcional às condições de operação (8--30\%), e ajusta-se o parâmetro de \textit{guard-band} para cada perfil visando otimizar o compromisso entre robustez e eficiência. O experimento identifica o \ac{SNR} mínimo operacional para cada cenário.
+
+\subsubsection{Experimento 6: Análise de Segurança contra Espionagem Passiva}
+
+Investiga-se a segurança do sistema contra um atacante passivo (Eve) que observa o canal a partir de posições espaciais e temporais distintas. Duas configurações são avaliadas: (i)~descorrelação espacial, variando a distância lateral de Eve em relação a Alice de 0.1~m a 10~m, com frequência fixa em 2.4~GHz ($\lambda = 12.5$~cm); (ii)~descorrelação temporal, variando o atraso de observação de Eve de 0 a 10~ms.
+
+Para cada configuração, calcula-se a correlação espacial $\rho_{\text{espacial}} = J_0(2\pi d/\lambda)$ e temporal $\rho_{\text{temporal}} = J_0(2\pi f_D \tau)$, e mede-se a \ac{BER} de Eve antes e após reconciliação \ac{BCH}. Espera-se que para distâncias superiores a $\lambda/2$ ($\approx 6.25$~cm), a correlação espacial seja suficientemente baixa para garantir \ac{BER} de Eve próxima a 50\% (equivalente a chute aleatório), validando a segurança do sistema.
+
+\subsubsection{Experimento 7: Impacto do Guard-Band}
+
+O último experimento avalia o impacto da limiarização adaptativa (\textit{guard-band}) sobre a eficiência e segurança do sistema. Varia-se o parâmetro de \textit{guard-band} de 0.0 (sem zona morta) a 1.0 (zona morta ampla, em múltiplos de $\sigma_n$), medindo-se: (i)~\ac{KDR} entre Alice e Bob; (ii)~\ac{BER} de Eve; (iii)~percentual de bits descartados; (iv)~taxa efetiva de geração de chaves em bits por segundo.
+
+O experimento investiga se \textit{guard-band} elevado melhora a segurança contra Eve (aumentando \ac{BER} de Eve) ou se introduz viés estatístico que pode ser explorado pelo atacante. Adicionalmente, quantifica-se o custo em termos de redução da taxa de geração de chaves devido ao descarte de bits próximos ao limiar de decisão.

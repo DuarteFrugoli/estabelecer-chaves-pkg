@@ -1,114 +1,66 @@
-\section{Implementação e Detalhes de Simulação}
-\label{sec:metodos}
+\section{Modelo de Sistema}
+\label{sec:modelo}
 
-Esta seção apresenta detalhadamente os métodos utilizados para a implementação e simulação % avaliação 
-do sistema de geração de chaves criptográficas em camada física. O ambiente de desenvolvimento de simulação é descrito, incluindo a modelagem do canal sem fio, o processo de extração de aleatoriedade a partir das observações do canal, bem como os procedimentos empregados nas etapas de reconciliação da informação e amplificação de privacidade. Adicionalmente, apresentam-se os experimentos conduzidos para análise quantitativa do desempenho do sistema sob diferentes condições de operação.
+Esta seção descreve o cenário físico e o modelo de comunicação adotado para a geração de chaves criptográficas em camada física. O sistema considera dispositivos \ac{IoT} conectados a uma estação rádio base comum, explorando a correlação espacial entre os canais \textit{downlink} para estabelecimento de chaves secretas compartilhadas, enquanto garante segurança contra atacantes passivos por meio da descorrelação espacial natural.
 
-%\subsection{Descrição Geral da Simulação}
+\subsection{Cenário de Operação}
 
-O objetivo da simulação é reproduzir, de forma matemática e computacionalmente controlada, um sistema de geração de chaves baseado nas propriedades estatísticas do canal sem fio, explorando a correlação entre as observações realizadas por dois usuários legítimos, Alice e Bob. No cenário considerado, ambos recebem sinais provenientes de uma mesma fonte transmissora, de modo que suas estimativas de canal, embora não idênticas, permanecem similares.
+O sistema proposto opera no contexto de redes celulares de quinta geração (\ac{5G}) e tecnologias \ac{IoT}, em que múltiplos dispositivos estabelecem comunicação com uma estação rádio base (gNodeB). Considera-se especificamente o cenário em que dois dispositivos legítimos, denominados Alice e Bob, encontram-se espacialmente próximos (tipicamente a distâncias inferiores a 1~metro) e desejam estabelecer uma chave criptográfica compartilhada para proteger suas comunicações futuras.
 
-A simulação contempla a geração de amostras complexas de canal Rayleigh, a transmissão de símbolos através de um canal sujeito a ruído \ac{AWGN}, a aplicação de esquemas de modulação digital \ac{BPSK} e \ac{QPSK} com detecção coerente, bem como o emprego de códigos corretores de erro \ac{BCH} para a etapa de reconciliação. A amplificação de privacidade é realizada por meio do algoritmo \ac{SHA}-256, garantindo que a chave final apresente elevada entropia mesmo na presença de vazamento controlado de informação durante a comunicação pública.
+Ambos os dispositivos recebem sinais de referência (\textit{pilots}) transmitidos pela estação base em canal \textit{downlink}, estimam seus respectivos coeficientes de canal, e utilizam essas estimativas como fonte de aleatoriedade comum para geração da chave. A proximidade espacial entre Alice e Bob garante que seus canais apresentem correlação estatística significativa, enquanto um atacante passivo (Eve), localizado a uma distância superior, observa um canal estatisticamente independente.
 
-Por fim, o arcabouço completo permite avaliar na Seção \ref{sec:results} como alterações nas condições do canal e nos parâmetros de comunicação afetam a taxa de concordância entre as chaves geradas e o desempenho global do sistema, por meio de métricas como a \ac{KDR} e a taxa de concordância.
+\subsection{Modelo Matemático}
 
-%\subsection{Ambiente de Desenvolvimento}
-
-\subsection{Linguagem e Bibliotecas Utilizadas}
-
-As simulações foram implementadas integralmente em Python 3.11, devido à sua flexibilidade e à ampla disponibilidade de bibliotecas científicas voltadas ao processamento numérico e à análise de sinais. As principais dependências incluem \textbf{NumPy}, utilizado para geração de amostras complexas e operações matriciais; \textbf{SciPy}, empregado em funções estatísticas e rotinas auxiliares; \textbf{Matplotlib}, destinado à visualização e geração de gráficos de desempenho; \textbf{Galois}, utilizado na implementação de códigos \ac{BCH} aplicados na etapa de reconciliação da informação; \textbf{hashlib}, responsável pela implementação do algoritmo \ac{SHA}-256 empregado na amplificação de privacidade; e \textbf{tqdm}, utilizado para exibição de barras de progresso durante execuções de longa duração.
-
-Todas as simulações foram executadas em ambiente local, em um computador equipado com processador Intel Core i7 de 11ª geração, assegurando capacidade computacional adequada para a realização dos experimentos numéricos. O gerenciamento de dependências e dos ambientes virtuais foi realizado por meio do \textit{Poetry}, uma ferramenta moderna para controle e reprodutibilidade de projetos em Python.
-
-\subsection{Parâmetros de Simulação}
-
-Os parâmetros controláveis do ambiente de simulação incluem o número de bits transmitidos, tipicamente \(N = 127\) correspondente ao comprimento do código \ac{BCH}, os níveis de \ac{SNR} variando no intervalo \(\mathrm{SNR} \in [0, 30]\, \mathrm{dB}\), o parâmetro de escala Rayleigh \(\sigma \in [0.5, 2.0]\), os parâmetros do código \ac{BCH} \((n,k,t)\) com \(n=127\), \(k=64\) e \(t=10\), o tipo de modulação (\ac{BPSK} ou \ac{QPSK}), e a variância do ruído \ac{AWGN} calculada a partir da \ac{SNR} desejada.
-
-Esses parâmetros foram escolhidos de forma a representar condições realistas e cobrir uma ampla faixa de cenários físicos.
-
-%\subsection{Estrutura do Código}
-
-\subsection{Módulos Principais}
-
-A implementação foi organizada em módulos independentes visando clareza e modularidade. O módulo \texttt{canal/canal.py} implementa a simulação de canal Rayleigh com ruído \ac{AWGN} e modulação \ac{BPSK}/\ac{QPSK}, enquanto \texttt{canal/modulacao.py} realiza modulação temporal realista com frequência de portadora. O módulo \texttt{codigos\_corretores/bch.py} provê codificação e decodificação \ac{BCH}, e \texttt{pilares/reconciliacao.py} implementa a reconciliação de chaves usando o protocolo \textit{code-offset}. A aplicação do \ac{SHA}-256 para obtenção da chave final é realizada em
-\texttt{pilares/amplificacao\_privacidade.py}, a geração de gráficos de métricas e desempenho é feita por \texttt{visualizacao/plotkdr.py}, e operações auxiliares com sequências binárias são providas por \texttt{util/binario\_util.py}.
-
-\subsection{Fluxo Geral de Execução}
-
-O arcabouço da simulação segue:
-
-\begin{enumerate}
-    \item geração de sequência de bits aleatória para Alice;
-    \item geração do ganho de canal \(h \sim \mathcal{CN}(0,1)\) (Rayleigh);
-    \item transmissão de Alice para Bob: \(y_B = h \cdot x_A + n_B\);
-    \item transmissão de Bob para Alice: \(y_A = h \cdot x_B + n_A\) (reciprocidade);
-    \item demodulação e detecção dos bits recebidos;
-    \item reconciliação das sequências via \ac{BCH} usando code-offset;
-    \item amplificação de privacidade via \ac{SHA}-256;
-    \item cálculo das métricas (\ac{KDR} pré e pós-reconciliação, \ac{KDR} pós-amplificação).
-\end{enumerate}
-
-O fluxo permite avaliar precisamente o impacto da \ac{SNR}, distância e número de amostras sobre a qualidade das chaves.
-
-%\subsection{Modelagem do Canal}
-
-\subsection{Canal Rayleigh}
-
-O canal é modelado como uma variável aleatória complexa:
-
+A estação base transmite um sinal de referência $x$ conhecido por todos os dispositivos. Os sinais recebidos por Alice e Bob são modelados como
 \begin{equation}
-h \sim \mathcal{CN}(0,1),
+y_A = h_A \, x + n_A, \quad y_B = h_B \, x + n_B,
 \end{equation}
+em que $h_A, h_B \in \mathbb{C}$ denotam os coeficientes complexos de canal entre a estação base e cada dispositivo, representando desvanecimento Rayleigh plano, e $n_A, n_B \sim \mathcal{CN}(0, \sigma^2_n)$ correspondem ao ruído \ac{AWGN} independente em cada receptor.
 
-resultando em módulo Rayleigh e fase uniforme. Esse modelo captura condições de multipercurso \ac{NLoS}, típico de ambientes internos.
+Os coeficientes de canal são modelados como variáveis aleatórias complexas gaussianas $h_A, h_B \sim \mathcal{CN}(0,1)$, cujos módulos seguem distribuição Rayleigh e cujas fases são uniformemente distribuídas em $[0, 2\pi]$. Esse modelo captura condições de propagação multipercurso sem linha de visada direta (\ac{NLoS}), típicas de ambientes internos e urbanos densos.
 
-\subsection{Modelo de Ruído, Distância e Amostras}
+\subsection{Correlação Espacial entre Alice e Bob}
 
-Cada nó observa:
-
+Devido à proximidade física entre Alice e Bob, os canais $h_A$ e $h_B$ apresentam correlação estatística significativa. Essa correlação é modelada por
 \begin{equation}
-y = h x + n,
+h_B = \rho \, h_A + \sqrt{1 - \rho^2} \, h_{\text{ind}},
 \end{equation}
+em que $\rho \in [0,1]$ é o coeficiente de correlação espacial e $h_{\text{ind}} \sim \mathcal{CN}(0,1)$ representa uma componente independente de $h_A$.
 
-onde \(x\) é o piloto e \(n \sim \mathcal{CN}(0,\sigma^2)\) representa \ac{AWGN}.
-
-A influência da distância é incorporada por perda de percurso:
-
+Conforme apresentado na Seção~II, o valor de $\rho$ é determinado pela separação física $d$ entre os dispositivos segundo o modelo de Clarke~\cite{clarke_1968}:
 \begin{equation}
-h_d = \frac{h}{d^\alpha},
+\rho_{\text{espacial}}(d) = J_0\left( \frac{2\pi d}{\lambda} \right),
 \end{equation}
+em que $J_0(\cdot)$ denota a função de Bessel de primeira espécie e ordem zero, e $\lambda$ é o comprimento de onda da portadora. Para dispositivos próximos, com separação $d < \lambda/2$, tem-se tipicamente $\rho > 0.7$, garantindo elevada similaridade entre as observações de canal realizadas por Alice e Bob.
 
-com \(\alpha \in [2,4]\) dependendo do ambiente.
+Neste trabalho, adota-se $\rho = 0.9$ como valor típico, correspondente a uma separação espacial de aproximadamente $d \approx 0.1\lambda$ em cenários de alta correlação. Esse valor representa situações práticas como dispositivos \textit{wearable} carregados por um mesmo usuário, sensores \ac{IoT} instalados próximos, ou dispositivos embarcados em um mesmo veículo.
 
-Batches de amostras são gerados para cada estimativa, simulando múltiplas realizações do canal e permitindo análise estatística do desempenho. A correlação entre os canais observados por Alice e Bob é controlada pelo parâmetro \(\rho \in [0,1]\), sendo \(\rho = 0.9\) o valor típico utilizado neste trabalho, representando alta reciprocidade.
+\subsection{Segurança contra Espionagem Passiva}
 
-\subsection{Protocolo de Reconciliação Code-Offset}
+A segurança do sistema baseia-se na descorrelação espacial natural entre os canais observados pelos usuários legítimos (Alice e Bob) e por um atacante passivo (Eve). Assume-se que Eve possui capacidade ilimitada de escuta do canal público (podendo interceptar toda a informação trocada durante a reconciliação), mas não pode alterar ou injetar mensagens (\textit{eavesdropper passivo}).
 
-A reconciliação de chaves neste trabalho é implementada utilizando o protocolo \textit{code-offset}, que combina segurança da informação com correção de erros.
-O protocolo opera da seguinte forma:
-
-\begin{enumerate}
-    \item Bob gera uma sequência aleatória de \(k\) bits e a codifica usando um código \ac{BCH} \((n,k,t)\), obtendo um código \(\mathbf{c}\) de \(n\) bits;
-    \item Bob calcula a síndrome pública \(\mathbf{s} = \mathbf{b}_B \oplus \mathbf{c}\), onde \(\mathbf{b}_B\) é sua sequência de bits quantizada;
-    \item Bob transmite \(\mathbf{s}\) para Alice através do canal público;
-    \item Alice calcula \(\mathbf{c}' = \mathbf{s} \oplus \mathbf{b}_A = \mathbf{c} \oplus \mathbf{e}\), onde \(\mathbf{e} = \mathbf{b}_A \oplus \mathbf{b}_B\) representa o vetor de erros;
-    \item Alice decodifica \(\mathbf{c}'\) usando o decodificador \ac{BCH}, recuperando \(\hat{\mathbf{c}} = \mathbf{c}\) se o número de erros não exceder \(t\);
-    \item Alice calcula a chave reconciliada \(\mathbf{k}_A = \mathbf{s} \oplus \hat{\mathbf{c}}\), que coincide com \(\mathbf{b}_B\) de Bob.
-\end{enumerate}
-
-O código \ac{BCH}(127,64,10) foi escolhido por oferecer bom compromisso entre taxa de código (\(R = k/n \approx 0.5\)) e capacidade de correção de até 10 erros.
-Esse código é adequado para cenários de \ac{SNR} moderada, típicos em comunicações \ac{IoT} \cite{proakis_digital}.
-
-\subsection{Métricas de Avaliação}
-
-Para avaliar o desempenho do sistema, utiliza-se principalmente a métrica \ac{KDR}, definida como a taxa de discordância de bits entre as chaves geradas por Alice e Bob:
-
+Eve observa o sinal transmitido pela estação base através de um canal independente:
 \begin{equation}
-\text{KDR} = \frac{\text{número de bits diferentes}}{\text{número total de bits}} \times 100\%.
+y_E = h_E \, x + n_E,
 \end{equation}
+em que $h_E \sim \mathcal{CN}(0,1)$ representa o coeficiente de canal entre a estação base e Eve.
 
-O \ac{KDR} é calculado em três momentos distintos: o \ac{KDR} pré-reconciliação representa a discordância entre \(\mathbf{b}_A\) e \(\mathbf{b}_B\) imediatamente após a quantização, o \ac{KDR} pós-reconciliação mede a discordância após a aplicação do protocolo \textit{code-offset}, e o \ac{KDR} pós-amplificação quantifica a discordância após a aplicação do \ac{SHA}-256, devendo assumir apenas os valores 0\% ou 100\% devido à natureza determinística da função hash.
+Devido à separação espacial entre Eve e os usuários legítimos, o canal $h_E$ apresenta correlação desprezível com $h_A$ e $h_B$. Especificamente, para distâncias $d_E > \lambda/2$ (aproximadamente 6.25~cm em frequências de 2.4~GHz), a correlação espacial $\rho_{\text{espacial}}(d_E) \approx 0$, garantindo que as observações de Eve sejam estatisticamente independentes das observações de Alice e Bob.
 
-Idealmente, espera-se que o \ac{KDR} pré-reconciliação seja reduzido a 0\% após a reconciliação, desde que a capacidade de correção do código \ac{BCH} não seja excedida. Além do \ac{KDR}, avalia-se também o tempo de execução das simulações para verificar a viabilidade computacional do sistema em dispositivos com recursos limitados.
+Nesse regime, mesmo que Eve conheça toda a informação pública trocada durante a reconciliação (síndrome transmitida via \textit{code-offset}), sua capacidade de inferir a chave final é equivalente a uma tentativa de adivinhação aleatória, caracterizada por uma \ac{BER} próxima a 50\%. Esse comportamento é validado experimentalmente no Experimento~6 apresentado na Seção~IV.
 
-%\subsection{Experimentos Realizados}
+\subsection{Justificativa do Modelo: Correlação Espacial vs. Temporal}
+
+Este trabalho adota o modelo de correlação espacial (dispositivos próximos observando canais \textit{downlink} correlacionados) em detrimento do modelo de reciprocidade temporal tradicional (exploração da reciprocidade do canal em sistemas TDD). A escolha justifica-se pelos seguintes fatores:
+
+\begin{itemize}
+    \item \textbf{Compatibilidade com 5G/IoT}: Sistemas \ac{5G} e \ac{NB-IoT} frequentemente operam em modo FDD ou utilizam bandas assimétricas, impossibilitando exploração direta de reciprocidade temporal. O modelo espacial aplica-se independentemente da duplex;
+    
+    \item \textbf{Simplicidade de implementação}: Não requer sincronização temporal precisa nem transmissão de pilotos por Alice e Bob, apenas recepção de sinais \textit{downlink} já disponíveis para estimação de canal em protocolos celulares padrão;
+    
+    \item \textbf{Escalabilidade}: Múltiplos pares de dispositivos próximos podem gerar chaves simultaneamente sem interferência, utilizando os mesmos sinais de referência da estação base;
+    
+    \item \textbf{Segurança intrínseca}: A descorrelação espacial garante segurança física contra atacantes distantes sem necessidade de suposições adicionais sobre o comportamento temporal do canal.
+\end{itemize}
+
+Adicionalmente, o modelo pode ser estendido para cenários \textit{Device-to-Device} (\ac{D2D}), nos quais dispositivos próximos observam canais correlacionados espacialmente em relação a uma fonte transmissora comum (que pode ser outro dispositivo \ac{D2D} ou a própria estação base operando como âncora).

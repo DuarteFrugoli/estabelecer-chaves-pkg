@@ -83,7 +83,13 @@ em que $x$ representa o sinal transmitido pela estação rádio base ou ponto de
 
 Como Alice e Bob recebem sinais provenientes de uma mesma fonte transmissora e encontram-se em posições espacialmente próximas, os coeficientes de canal $h_A$ e $h_B$ tendem a apresentar correlação estatística significativa dentro do tempo de coerência do canal. Essa correlação constitui uma fonte essencial de entropia compartilhada, explorada no processo de geração de chaves criptográficas em camada física~\cite{mathur_pks, bloch_wireless_security}.
 
-Por outro lado, um invasor localizado a uma distância suficientemente grande observa um canal caracterizado por coeficientes de desvanecimento estatisticamente distintos. Estudos clássicos demonstram que, devido ao fenômeno de decorrelação espacial, as observações realizadas por Eve apresentam correlação significativamente reduzida em relação às observações dos usuários legítimos, limitando sua capacidade de inferir a informação compartilhada entre Alice e Bob~\cite{mathur_pks, bloch_wireless_security, maurer_secret_key}.
+Por outro lado, um invasor localizado a uma distância suficientemente grande observa um canal caracterizado por coeficientes de desvanecimento estatisticamente distintos. A correlação espacial entre canais observados a partir de posições distintas é modelada pela função de Bessel de primeira espécie de ordem zero, conforme descrito por Clarke~\cite{clarke_1968}:
+%
+\begin{equation}
+\rho_{\text{espacial}}(d) = J_0\left(\frac{2\pi d}{\lambda}\right),
+\end{equation}
+%
+em que $d$ representa a separação espacial entre os dispositivos e $\lambda$ o comprimento de onda da portadora. Essa função decresce rapidamente com o aumento de $d$, atingindo valores próximos a zero para $d > \lambda/2$. Consequentemente, as observações realizadas por Eve apresentam correlação significativamente reduzida em relação às observações dos usuários legítimos quando Eve está suficientemente distante, limitando sua capacidade de inferir a informação compartilhada entre Alice e Bob~\cite{mathur_pks, bloch_wireless_security, maurer_secret_key}.
 
 Assim, propriedades como desvanecimento aleatório, correlação estatística entre canais legítimos e decorrelação espacial em relação ao invasor constituem a base física que viabiliza a extração de segredos diretamente do meio de propagação. Na subseção seguinte, descreve-se como as observações do canal são sistematicamente processadas nas etapas de quantização, reconciliação da informação e amplificação de privacidade no processo de geração de chaves criptográficas em camada física.
 
@@ -148,7 +154,7 @@ b_i(k) =
 0, & z_i(k) < \tau,
 \end{cases}
 \end{equation}
-em que $\tau$ representa um limiar previamente estabelecido. Estratégias mais elaboradas podem empregar múltiplos níveis de quantização, visando aumentar a taxa de geração de bits, ao custo de maior sensibilidade ao ruído e às imperfeições de estimação~\cite{bloch_wireless_security}.
+em que $\tau$ representa um limiar previamente estabelecido. Em cenários práticos com esquemas de modulação digital \ac{BPSK} ou \ac{QPSK}, estratégias de limiarização adaptativa podem ser empregadas para aumentar a robustez contra ruído. Uma abordagem consiste em introduzir uma zona morta (\textit{guard-band}) ao redor do limiar de decisão, tratando de forma especial ou descartando amostras cuja magnitude esteja próxima de $\tau$. Embora essa técnica possa reduzir a taxa de discordância inicial entre Alice e Bob, também diminui a taxa efetiva de geração de bits devido ao descarte de amostras incertas~\cite{proakis_digital}. Estratégias mais elaboradas podem empregar múltiplos níveis de quantização, visando aumentar a taxa de geração de bits, ao custo de maior sensibilidade ao ruído e às imperfeições de estimação~\cite{bloch_wireless_security}.
 
 Devido às assimetrias introduzidas por ruído, imperfeições de \textit{hardware}, erros de estimação e à própria não identidade entre as observações dos dispositivos, as sequências discretas geradas a partir dos sinais recebidos por Alice e Bob podem diferir em determinadas posições, isto é,
 \begin{equation}
@@ -174,17 +180,22 @@ Para corrigir essas discrepâncias, adota-se neste trabalho um processo de recon
 
 O princípio da reconciliação consiste na transmissão de informações auxiliares por meio de um canal público, de modo que Bob possa corrigir sua sequência sem que a chave em si seja explicitamente revelada. No contexto de códigos lineares, essas informações auxiliares podem assumir a forma de uma síndrome, que corresponde a um conjunto de verificações de paridade calculadas a partir da sequência binária de Alice.
 
-Seja um código \ac{BCH} linear definido pelos parâmetros $(n,k,t)$, em que $n$ representa o comprimento da palavra-código, $k$ o comprimento da palavra de informação e $t$ a capacidade máxima de correção de erros. Denotando por $\mathbf{H}$ a matriz de verificação de paridade do código, Alice calcula a síndrome associada à sua sequência como
+Seja um código \ac{BCH} linear definido pelos parâmetros $(n,k,t)$, em que $n$ representa o comprimento da palavra-código, $k$ o comprimento da palavra de informação e $t$ a capacidade máxima de correção de erros. Neste trabalho, emprega-se o protocolo \textit{code-offset}, no qual Bob gera uma sequência aleatória $\mathbf{r}$ de $k$ bits e a codifica utilizando o código \ac{BCH}, obtendo a palavra-código $\mathbf{c} = \text{BCH}_{\text{enc}}(\mathbf{r})$ de comprimento $n$. Bob então transmite a síndrome pública
 \begin{equation}
-\boldsymbol{\sigma} = \mathbf{H} \, \mathbf{b}_A^{\mathrm{T}},
+\boldsymbol{\sigma} = \mathbf{b}_B \oplus \mathbf{c}
 \end{equation}
-em que as operações são realizadas no corpo finito apropriado. A síndrome $\boldsymbol{\sigma}$ não revela diretamente a sequência $\mathbf{b}_A$, mas fornece informação suficiente para auxiliar a identificação de padrões de erro durante a decodificação.
+a Alice através do canal público. A síndrome $\boldsymbol{\sigma}$ não revela diretamente a sequência $\mathbf{b}_B$ ou a palavra-código $\mathbf{c}$, mas permite que Alice corrija sua sequência.
 
-A síndrome é então transmitida a Bob por meio de um canal público. Utilizando essa informação auxiliar em conjunto com sua própria sequência $\mathbf{b}_B$, Bob executa o algoritmo de decodificação do código \ac{BCH} para estimar o vetor de erro $\mathbf{e}$. A sequência reconciliada é obtida por
+Ao receber $\boldsymbol{\sigma}$, Alice calcula $\mathbf{c}' = \boldsymbol{\sigma} \oplus \mathbf{b}_A = \mathbf{c} \oplus \mathbf{e}$, onde $\mathbf{e} = \mathbf{b}_A \oplus \mathbf{b}_B$ representa o vetor de erros entre as sequências. Aplicando o algoritmo de decodificação \ac{BCH}, Alice estima
 \begin{equation}
-\hat{\mathbf{b}}_A = \mathbf{b}_B \oplus \mathbf{e},
+\hat{\mathbf{c}} = \text{BCH}_{\text{dec}}(\mathbf{c}'),
 \end{equation}
-em que $\oplus$ denota a soma módulo dois. Caso o número de erros esteja dentro da capacidade de correção $t$ do código, a decodificação é bem-sucedida e tem-se $\hat{\mathbf{b}}_A = \mathbf{b}_A$.
+recuperando $\hat{\mathbf{c}} = \mathbf{c}$ caso $||\mathbf{e}|| \leq t$. A sequência reconciliada é então obtida por
+\begin{equation}
+\hat{\mathbf{b}}_A = \boldsymbol{\sigma} \oplus \hat{\mathbf{c}} = \mathbf{b}_B.
+\end{equation}
+
+Especificamente, este trabalho utiliza o código \ac{BCH}(127,64,10), que apresenta comprimento de bloco $n=127$ bits, $k=64$ bits de informação, e capacidade de correção de até $t=10$ erros. Essa configuração oferece equilíbrio favorável entre taxa de código ($R = k/n \approx 0.50$) e robustez contra erros, sendo adequada para cenários de \ac{PKG} em canais com \ac{SNR} moderada.
 
 Embora a síndrome não revele diretamente a sequência binária compartilhada, sua transmissão em um canal público implica vazamento controlado de informação ao potencial invasor. Esse vazamento reduz a entropia da chave condicionada ao conhecimento público e às observações do adversário, tornando necessária a aplicação de uma etapa adicional de amplificação de privacidade, descrita a seguir~\cite{maurer_secret_key}.
 
@@ -198,7 +209,7 @@ Seja $\mathbf{k} \in \{0,1\}^n$ a sequência binária comum obtida após a recon
 \begin{equation}
 \mathbf{k}_{\mathrm{final}} = H(\mathbf{k}),
 \end{equation}
-em que $H(\cdot)$ representa a função hash utilizada e $\mathbf{k}_{\mathrm{final}} \in \{0,1\}^m$ é a chave final, com $m < n$. A redução do comprimento está diretamente relacionada à eliminação do vazamento de informação associado às mensagens públicas trocadas durante a reconciliação.
+em que $H(\cdot)$ representa a função hash utilizada e $\mathbf{k}_{\mathrm{final}} \in \{0,1\}^{256}$ é a chave final de 256 bits (saída fixa do SHA-256), adequada para uso direto em algoritmos criptográficos simétricos como \ac{AES}-256. A redução do comprimento em relação à sequência original ($n=127$ bits para a chave BCH) ou a compressão de múltiplas chaves concatenadas está diretamente relacionada à eliminação do vazamento de informação associado às mensagens públicas trocadas durante a reconciliação.
 
 No modelo adotado neste trabalho, a amplificação de privacidade é implementada por meio do algoritmo SHA-256, pertencente à família SHA-2, amplamente padronizada e recomendada por órgãos de normalização como o \textit{National Institute of Standards and Technology} (NIST)~\cite{nist_sha}. A escolha dessa função justifica-se por sua eficiência computacional e por propriedades como difusão e resistência a colisões, que dificultam a inferência do segredo original mesmo quando o adversário conhece a função empregada e tem acesso às informações públicas trocadas.
 
