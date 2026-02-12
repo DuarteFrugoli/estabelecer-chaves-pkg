@@ -47,8 +47,8 @@ em que $i \in \{A, B, E\}$ representa, respectivamente, os sinais recebidos por 
 
 \begin{figure}[!t]
     \centering
-    \includegraphics[width=0.85\linewidth]{figuras/Figura1.png}
-    \caption{Modelo geral de segurança com estação rádio base, usuários legítimos e invasor passivo.}
+    \includegraphics[width=0.85\linewidth]{figuras/fig01_modelo_sistema.png}
+    \caption{Modelo de sistema para geração de chaves em camada física. Alice e Bob, espacialmente próximos ($d_{AB} < 0.5$~m), observam canais altamente correlacionados ($\rho \approx 0.9$), enquanto Eve, distante ($d_E > 20$~cm), experimenta canal descorrelacionado ($\rho_E \approx 0$). A correlação espacial segue o modelo de Clarke: $\rho = J_0(2\pi d/\lambda)$.}
     \label{fig:modelo_sistema}
 \end{figure}
 
@@ -63,15 +63,6 @@ Dessa forma, o modelo apresentado estabelece o cenário de segurança adotado ne
 A geração de chaves criptográficas em camada física fundamenta-se diretamente nas propriedades estatísticas do canal sem fio. Diferentemente do modelo clássico de comunicação ponto a ponto, o sistema considerado neste trabalho assume um cenário no qual uma estação rádio base ou ponto de acesso transmite sinais que são recebidos de forma independente por Alice e Bob. Dessa forma, os canais experimentados por cada dispositivo não são idênticos, mas podem apresentar correlação estatística significativa devido à proximidade espacial e às condições semelhantes de propagação.
 
 O canal sem fio é modelado como um meio sujeito a desvanecimento aleatório, no qual o sinal transmitido sofre variações estocásticas de amplitude e fase ao longo do tempo e da frequência. Essas variações decorrem principalmente do fenômeno de propagação multipercurso, em que múltiplas réplicas do sinal chegam ao receptor após reflexões, difrações e espalhamentos causados por obstáculos no ambiente. Como consequência, o sinal recebido pode ser descrito como uma superposição ponderada dessas componentes, resultando em flutuações aleatórias conhecidas como desvanecimento (\textit{fading})~\cite{tse_viswanath}.
-
-A Figura~\ref{fig:cenario_propagacao} ilustra um cenário típico de propagação sem fio, evidenciando o efeito de multipercurso e a correlação espacial existente entre os canais observados pelos dispositivos legítimos. Observa-se que Alice e Bob encontram-se separados por uma distância suficientemente pequena para que suas observações do canal permaneçam correlacionadas, enquanto o invasor Eve está localizado a uma distância consideravelmente maior, condição associada à decorrelação espacial do canal.
-
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=0.85\linewidth]{figuras/Figura2.png}
-    \caption{Cenário de propagação evidenciando o efeito de multipercurso e a correlação espacial entre os terminais legítimos.}
-    \label{fig:cenario_propagacao}
-\end{figure}
 
 Matematicamente, o sinal recebido por um dispositivo pode ser expresso como
 %
@@ -89,7 +80,18 @@ Por outro lado, um invasor localizado a uma distância suficientemente grande ob
 \rho_{\text{espacial}}(d) = J_0\left(\frac{2\pi d}{\lambda}\right),
 \end{equation}
 %
-em que $d$ representa a separação espacial entre os dispositivos e $\lambda$ o comprimento de onda da portadora. Essa função decresce rapidamente com o aumento de $d$, atingindo valores próximos a zero para $d > \lambda/2$. Consequentemente, as observações realizadas por Eve apresentam correlação significativamente reduzida em relação às observações dos usuários legítimos quando Eve está suficientemente distante, limitando sua capacidade de inferir a informação compartilhada entre Alice e Bob~\cite{mathur_pks, bloch_wireless_security, maurer_secret_key}.
+em que $d$ representa a separação espacial entre os dispositivos e $\lambda$ o comprimento de onda da portadora.
+
+A Figura~\ref{fig:clarke_correlacao} apresenta o comportamento da correlação espacial em função da distância para um sistema operando em $f = 2.4$~GHz ($\lambda \approx 12.5$~cm). Observa-se que a correlação decresce rapidamente com o aumento da distância, cruzando zero em aproximadamente $d \approx \lambda/2 \approx 6.25$~cm e oscilando com amplitude decrescente para distâncias maiores. Para $d \geq 20$~cm (limiar de segurança adotado neste trabalho e validado experimentalmente na Seção~\ref{sec:results}), a correlação torna-se próxima a zero, garantindo que as observações de Eve sejam estatisticamente independentes daquelas obtidas por Alice e Bob.
+
+\begin{figure}[!t]
+    \centering
+    \includegraphics[width=0.85\linewidth]{figuras/fig03_clarke_correlacao.png}
+    \caption{Correlação espacial segundo o modelo de Clarke para $f = 2.4$~GHz. A correlação decresce rapidamente com a distância, atingindo valores próximos a zero para $d \geq 20$~cm (limiar de segurança). A linha vertical tracejada indica a distância mínima para garantir descorrelação espacial suficiente entre os usuários legítimos e o invasor.}
+    \label{fig:clarke_correlacao}
+\end{figure}
+
+Consequentemente, as observações realizadas por Eve apresentam correlação significativamente reduzida em relação às observações dos usuários legítimos quando Eve está suficientemente distante, limitando sua capacidade de inferir a informação compartilhada entre Alice e Bob~\cite{mathur_pks, bloch_wireless_security, maurer_secret_key}.
 
 Assim, propriedades como desvanecimento aleatório, correlação estatística entre canais legítimos e decorrelação espacial em relação ao invasor constituem a base física que viabiliza a extração de segredos diretamente do meio de propagação. Na subseção seguinte, descreve-se como as observações do canal são sistematicamente processadas nas etapas de quantização, reconciliação da informação e amplificação de privacidade no processo de geração de chaves criptográficas em camada física.
 
@@ -101,8 +103,8 @@ De forma geral, o processo de geração de chaves pode ser decomposto em quatro 
 
 \begin{figure}[!t]
 \centering
-\includegraphics[width=0.85\linewidth]{figuras/ProcessoGer.png}
-\caption{Etapas fundamentais do processo de geração de chaves em camada física}
+\includegraphics[width=0.85\linewidth]{figuras/fig02_fluxograma_pkg.png}
+\caption{Fluxograma do processo de geração de chaves em camada física. O sistema opera em quatro etapas sequenciais: (1) sondagem do canal e amostragem de observações correlacionadas, (2) quantização BPSK/QPSK dos sinais recebidos, (3) reconciliação de informação via código BCH(127,64,10), e (4) amplificação de privacidade com SHA-256, resultando em chave simétrica de 256 bits.}
 \label{fig:Processo_Geração}
 \end{figure}
 

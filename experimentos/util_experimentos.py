@@ -92,7 +92,7 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
                                    nome_arquivo, 
                                    legenda_template=None):
     """
-    Cria gráfico comparativo de BMR e KDR para diferentes variações de parâmetro
+    Cria 2 gráficos separados de BMR e KDR para diferentes variações de parâmetro
     
     Args:
         snr_db: Array com valores de SNR
@@ -102,44 +102,47 @@ def criar_grafico_comparativo_kdr(snr_db, dados_variacoes,
         nome_arquivo: Nome do arquivo para salvar
         legenda_template: Template para legendas (ex: "σ = {}")
     """
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    fig.suptitle(titulo, fontsize=14, fontweight='bold')
-    
     cores = plt.cm.tab10(np.linspace(0, 1, len(dados_variacoes)))
     
-    titulos_subplots = [
-        'BMR (antes da reconciliação)',
-        'KDR (após reconciliação BCH)'
-    ]
-    
-    metricas = ['bmr_rates', 'kdr_rates']
-    
-    for i, (metrica, titulo_sub) in enumerate(zip(metricas, titulos_subplots)):
-        ax = axes[i]
-        
-        for j, (variacao, dados) in enumerate(sorted(dados_variacoes.items())):
-            if legenda_template:
-                label = legenda_template.format(variacao)
-            else:
-                label = str(variacao)
-            
-            ax.plot(snr_db, dados[metrica], 
-                   marker='o', linestyle='-', linewidth=2,
-                   color=cores[j], label=label)
-        
-        ax.set_xlabel(xlabel)
-        ylabel = 'BMR (%)' if metrica == 'bmr_rates' else 'KDR (%)'
-        ax.set_ylabel(ylabel)
-        ax.set_title(titulo_sub)
-        ax.grid(True, alpha=0.3)
-        ax.legend()
-    
+    # FIGURA 1: BMR (antes da reconciliação)
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    for j, (variacao, dados) in enumerate(sorted(dados_variacoes.items())):
+        if legenda_template:
+            label = legenda_template.format(variacao)
+        else:
+            label = str(variacao)
+        ax1.plot(snr_db, dados['bmr_rates'], 
+               marker='o', linestyle='-', linewidth=2,
+               color=cores[j], label=label)
+    ax1.set_xlabel(xlabel, fontsize=12)
+    ax1.set_ylabel('BMR (%)', fontsize=12)
+    ax1.set_title(f'BMR Antes da Reconciliação\n{titulo}', fontsize=13, fontweight='bold')
+    ax1.grid(True, alpha=0.3)
+    ax1.legend(fontsize=11)
     plt.tight_layout()
-    
-    filepath = salvar_grafico(fig, nome_arquivo)
+    filepath1 = salvar_grafico(fig1, f"{nome_arquivo}_01")
     plt.close()
     
-    return filepath
+    # FIGURA 2: KDR (após reconciliação BCH)
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    for j, (variacao, dados) in enumerate(sorted(dados_variacoes.items())):
+        if legenda_template:
+            label = legenda_template.format(variacao)
+        else:
+            label = str(variacao)
+        ax2.plot(snr_db, dados['kdr_rates'], 
+               marker='s', linestyle='-', linewidth=2,
+               color=cores[j], label=label)
+    ax2.set_xlabel(xlabel, fontsize=12)
+    ax2.set_ylabel('KDR (%)', fontsize=12)
+    ax2.set_title(f'KDR Após Reconciliação BCH\n{titulo}', fontsize=13, fontweight='bold')
+    ax2.grid(True, alpha=0.3)
+    ax2.legend(fontsize=11)
+    plt.tight_layout()
+    filepath2 = salvar_grafico(fig2, f"{nome_arquivo}_02")
+    plt.close()
+    
+    return filepath1, filepath2
 
 
 def gerar_tabela_latex(dados, nome_experimento):

@@ -324,12 +324,17 @@ def experimento_eve_temporal(
 
 def criar_graficos(resultados_espacial, resultados_temporal, kdr_bob, lambda_cm, timestamp):
     """
-    Cria dois gráficos: espacial e temporal (correlação de coeficientes h)
+    Cria dois gráficos separados: espacial e temporal (correlação de coeficientes h)
     """
     
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    dir_figuras = os.path.join(base_dir, 'resultados', 'figuras')
+    os.makedirs(dir_figuras, exist_ok=True)
     
-    # ===== GRÁFICO 1: Correlação h vs Distância de Eve =====
+    lambda_2_m = lambda_cm / 100 / 2
+    
+    # ===== FIGURA 1: Correlação h vs Distância de Eve =====
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
     ax1.plot(resultados_espacial['distancia_eve_m'], 
              resultados_espacial['correlacao_h_alice_eve'],
              'o-', color='red', linewidth=2, markersize=8,
@@ -341,19 +346,24 @@ def criar_graficos(resultados_espacial, resultados_temporal, kdr_bob, lambda_cm,
         ax1.axhline(y=corr_bob, color='green', linestyle='--', linewidth=2,
                     label=f'ρ(h_Alice, h_Bob) = {corr_bob:.3f}')
     
+    # Linha vertical em λ/2
+    ax1.axvline(x=lambda_2_m, color='blue', linestyle=':', alpha=0.5,
+                label=f'λ/2 = {lambda_cm/2:.1f}cm')
+    
     ax1.set_xlabel('Distância Eve de Alice (m)', fontsize=12)
     ax1.set_ylabel('Correlação de coeficientes h', fontsize=12)
     ax1.set_title('Descorrelação Espacial (método Yuan et al.)', fontsize=13, fontweight='bold')
     ax1.grid(True, alpha=0.3)
     ax1.legend(fontsize=10)
     ax1.set_ylim([-0.1, 1.0])
+    plt.tight_layout()
     
-    # Adicionar linha vertical em λ/2
-    lambda_2_m = lambda_cm / 100 / 2
-    ax1.axvline(x=lambda_2_m, color='blue', linestyle=':', alpha=0.5,
-                label=f'λ/2 = {lambda_cm/2:.1f}cm')
+    caminho1 = os.path.join(dir_figuras, f'exp06_analise_eve_{timestamp}_01.png')
+    plt.savefig(caminho1, dpi=300, bbox_inches='tight')
+    plt.close()
     
-    # ===== GRÁFICO 2: Correlação h vs Atraso de Eve =====
+    # ===== FIGURA 2: Correlação h vs Atraso de Eve =====
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
     ax2.plot(resultados_temporal['atraso_ms'],
              resultados_temporal['correlacao_h_alice_eve'],
              's-', color='orange', linewidth=2, markersize=8,
@@ -371,16 +381,11 @@ def criar_graficos(resultados_espacial, resultados_temporal, kdr_bob, lambda_cm,
     ax2.grid(True, alpha=0.3)
     ax2.legend(fontsize=10)
     ax2.set_ylim([0, 55])
-    
     plt.tight_layout()
     
-    # Salvar
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    caminho_figura = os.path.join(base_dir, 'resultados', 'figuras', f'exp06_analise_eve_{timestamp}.png')
-    os.makedirs(os.path.dirname(caminho_figura), exist_ok=True)
-    plt.savefig(caminho_figura, dpi=300, bbox_inches='tight')
-    print(f"\n[OK] Grafico salvo: {caminho_figura}")
-    
+    caminho2 = os.path.join(dir_figuras, f'exp06_analise_eve_{timestamp}_02.png')
+    plt.savefig(caminho2, dpi=300, bbox_inches='tight')
+    print(f"\n[OK] Gráficos salvos: {caminho1} e {caminho2}")
     plt.close()
 
 

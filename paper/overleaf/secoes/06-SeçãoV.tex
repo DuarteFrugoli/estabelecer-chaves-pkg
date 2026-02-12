@@ -7,14 +7,16 @@ Esta seção apresenta os resultados dos sete experimentos sistemáticos conduzi
 
 O primeiro experimento investiga o impacto da \ac{SNR} sobre a \ac{BMR} inicial e o \ac{KDR} após reconciliação. A \ac{SNR} foi variada logaritmicamente de $-10$~dB a $30$~dB em 18 pontos, mantendo fixos a correlação espacial $\rho = 0.9$, a modulação \ac{BPSK}, e o código \ac{BCH}(127,64,10).
 
-A Figura~\ref{fig:exp01_snr} apresenta a curva característica do \ac{KDR} em função da \ac{SNR}. Observa-se que o \ac{KDR} decresce exponencialmente com o aumento da \ac{SNR}, atingindo valores próximos a zero a partir de aproximadamente $13$--$15$~dB. A Tabela~\ref{tab:exp01_snr} apresenta os valores numéricos obtidos para pontos selecionados da curva.
+A Figura~\ref{fig:exp01_snr} apresenta as curvas de \ac{BMR} e \ac{KDR} em função da \ac{SNR}, demonstrando o impacto da reconciliação \ac{BCH}. Observa-se que o \ac{BMR} decresce continuamente com a \ac{SNR}, enquanto o \ac{KDR} apresenta decaimento exponencial mais acentuado, atingindo valores nulos a partir de $13$--$15$~dB. A Tabela~\ref{tab:exp01_snr} apresenta os valores numéricos obtidos para pontos selecionados.
 
-\begin{figure}[htbp]
+\begin{figure*}[t]
 \centering
-% \includegraphics[width=0.8\textwidth]{figuras/exp01_variacao_snr.png}
-\caption{Taxa de Desacordo de Chaves (KDR) em função da Relação Sinal-Ruído (SNR). A curva mostra decaimento exponencial, atingindo KDR nula a partir de 13--15~dB.}
+\subfigure[BMR antes da reconciliação]{\includegraphics[width=0.48\textwidth]{figuras/exp01_variacao_snr_01_20260212_021057.png}\label{fig:exp01_bmr}}
+\hfill
+\subfigure[KDR após reconciliação BCH(127,64,10)]{\includegraphics[width=0.48\textwidth]{figuras/exp01_variacao_snr_02_20260212_021057.png}\label{fig:exp01_kdr}}
+\caption{Impacto da SNR no desempenho do sistema. (a) BMR decresce continuamente com SNR. (b) KDR apresenta decaimento exponencial, atingindo valores nulos em 13--15~dB, demonstrando eficácia da reconciliação BCH e viabilidade para enlaces típicos de IoT.}
 \label{fig:exp01_snr}
-\end{figure}
+\end{figure*}
 
 \begin{table}[htbp]
 \centering
@@ -86,7 +88,14 @@ Os resultados confirmam que o código \ac{BCH}(127,64,10), com capacidade de cor
 
 \subsection{Experimento 4: Análise de Complexidade Computacional}
 
-O quarto experimento mede o tempo de execução das principais operações do sistema para diferentes códigos \ac{BCH}. A Tabela~\ref{tab:exp04_complexidade} apresenta os tempos médios de codificação, decodificação e processamento total.
+O quarto experimento mede o tempo de execução das principais operações do sistema para diferentes códigos \ac{BCH}. A Figura~\ref{fig:exp04_complexidade} apresenta graficamente os tempos de codificação e decodificação, enquanto a Tabela~\ref{tab:exp04_complexidade} apresenta os valores numéricos completos.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\columnwidth]{figuras/exp04_analise_complexidade_01_20260212_021634.png}
+\caption{Tempo de codificação versus decodificação para diferentes códigos BCH. O código BCH(127,64,10) apresenta tempo total de 0.36~ms, demonstrando viabilidade para aplicações IoT em tempo real ($<$10~ms).}
+\label{fig:exp04_complexidade}
+\end{figure}
 
 \begin{table}[htbp]
 \centering
@@ -108,7 +117,7 @@ O tempo de processamento de $0.489$~ms para o código \ac{BCH}(127,64) correspon
 
 \subsection{Experimento 5: Perfis de Dispositivos IoT}
 
-O quinto experimento valida a aplicabilidade do sistema em cinco perfis representativos de dispositivos \ac{IoT}, cada um caracterizado por parâmetros físicos realistas de mobilidade, frequência de operação e condições de canal. A Tabela~\ref{tab:exp05_perfis} apresenta os parâmetros e resultados para cada perfil.
+O quinto experimento valida a aplicabilidade do sistema em cinco perfis representativos de dispositivos \ac{IoT}, cada um caracterizado por parâmetros físicos realistas de mobilidade, frequência de operação e condições de canal. A Figura~\ref{fig:exp05_perfis} apresenta graficamente o comportamento de \ac{BMR} e \ac{KDR} para todos os perfis, enquanto a Tabela~\ref{tab:exp05_perfis} sumariza os parâmetros e \ac{SNR} mínimo operacional.
 
 \begin{table}[htbp]
 \centering
@@ -131,12 +140,14 @@ Observa-se que o perfil de sensor estático apresenta o melhor desempenho, ating
 
 Um resultado notável é a operação bem-sucedida do sistema no cenário de veículo urbano ($60$~km/h, $\rho_{\text{temporal}} = 0.16$), demonstrando que o erro de estimação de canal controlado ($\leq 30\%$) é mais crítico para a viabilidade do sistema do que a correlação temporal propriamente dita. Esse insight sugere que estratégias de estimação robusta de canal são fundamentais para extensão do sistema a cenários de alta mobilidade.
 
-\begin{figure}[htbp]
+\begin{figure*}[t]
 \centering
-% \includegraphics[width=0.8\textwidth]{figuras/exp05_perfis_dispositivos.png}
-\caption{Desempenho do sistema em cinco perfis de dispositivos IoT. \ac{KDR} inferior a 1\% é alcançada em SNR entre 9--11~dB, com \ac{KDR} nula atingida em 13~dB para todos os perfis.}
+\subfigure[BMR antes da reconciliação]{\includegraphics[width=0.48\textwidth]{figuras/exp05_perfis_dispositivos_20260212_021230_01.png}\label{fig:exp05_bmr}}
+\hfill
+\subfigure[KDR após reconciliação BCH(127,64,10)]{\includegraphics[width=0.48\textwidth]{figuras/exp05_perfis_dispositivos_20260212_021230_02.png}\label{fig:exp05_kdr}}
+\caption{Desempenho do sistema em cinco perfis de dispositivos IoT. (a) BMR inicial varia entre perfis de acordo com erro de estimação. (b) Todos os perfis atingem KDR $<1\%$ em 9--11~dB e KDR nula em 13~dB, demonstrando robustez desde sensores estáticos até veículos urbanos a 60~km/h.}
 \label{fig:exp05_perfis}
-\end{figure}
+\end{figure*}
 
 \subsection{Experimento 6: Análise de Segurança contra Espionagem Passiva}
 
@@ -166,8 +177,8 @@ Os resultados demonstram que para distâncias superiores a $0.2$~m (aproximadame
 
 \begin{figure}[htbp]
 \centering
-% \includegraphics[width=0.8\textwidth]{figuras/exp06_analise_eve.png}
-\caption{Correlação espacial e BER de Eve em função da distância lateral. Descorrelação espacial superior a 20~cm garante segurança equivalente a chute aleatório (BER $\approx 50\%$).}
+\includegraphics[width=0.75\columnwidth]{figuras/exp06_analise_eve_20260212_021230_01.png}
+\caption{Descorrelação espacial: correlação de coeficientes de canal $\rho(h_{\text{Alice}}, h_{\text{Eve}})$ versus distância lateral (método Yuan et al.). A partir de 20~cm ($\approx 3\lambda/2$ a 2.4~GHz), a correlação torna-se desprezível ($\rho < 0.02$), garantindo segurança física contra espionagem passiva.}
 \label{fig:exp06_eve}
 \end{figure}
 
@@ -200,12 +211,12 @@ A Tabela~\ref{tab:exp07_guardband} apresenta os resultados obtidos. Observa-se q
 
 \begin{figure}[htbp]
 \centering
-% \includegraphics[width=0.8\textwidth]{figuras/exp07_impacto_guard_band.png}
-\caption{Trade-off entre eficiência e segurança em função do parâmetro de guard-band. O sistema é naturalmente seguro sem guard-band (BER Eve $\approx 50\%$), e valores elevados (GB $> 0.5$) são contraproducentes.}
+\includegraphics[width=0.85\columnwidth]{figuras/exp07_impacto_guard_band_20260212_021342_02.png}
+\caption{Segurança contra espionagem: BER de Eve versus guard-band (SNR = 15~dB). Eve mantém BER $\approx 50\%$ (chute aleatório) para todos os valores de GB, mesmo sem limiarização (GB=0), confirmando que a descorrelação espacial garante segurança física sem necessidade de técnicas adaptativas complexas.}
 \label{fig:exp07_guardband}
 \end{figure}
 
-Esse resultado é particularmente relevante, pois demonstra que técnicas de limiarização adaptativa complexa, frequentemente propostas na literatura, não são necessárias para garantir a segurança do sistema quando a descorrelação espacial é adequadamente explorada. Recomenda-se operar o sistema com GB $= 0$ ou GB $\leq 0.1\sigma$ para maximizar a taxa de geração de chaves sem comprometer a segurança.
+Esse resultado é particularmente relevante, pois demonstra que técnicas de limiarização adaptativa complexa, frequentemente propostas na literatura, não são necessárias para garantir a segurança do sistema quando a descorrelação espacial é adequadamente explorada. A Figura~\ref{fig:exp07_guardband} confirma que a \ac{BER} de Eve permanece próxima a $50\%$ independentemente do guard-band. Recomenda-se operar o sistema com GB $= 0$ ou GB $\leq 0.1\sigma$ para maximizar a taxa de geração de chaves sem comprometer a segurança.
 
 \subsection{Discussão Geral e Comparação com Estado da Arte}
 

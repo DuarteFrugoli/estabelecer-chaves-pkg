@@ -1,278 +1,270 @@
 # Prompts para Geração de Figuras do Artigo - Sistema PKG
 
-**Data:** 06/02/2026  
-**Objetivo:** Prompts detalhados para IA geradora de imagens (DALL-E, Midjourney, Stable Diffusion)
+**Data:** 12/02/2026  
+**Objetivo:** Prompts para geração de figuras conceituais usando IA (DALL-E, Midjourney, etc.) ou ferramentas manuais (PowerPoint, draw.io)
+
+**RESUMO:** Este documento contém prompts para **2 figuras conceituais** da Seção II que devem ser geradas por IA ou manualmente.
+
+> 📝 **Nota:** Figuras geradas por Python estão em arquivo separado: `FIGURAS_PYTHON.md`
 
 ---
 
-## FIGURA 1: Diagrama do Modelo de Sistema (Seção III)
+## FIGURA 1: Diagrama do Modelo de Sistema (Seção II)
 
 **Tipo:** Diagrama técnico/esquemático  
-**Onde usar:** Seção III (Modelo de Sistema) - após equação $y_A = h_A x + n_A$  
-**Label LaTeX:** `\label{fig:modelo_sistema}`
+**Onde usar:** Seção II (Fundamentos Teóricos) - Modelo de Sistema para PKG  
+**Label LaTeX:** `\label{fig:modelo_sistema}`  
+**Arquivo:** `paper/overleaf/figuras/fig01_modelo_sistema.png`
+
+### Prompt MELHORADO para IA:
+
+```
+Create a professional technical diagram for an IEEE academic paper on physical-layer key generation. White background, publication-quality style.
+
+LAYOUT STRUCTURE:
+- TOP CENTER: 5G cellular tower (gNodeB/base station) with visible antenna
+  * Label: "gNodeB"
+  * Downward arrow labeled "x" (transmitted signal)
+  
+- MIDDLE SECTION: Two small devices (smartphone/IoT icons) very close together (<0.5m):
+  * LEFT device: labeled "Alice" 
+  * RIGHT device: labeled "Bob"
+  * Visual indication of proximity: bracket showing "d_AB < 0.5m"
+  * Arrow from gNodeB to Alice: labeled "h_A"
+  * Arrow from gNodeB to Bob: labeled "h_B"
+  * Double-headed arrow between them: labeled "ρ = 0.9" (high spatial correlation)
+  
+- BOTTOM RIGHT: Third device positioned farther away:
+  * Label: "Eve" (use RED color to indicate eavesdropper)
+  * Arrow from gNodeB labeled "h_E"
+  * Distance annotation: "d_E > 20cm"
+  * Correlation annotation: "ρ_E ≈ 0" (decorrelated)
+
+MATHEMATICAL ANNOTATIONS (small, professional font):
+- Top or side corner: Mathematical box with "ρ = J₀(2πd/λ)" (Clarke model)
+- Near Alice/Bob: "Spatial correlation"
+- Near Eve: "Decorrelated"
+
+VISUAL STYLE:
+- Clean engineering schematic (not photo-realistic)
+- Blue/gray tones for Alice/Bob (legitimate users)
+- Red tone for Eve (threat/eavesdropper)
+- Dashed security perimeter circle at 20cm radius around Alice/Bob
+- Professional IEEE publication quality
+- High contrast for black & white printing compatibility
+- Grid background optional (very subtle if used)
+
+The diagram must clearly convey: Alice and Bob are spatially correlated (close proximity) while Eve is decorrelated (far away), forming the physical security basis for key generation.
+```
+
+**Alternativa se IA não funcionar:** 
+- Procure no Google Images: "5G downlink communication diagram" ou "spatial correlation wireless channel"
+- Use PowerPoint/Google Slides para criar com formas básicas e anotações
+- Ferramentas recomendadas: draw.io, Lucidchart, TikZ (LaTeX)
+
+---
+
+## FIGURA 2: Fluxograma do Processo PKG (Seção II)
+
+**Tipo:** Fluxograma vertical (4 etapas sequenciais)  
+**Onde usar:** Seção II (Fundamentos Teóricos) - Processo de Geração de Chaves em Camada Física  
+**Label LaTeX:** `\label{fig:Processo_Geração}`  
+**Arquivo:** `paper/overleaf/figuras/fig02_fluxograma_pkg.png`
 
 ### Prompt para IA:
-
 ```
-Create a clean technical diagram showing a 5G/IoT physical-layer key generation system with spatial correlation. The image should have a white background and include:
+Create a professional vertical flowchart for an IEEE academic paper showing the Physical-Layer Key Generation protocol. White background, clean technical style.
 
-1. TOP CENTER: A cellular tower (gNodeB/base station) labeled "gNodeB" transmitting downlink signal "x"
-2. MIDDLE: Two small IoT devices (smartphones/sensors) positioned close together (< 0.5 meters apart):
-   - Left device labeled "Alice" 
-   - Right device labeled "Bob"
-   - Arrow from gNodeB to Alice labeled "h_A" (channel coefficient)
-   - Arrow from gNodeB to Bob labeled "h_B" (channel coefficient)
-   - Double-headed arrow between Alice and Bob labeled "ρ = 0.9" indicating high spatial correlation
-3. BOTTOM RIGHT: A third device farther away (> 20cm) labeled "Eve" (eavesdropper)
-   - Arrow from gNodeB to Eve labeled "h_E"
-   - Text near Eve: "d_E > 20cm" and "ρ_E ≈ 0" indicating decorrelation
-4. Style: Clean engineering diagram with simple icons, blue/gray color scheme for professional look
-5. Include mathematical notation: spatial correlation formula ρ = J₀(2πd/λ) in small text
+STRUCTURE (4 sequential stages, top to bottom):
 
-The diagram should clearly show that Alice and Bob are spatially correlated (close proximity) while Eve is decorrelated (far away).
+╔════════════════════════════════════════╗
+║    STAGE 1: CHANNEL PROBING           ║
+╠════════════════════════════════════════╣
+║ Box title: "Sondagem e Amostragem"    ║
+║ Formula: y_i = h_i · x + n_i          ║
+║ Icon: Antenna/tower symbol            ║
+║ Description: "Observações              ║
+║              correlacionadas"          ║
+╚════════════════════════════════════════╝
+           ↓ (arrow down)
+╔════════════════════════════════════════╗
+║    STAGE 2: QUANTIZATION              ║
+╠════════════════════════════════════════╣
+║ Box title: "Quantização"              ║
+║ Formula: b_i = Q(z_i)                 ║
+║ Icon: Digital waveform/binary         ║
+║ Description: "BPSK/QPSK               ║
+║              Guard-band opcional"      ║
+╚════════════════════════════════════════╝
+           ↓ (arrow down)
+╔════════════════════════════════════════╗
+║    STAGE 3: RECONCILIATION            ║
+╠════════════════════════════════════════╣
+║ Box title: "Reconciliação"            ║
+║ Formula: σ = b_B ⊕ c                  ║
+║ Icon: Error correction symbol         ║
+║ Description: "Código BCH(127,64,10)   ║
+║              Canal público"            ║
+╚════════════════════════════════════════╝
+           ↓ (arrow down)
+╔════════════════════════════════════════╗
+║    STAGE 4: PRIVACY AMPLIFICATION     ║
+╠════════════════════════════════════════╣
+║ Box title: "Amplificação Privacidade" ║
+║ Formula: k_final = H(k)               ║
+║ Icon: Lock/padlock symbol             ║
+║ Description: "SHA-256                 ║
+║              Chave 256 bits"           ║
+╚════════════════════════════════════════╝
+
+VISUAL SPECIFICATIONS:
+- Box style: Light blue fill (#E3F2FD), dark blue border (#1976D2), rounded corners
+- Box dimensions: Approximately same width, height adjust to content
+- Arrows: Solid dark blue, medium thickness, with arrowhead
+- Formula text: Mathematical font, clear and readable
+- Icons: Simple, minimalist, monochrome (blue/gray)
+- Spacing: Equal vertical spacing between boxes
+- Title text: Bold, 14pt
+- Formula text: 12pt
+- Description text: Regular, 10pt
+- Overall dimensions: Portrait orientation, suitable for IEEE column
+
+STYLE GUIDELINES:
+- Professional engineering diagram
+- Clean, minimalist design
+- High contrast for printing
+- IEEE publication quality
+- No shadows or 3D effects
+- White/light gray background
+- Grid lines optional (very subtle if included)
+
+The flowchart must clearly show the sequential nature of the PKG process, from correlated channel observations to final secure key generation.
 ```
 
-**Alternativa simples:** Procure no Google por "5G downlink communication diagram" ou "spatial correlation wireless channel" e adapte com anotações.
+**Alternativa manual (PowerPoint/Google Slides):**
+1. Criar 4 retângulos arredondados verticalmente alinhados
+2. Preencher com azul claro (#E3F2FD), borda azul escuro (#1976D2)
+3. Inserir texto em cada caixa:
+   - Título em negrito (ex: "Sondagem e Amostragem")
+   - Fórmula matemática (usar Inserir → Equação)
+   - Descrição breve abaixo
+4. Adicionar setas verticais entre as caixas
+5. Inserir ícones simples ao lado de cada título:
+   - Etapa 1: 📡 antena
+   - Etapa 2: 💠 sinal digital
+   - Etapa 3: ⚙️ engrenagem/correção
+   - Etapa 4: 🔒 cadeado
+6. Exportar como PNG 300 DPI (Arquivo → Salvar Como → PNG, opções de alta qualidade)
+
+**Ferramentas alternativas:**
+- **draw.io** (diagrams.net) - gratuito, online, templates prontos
+- **Lucidchart** - profissional, tem versão gratuita
+- **Dia Diagram Editor** - código aberto, Windows/Linux
+- **TikZ (LaTeX)** - para quem domina LaTeX, resultado perfeito
 
 ---
 
-## FIGURA 2: Fluxograma do Protocolo PKG Completo (Seção IV)
+## RESUMO DAS FIGURAS
 
-**Tipo:** Fluxograma vertical  
-**Onde usar:** Seção IV (Metodologia Experimental) - após Fluxo de Processamento  
-**Label LaTeX:** `\label{fig:fluxograma_protocolo}`
+**Figuras conceituais para geração por IA ou manualmente:**
 
-### Prompt para IA:
+1. **fig:modelo_sistema** - Diagrama Alice/Bob/Eve com correlação espacial
+   - 📍 Seção II (Modelo de Sistema)
+   - 📄 Arquivo: `fig01_modelo_sistema.png`
+   - ⚠️ **PRECISA GERAR** - Usar IA (DALL-E, Midjourney) ou PowerPoint
+   
+2. **fig:Processo_Geração** - Fluxograma das 4 etapas do protocolo PKG
+   - 📍 Seção II (Processo de Geração de Chaves)
+   - 📄 Arquivo: `fig02_fluxograma_pkg.png`
+   - ⚠️ **PRECISA GERAR** - Usar IA ou draw.io/PowerPoint
 
-```
-Create a vertical flowchart showing the complete flow of a physical-layer key generation protocol with 7 steps. White background, professional style:
+### 🔧 AÇÕES NECESSÁRIAS:
 
-1. Top box: "1. Channel Generation" with formula "h_A, h_B (ρ = 0.9)"
-2. Second box: "2. Downlink Reception" with formula "y_A = h_A·x + n_A"
-3. Third box: "3. Channel Estimation" with text "Error 10-30%"
-4. Fourth box: "4. BPSK/QPSK Quantization" with text "Guard-band optional"
-5. Fifth box: "5. Code-Offset BCH(127,64,10)" with formula "σ = b_B ⊕ c"
-6. Sixth box: "6. SHA-256 Privacy Amplification" with text "256-bit key"
-7. Bottom box: "7. Metrics" with text "BER, KDR"
+1. ⚠️ **Gerar fig01_modelo_sistema.png** 
+   - **Opção 1 (Recomendada):** IA generativa (DALL-E, Midjourney, Stable Diffusion)
+     * Copiar prompt completo da seção "FIGURA 1" acima
+     * Gerar imagem
+     * Salvar como PNG 300 DPI mínimo
+   - **Opção 2:** PowerPoint/Google Slides
+     * Criar manualmente com formas e setas
+     * Adicionar anotações matemáticas
+     * Exportar como PNG alta qualidade
+   - **Opção 3:** draw.io, Lucidchart, ou TikZ (LaTeX)
+   
+2. ⚠️ **Gerar fig02_fluxograma_pkg.png**
+   - **Opção 1 (Recomendada):** IA generativa
+     * Copiar prompt completo da seção "FIGURA 2" acima
+     * Gerar fluxograma vertical com 4 etapas
+   - **Opção 2:** PowerPoint/Google Slides
+     * Seguir instruções manuais fornecidas
+     * Usar retângulos arredondados + setas
+     * Adicionar ícones (antena, binário, engrenagem, cadeado)
+   - **Opção 3:** draw.io (tem templates de fluxograma prontos)
 
-Connect boxes with downward arrows. Use light blue boxes with dark blue borders. Add small icons (antenna, lock, hash symbol) where appropriate. Keep it clean and technical.
-```
+### 📋 FERRAMENTAS RECOMENDADAS:
 
-**IMPORTANTE:** Você já tem a figura **ProcessoGer.png** na pasta `paper/overleaf/figuras/`. Verifique se essa figura serve! Se servir, use ela e não precisa gerar nova.
+**Para IA Generativa:**
+- DALL-E 3 (OpenAI) - excelente para diagramas técnicos
+- Midjourney - resultados artísticos de alta qualidade
+- Stable Diffusion - código aberto, customizável
 
----
-
-## FIGURA 3: Curva de Correlação Espacial de Clarke (Seção III)
-
-**Tipo:** Gráfico técnico/científico  
-**Onde usar:** Seção III (Modelo de Sistema) - após equação $\rho = J_0(2\pi d/\lambda)$  
-**Label LaTeX:** `\label{fig:clarke_correlacao}`
-
-### Prompt para IA:
-
-```
-Create a technical graph showing the Clarke spatial correlation model. Clean scientific style with white background:
-
-X-axis: Distance (meters) from 0 to 1.0 m
-Y-axis: Spatial Correlation ρ from -0.4 to 1.0
-Plot: Bessel function J₀(2πd/λ) curve showing:
-- Starting at ρ=1.0 when d=0
-- Decreasing to ρ≈0.7 at d=0.1m
-- Crossing zero at d≈0.0625m (λ/2 for 2.4 GHz)
-- Oscillating with decreasing amplitude for d > 0.2m
-
-Add annotations:
-- Vertical dashed line at d=0.2m labeled "Security threshold (20cm)"
-- Horizontal dashed line at ρ=0 
-- Text box: "f = 2.4 GHz, λ = 12.5 cm"
-- Title: "Spatial Correlation vs Distance (Clarke Model)"
-
-Use blue line, grid background, professional scientific plotting style similar to matplotlib.
-```
-
-**Alternativa:** Gere a curva real usando Python/Matplotlib e salve como PNG. Mais fácil e preciso do que IA.
-
-**Código Python para gerar:**
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.special import jv
-
-freq = 2.4e9  # 2.4 GHz
-lambda_m = 3e8 / freq
-d = np.linspace(0, 1.0, 500)
-rho = jv(0, 2*np.pi*d/lambda_m)
-
-plt.figure(figsize=(8, 5))
-plt.plot(d, rho, 'b-', linewidth=2)
-plt.axhline(0, color='k', linestyle='--', linewidth=0.8)
-plt.axvline(0.2, color='r', linestyle='--', linewidth=1.5, label='Limiar segurança (20cm)')
-plt.xlabel('Distância (m)', fontsize=12)
-plt.ylabel('Correlação Espacial ρ', fontsize=12)
-plt.title('Modelo de Clarke: ρ = J₀(2πd/λ)', fontsize=14)
-plt.grid(True, alpha=0.3)
-plt.legend()
-plt.tight_layout()
-plt.savefig('clarke_correlacao.png', dpi=300)
-```
+**Para Criação Manual:**
+- draw.io (diagrams.net) - gratuito, templates prontos
+- PowerPoint/Google Slides - fácil, universal
+- Lucidchart - profissional, colaborativo
+- TikZ (LaTeX) - perfeito para publicações acadêmicas
 
 ---
 
-## FIGURA 4: Diagrama Guard-Band (Quantização) (Seção II ou VII)
+## INSTRUÇÕES FINAIS DE USO
 
-**Tipo:** Diagrama técnico/ilustrativo  
-**Onde usar:** Seção II (Fundamentação) ou Seção V (Exp07)  
-**Label LaTeX:** `\label{fig:guardband_quantizacao}`
+### Para gerar as 2 figuras conceituais:
 
-### Prompt para IA:
+**1. Figura 1 (Diagrama Modelo de Sistema):**
+```bash
+# Opção A: Usar IA (DALL-E, Midjourney, Stable Diffusion, etc.)
+# 1. Copiar prompt completo da seção "FIGURA 1" acima
+# 2. Colar na IA geradora de imagens
+# 3. Ajustar se necessário (pode gerar múltiplas versões e escolher a melhor)
+# 4. Salvar em: paper/overleaf/figuras/fig01_modelo_sistema.png
 
-```
-Create a technical diagram illustrating the guard-band concept in signal quantization. White background, clean style:
-
-Show a vertical amplitude axis with symmetric zones:
-- Top region (+σ): Light green zone labeled "Bit = 1"
-- Upper middle (+GB to +σ): Yellow zone labeled "Guard-band (discard)"
-- Center (-GB to +GB): Yellow zone labeled "Dead zone (discard)"
-- Lower middle (-σ to -GB): Yellow zone labeled "Guard-band (discard)"
-- Bottom region (below -σ): Light red zone labeled "Bit = 0"
-
-Add:
-- Horizontal dashed lines at +σ, +GB, 0, -GB, -σ
-- Small signal points scattered in each region
-- Arrow pointing to discarded samples in guard-band with text "30-50% discarded for GB=0.5σ"
-- Title: "Guard-Band Effect on Quantization"
-- Annotation: "Trade-off: Security vs Efficiency"
-
-Use engineering diagram style with clear labels and professional color scheme.
+# Opção B: Criar manualmente (PowerPoint/Google Slides)
+# 1. Abrir PowerPoint/Slides em branco
+# 2. Inserir formas: retângulos (Alice, Bob, Eve), triângulo (gNodeB)
+# 3. Adicionar setas com rótulos (h_A, h_B, h_E, x)
+# 4. Inserir fórmula matemática (Inserir → Equação): ρ = J₀(2πd/λ)
+# 5. Colorir: azul/cinza para Alice/Bob, vermelho para Eve
+# 6. Exportar: Arquivo → Salvar Como → PNG, configurar DPI alto (300)
+# 7. Salvar em: paper/overleaf/figuras/fig01_modelo_sistema.png
 ```
 
-**MUITO SIMPLES:** Procure por "quantization threshold diagram" ou "guard band signal processing" no Google Images. Fácil de encontrar e adaptar com anotações.
+**2. Figura 2 (Fluxograma PKG):**
+```bash
+# Opção A: Usar IA (recomendada para fluxogramas)
+# 1. Copiar prompt completo da seção "FIGURA 2" acima
+# 2. Colar na IA geradora de imagens
+# 3. Verificar se as 4 etapas estão corretas e legíveis
+# 4. Salvar em: paper/overleaf/figuras/fig02_fluxograma_pkg.png
 
----
+# Opção B: Usar draw.io (diagrams.net) - MUITO FÁCIL
+# 1. Acessar https://app.diagrams.net/
+# 2. Novo diagrama → Flowchart template
+# 3. Arrastar 4 retângulos arredondados verticalmente
+# 4. Conectar com setas
+# 5. Adicionar texto conforme especificado no prompt
+# 6. Exportar: File → Export as → PNG (300 DPI)
+# 7. Salvar em: paper/overleaf/figuras/fig02_fluxograma_pkg.png
 
-## FIGURA 5: Comparação Reciprocidade Temporal vs Correlação Espacial (Seção III)
-
-**Tipo:** Diagrama comparativo lado a lado  
-**Onde usar:** Seção III (Modelo de Sistema) - Justificativa  
-**Label LaTeX:** `\label{fig:temporal_vs_espacial}`
-
-### Prompt para IA:
-
-```
-Create a side-by-side comparison diagram showing two wireless channel models. Clean technical style, white background:
-
-LEFT PANEL - "Temporal Reciprocity (TDD)":
-- Alice device with upward arrow labeled "Pilot (t₁)"
-- Bob device with downward arrow labeled "Pilot (t₂)"
-- Double-headed arrow between them labeled "h_AB(t₁) ≈ h_BA(t₂)"
-- Text below: "Requires TDD mode"
-- Text below: "Time synchronization needed"
-
-RIGHT PANEL - "Spatial Correlation (FDD/TDD)":
-- Base station (tower) at top
-- Two devices (Alice and Bob) close together below
-- Downward arrows from tower to both devices labeled "h_A" and "h_B"
-- Arrow between devices labeled "ρ = J₀(2πd/λ)"
-- Text below: "Works in FDD/TDD"
-- Text below: "No synchronization needed"
-
-Add central label "vs" between panels. Use blue/green color scheme for professional look.
+# Opção C: PowerPoint/Slides (mesma lógica da Figura 1)
 ```
 
-**SIMPLES:** Procure "TDD reciprocity vs FDD correlation" ou desenhe manualmente no PowerPoint/Google Slides.
-
 ---
 
-## FIGURAS DOS RESULTADOS (Seção V) - JÁ EXISTEM!
-
-Essas figuras já foram geradas pelos experimentos Python. Apenas copie para pasta `paper/overleaf/figuras/`:
-
-### Exp01: SNR vs KDR
-- **Arquivo:** `resultados/figuras/exp01_variacao_snr_YYYYMMDD_HHMMSS.png`
-- **Label:** `\label{fig:exp01_snr}`
-- **Legenda:** "Taxa de Desacordo de Chaves (KDR) em função da Relação Sinal-Ruído (SNR). A curva mostra decaimento exponencial, atingindo KDR nula a partir de 13--15~dB."
-
-### Exp02: BPSK vs QPSK (opcional - dados na tabela)
-- **Arquivo:** `resultados/figuras/exp02_comparacao_modulacao_YYYYMMDD_HHMMSS.png`
-- **Label:** `\label{fig:exp02_modulacao}`
-
-### Exp03: Códigos BCH (opcional - dados na tabela)
-- **Arquivo:** `resultados/figuras/exp03_variacao_bch_YYYYMMDD_HHMMSS.png`
-- **Label:** `\label{fig:exp03_bch}`
-
-### Exp04: Complexidade Computacional (opcional - dados na tabela)
-- **Arquivo:** `resultados/figuras/exp04_analise_complexidade_YYYYMMDD_HHMMSS.png`
-- **Label:** `\label{fig:exp04_complexidade}`
-
-### Exp05: Perfis IoT
-- **Arquivo:** `resultados/figuras/exp05_perfis_dispositivos_YYYYMMDD_HHMMSS.png`
-- **Label:** `\label{fig:exp05_perfis}`
-- **Legenda:** "Desempenho do sistema em cinco perfis de dispositivos IoT. Todos os perfis atingem KDR nula em SNR entre 13--15~dB, demonstrando ampla aplicabilidade."
-
-### Exp06: Segurança Eve (Descorrelação Espacial)
-- **Arquivo:** `resultados/figuras/exp06_analise_eve_YYYYMMDD_HHMMSS.png`
-- **Label:** `\label{fig:exp06_eve}`
-- **Legenda:** "Correlação espacial e BER de Eve em função da distância lateral. Descorrelação espacial superior a 20~cm garante segurança equivalente a chute aleatório (BER $\approx 50\%$)."
-
-### Exp07: Guard-Band
-- **Arquivo:** `resultados/figuras/exp07_impacto_guard_band_YYYYMMDD_HHMMSS.png`
-- **Label:** `\label{fig:exp07_guardband}`
-- **Legenda:** "Trade-off entre eficiência e segurança em função do parâmetro de guard-band. O sistema é naturalmente seguro sem guard-band (BER Eve $\approx 50\%$), e valores elevados (GB $> 0.5$) são contraproducentes."
-
----
-
-## RESUMO DE PRIORIDADES
-
-### ESSENCIAIS (precisam ser criadas/encontradas):
-1. ✅ **FIGURA 1:** Diagrama Modelo Sistema (IA ou Google "5G downlink diagram")
-2. ✅ **FIGURA 2:** Fluxograma PKG (verificar se ProcessoGer.png serve!)
-3. ✅ **FIGURA 3:** Curva Clarke (GERAR COM PYTHON - código fornecido acima)
-
-### IMPORTANTES (melhoram o artigo):
-4. **FIGURA 4:** Guard-band (Google "quantization threshold" - fácil)
-5. **FIGURA 5:** Temporal vs Espacial (PowerPoint/Google Slides - simples)
-
-### JÁ EXISTEM (copiar da pasta resultados/figuras/):
-6. **Exp01:** SNR vs KDR (gráfico principal)
-7. **Exp05:** 5 perfis IoT
-8. **Exp06:** Eve descorrelação espacial
-9. **Exp07:** Guard-band trade-off
-
----
-
-## INSTRUÇÕES DE USO
-
-1. **Para IA (DALL-E, Midjourney, etc.):**
-   - Copie o prompt completo da seção correspondente
-   - Cole na IA geradora de imagens
-   - Ajuste se necessário (adicione "engineering style", "technical diagram", etc.)
-   - Salve a imagem em alta resolução (300 DPI mínimo)
-
-2. **Para Google Images:**
-   - Use termos de busca mencionados em cada seção
-   - Procure imagens com licença livre ou Creative Commons
-   - Adapte com anotações no PowerPoint/GIMP se necessário
-
-3. **Para gerar com Python:**
-   - Execute o código Python fornecido (Figura 3 - Clarke)
-   - Ajuste estilo/cores conforme necessário
-   - Salve como PNG 300 DPI
-
-4. **Organização final:**
-   - Salve todas as figuras em: `paper/overleaf/figuras/`
-   - Nomes sugeridos:
-     - `fig01_modelo_sistema.png`
-     - `fig02_fluxograma_pkg.png`
-     - `fig03_clarke_correlacao.png`
-     - `fig04_guardband.png`
-     - `fig05_temporal_vs_espacial.png`
-     - `exp01_snr_kdr.png`
-     - `exp05_perfis_iot.png`
-     - `exp06_eve_seguranca.png`
-     - `exp07_guardband_tradeoff.png`
-
----
-
-**Documento criado:** 06/02/2026  
-**Status:** Pronto para geração de imagens  
-**Próximo passo:** Gerar figuras e inserir no LaTeX descomentando os comandos `\includegraphics`
+**Documento atualizado:** 12/02/2026  
+**Status:** ✅ Pronto para geração das 2 figuras conceituais com IA  
+**Próximo passo:**
+1. Copiar prompts acima
+2. Gerar fig01_modelo_sistema.png usando IA ou PowerPoint
+3. Gerar fig02_fluxograma_pkg.png usando IA ou draw.io
+4. Salvar arquivos em `paper/overleaf/figuras/`
+5. Compilar LaTeX para verificar resultado

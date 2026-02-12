@@ -237,57 +237,68 @@ def experimento_impacto_guard_band(
 
 def criar_graficos_guard_band(resultados, timestamp):
     """
-    Cria gráficos de 3 painéis mostrando impacto do guard-band
+    Cria 3 gráficos separados mostrando impacto do guard-band
     """
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    dir_figuras = os.path.join(base_dir, "resultados", "figuras")
+    os.makedirs(dir_figuras, exist_ok=True)
     
     gb_vals = resultados['guard_band']
     
-    # ===== GRÁFICO 1: KDR Alice-Bob vs Guard-Band =====
-    axes[0].plot(gb_vals, resultados['kdr_bob'], 'o-', 
-                 color='blue', linewidth=2, markersize=8, label='KDR Bob')
-    axes[0].axhline(y=1.0, color='red', linestyle='--', linewidth=1.5, 
-                    label='Limiar 1% (aceitável)')
-    axes[0].set_xlabel('Guard-Band (× σ)', fontsize=12)
-    axes[0].set_ylabel('KDR Bob (%)', fontsize=12)
-    axes[0].set_title('(a) KDR Alice-Bob (menor = melhor)', fontsize=13, fontweight='bold')
-    axes[0].legend(fontsize=10)
-    axes[0].grid(True, alpha=0.3)
-    
-    # ===== GRÁFICO 2: BER Eve vs Guard-Band =====
-    axes[1].plot(gb_vals, resultados['ber_eve_raw'], 's-', 
-                 color='red', linewidth=2, markersize=8, label='BER Eve (raw)')
-    axes[1].plot(gb_vals, resultados['ber_eve_pos_bch'], '^-', 
-                 color='orange', linewidth=2, markersize=8, label='BER Eve (pós-BCH)')
-    axes[1].axhline(y=50.0, color='green', linestyle='--', linewidth=1.5, 
-                    label='50% (chute aleatório)')
-    axes[1].set_xlabel('Guard-Band (× σ)', fontsize=12)
-    axes[1].set_ylabel('BER Eve (%)', fontsize=12)
-    axes[1].set_title('(b) Segurança contra Eve', fontsize=13, fontweight='bold')
-    axes[1].legend(fontsize=10)
-    axes[1].grid(True, alpha=0.3)
-    axes[1].set_ylim([45, 55])
-    
-    # ===== GRÁFICO 3: Taxa de Bits vs Guard-Band =====
-    axes[2].plot(gb_vals, resultados['taxa_bits_bps'], 'D-', 
-                 color='purple', linewidth=2, markersize=8, label='Taxa de chaves')
-    axes[2].fill_between(gb_vals, 0, resultados['percentual_descartado'], 
-                         alpha=0.3, color='gray', label='Bits descartados')
-    axes[2].set_xlabel('Guard-Band (× σ)', fontsize=12)
-    axes[2].set_ylabel('Taxa (bits/s)', fontsize=12)
-    axes[2].set_title('(c) Eficiência do Sistema', fontsize=13, fontweight='bold')
-    axes[2].legend(fontsize=10)
-    axes[2].grid(True, alpha=0.3)
-    
+    # ===== FIGURA 1: KDR Alice-Bob vs Guard-Band =====
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    ax1.plot(gb_vals, resultados['kdr_bob'], 'o-', 
+             color='blue', linewidth=2, markersize=8, label='KDR Bob')
+    ax1.axhline(y=1.0, color='red', linestyle='--', linewidth=1.5, 
+                label='Limiar 1% (aceitável)')
+    ax1.set_xlabel('Guard-Band (× σ)', fontsize=12)
+    ax1.set_ylabel('KDR Bob (%)', fontsize=12)
+    ax1.set_title('KDR Alice-Bob (menor = melhor)', fontsize=13, fontweight='bold')
+    ax1.legend(fontsize=10)
+    ax1.grid(True, alpha=0.3)
     plt.tight_layout()
     
-    # Salvar
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    filepath = os.path.join(base_dir, "resultados", "figuras", 
-                           f"exp07_impacto_guard_band_{timestamp}.png")
-    os.makedirs(os.path.dirname(filepath), exist_ok=True)
-    plt.savefig(filepath, dpi=300, bbox_inches='tight')
-    print(f"\n[OK] Grafico salvo: {filepath}")
+    filepath1 = os.path.join(dir_figuras, f"exp07_impacto_guard_band_{timestamp}_01.png")
+    plt.savefig(filepath1, dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    # ===== FIGURA 2: BER Eve vs Guard-Band =====
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    ax2.plot(gb_vals, resultados['ber_eve_raw'], 's-', 
+             color='red', linewidth=2, markersize=8, label='BER Eve (raw)')
+    ax2.plot(gb_vals, resultados['ber_eve_pos_bch'], '^-', 
+             color='orange', linewidth=2, markersize=8, label='BER Eve (pós-BCH)')
+    ax2.axhline(y=50.0, color='green', linestyle='--', linewidth=1.5, 
+                label='50% (chute aleatório)')
+    ax2.set_xlabel('Guard-Band (× σ)', fontsize=12)
+    ax2.set_ylabel('BER Eve (%)', fontsize=12)
+    ax2.set_title('Segurança contra Eve', fontsize=13, fontweight='bold')
+    ax2.legend(fontsize=10)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_ylim([45, 55])
+    plt.tight_layout()
+    
+    filepath2 = os.path.join(dir_figuras, f"exp07_impacto_guard_band_{timestamp}_02.png")
+    plt.savefig(filepath2, dpi=300, bbox_inches='tight')
+    plt.close()
+    
+    # ===== FIGURA 3: Taxa de Bits vs Guard-Band =====
+    fig3, ax3 = plt.subplots(figsize=(8, 6))
+    ax3.plot(gb_vals, resultados['taxa_bits_bps'], 'D-', 
+             color='purple', linewidth=2, markersize=8, label='Taxa de chaves')
+    ax3.fill_between(gb_vals, 0, resultados['percentual_descartado'], 
+                     alpha=0.3, color='gray', label='Bits descartados')
+    ax3.set_xlabel('Guard-Band (× σ)', fontsize=12)
+    ax3.set_ylabel('Taxa (bits/s)', fontsize=12)
+    ax3.set_title('Eficiência do Sistema', fontsize=13, fontweight='bold')
+    ax3.legend(fontsize=10)
+    ax3.grid(True, alpha=0.3)
+    plt.tight_layout()
+    
+    filepath3 = os.path.join(dir_figuras, f"exp07_impacto_guard_band_{timestamp}_03.png")
+    plt.savefig(filepath3, dpi=300, bbox_inches='tight')
+    print(f"\n[OK] Gráficos salvos: {filepath1}, {filepath2}, {filepath3}")
+    plt.close()
     plt.close()
 
 

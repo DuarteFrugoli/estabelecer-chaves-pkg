@@ -139,31 +139,41 @@ def experimento_variacao_bch(
     colunas = ['SNR_dB'] + [f'{c}_{tipo}' for c in dados_todos_codigos.keys() for tipo in ['BMR', 'KDR']]
     salvar_resultado_csv(csv_dados, "exp03_variacao_bch", colunas)
     
-    # Cria gráfico comparativo
+    # Cria gráficos separados (2 figuras independentes)
     import matplotlib.pyplot as plt
     
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    fig.suptitle(f'Impacto do Código BCH no BMR/KDR\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})',
-                fontsize=14, fontweight='bold')
-    
     cores = plt.cm.tab10(np.linspace(0, 1, len(dados_todos_codigos)))
-    titulos = ['BMR Antes da Reconciliação', 'KDR Após Reconciliação BCH']
-    metricas = ['bmr_rates', 'kdr_rates']
     
-    for i, (ax, titulo, metrica) in enumerate(zip(axes, titulos, metricas)):
-        for j, (codigo_str, dados_codigo) in enumerate(dados_todos_codigos.items()):
-            ax.plot(snr_db_range, dados_codigo[metrica],
-                   marker='o', linestyle='-', linewidth=2,
-                   color=cores[j], label=f"{codigo_str} (t={dados_codigo['t']})")
-        
-        ax.set_xlabel('SNR (dB)')
-        ax.set_ylabel('BMR/KDR (%)')
-        ax.set_title(titulo)
-        ax.grid(True, alpha=0.3)
-        ax.legend()
-    
+    # FIGURA 1: BMR Antes da Reconciliação
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
+    for j, (codigo_str, dados_codigo) in enumerate(dados_todos_codigos.items()):
+        ax1.plot(snr_db_range, dados_codigo['bmr_rates'],
+                marker='o', linestyle='-', linewidth=2,
+                color=cores[j], label=f"{codigo_str} (t={dados_codigo['t']})")
+    ax1.set_xlabel('SNR (dB)', fontsize=12)
+    ax1.set_ylabel('BMR (%)', fontsize=12)
+    ax1.set_title(f'BMR Antes da Reconciliação\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})', 
+                 fontsize=13, fontweight='bold')
+    ax1.grid(True, alpha=0.3)
+    ax1.legend(fontsize=10)
     plt.tight_layout()
-    salvar_grafico(fig, "exp03_variacao_bch")
+    salvar_grafico(fig1, "exp03_variacao_bch_01")
+    plt.close()
+    
+    # FIGURA 2: KDR Após Reconciliação BCH
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
+    for j, (codigo_str, dados_codigo) in enumerate(dados_todos_codigos.items()):
+        ax2.plot(snr_db_range, dados_codigo['kdr_rates'],
+                marker='s', linestyle='-', linewidth=2,
+                color=cores[j], label=f"{codigo_str} (t={dados_codigo['t']})")
+    ax2.set_xlabel('SNR (dB)', fontsize=12)
+    ax2.set_ylabel('KDR (%)', fontsize=12)
+    ax2.set_title(f'KDR Após Reconciliação BCH\n(σ={rayleigh_param:.4f}, {modulacao.upper()}, ρ={correlacao_canal})', 
+                 fontsize=13, fontweight='bold')
+    ax2.grid(True, alpha=0.3)
+    ax2.legend(fontsize=10)
+    plt.tight_layout()
+    salvar_grafico(fig2, "exp03_variacao_bch_02")
     plt.close()
     
     # Sumário por código

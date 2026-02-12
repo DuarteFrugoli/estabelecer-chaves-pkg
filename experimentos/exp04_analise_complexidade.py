@@ -12,7 +12,7 @@ import time
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from src.codigos_corretores.bch import gerar_tabela_codigos_bch, codificar_bch, decodificar_bch
-from experimentos.util_experimentos import salvar_resultado_json, salvar_resultado_csv
+from experimentos.util_experimentos import salvar_resultado_json, salvar_resultado_csv, salvar_grafico
 
 
 def medir_tempo_bch(n, k, repeticoes=1000):
@@ -158,50 +158,46 @@ def experimento_analise_complexidade(
                         ['Codigo', 'n', 'k', 't', 'Taxa', 'Encode_ms', 
                          'Decode_limpo_ms', 'Decode_erros_ms', 'Total_ms'])
     
-    # Cria gráfico comparativo
+    # Cria gráficos separados (2 figuras independentes)
     import matplotlib.pyplot as plt
-    
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
-    fig.suptitle('Análise de Complexidade Computacional dos Códigos BCH',
-                fontsize=14, fontweight='bold')
     
     codigos_labels = list(resultados.keys())
     tempos_encode = [resultados[c]['tempos']['encode_media'] for c in codigos_labels]
     tempos_decode = [resultados[c]['tempos']['decode_erros_media'] for c in codigos_labels]
     tempos_total = [resultados[c]['tempos']['total_media'] for c in codigos_labels]
     
-    # Gráfico 1: Tempos individuais
     x = np.arange(len(codigos_labels))
     width = 0.35
     
+    # FIGURA 1: Tempos individuais (Codificação vs Decodificação)
+    fig1, ax1 = plt.subplots(figsize=(8, 6))
     ax1.bar(x - width/2, tempos_encode, width, label='Codificação', color='skyblue')
     ax1.bar(x + width/2, tempos_decode, width, label='Decodificação (c/ erros)', color='salmon')
-    
-    ax1.set_xlabel('Código BCH')
-    ax1.set_ylabel('Tempo (ms)')
-    ax1.set_title('Tempo de Codificação vs Decodificação')
+    ax1.set_xlabel('Código BCH', fontsize=12)
+    ax1.set_ylabel('Tempo (ms)', fontsize=12)
+    ax1.set_title('Tempo de Codificação vs Decodificação', fontsize=13, fontweight='bold')
     ax1.set_xticks(x)
     ax1.set_xticklabels(codigos_labels, rotation=15)
-    ax1.legend()
+    ax1.legend(fontsize=11)
     ax1.grid(True, alpha=0.3, axis='y')
+    plt.tight_layout()
+    salvar_grafico(fig1, "exp04_analise_complexidade_01")
+    plt.close()
     
-    # Gráfico 2: Tempo total e escalabilidade
+    # FIGURA 2: Tempo total
+    fig2, ax2 = plt.subplots(figsize=(8, 6))
     ax2.plot(codigos_labels, tempos_total, marker='o', linewidth=2, 
             markersize=8, color='green')
-    ax2.set_xlabel('Código BCH')
-    ax2.set_ylabel('Tempo Total (ms)')
-    ax2.set_title('Tempo Total (Codificação + Decodificação)')
+    ax2.set_xlabel('Código BCH', fontsize=12)
+    ax2.set_ylabel('Tempo Total (ms)', fontsize=12)
+    ax2.set_title('Tempo Total (Codificação + Decodificação)', fontsize=13, fontweight='bold')
     ax2.set_xticklabels(codigos_labels, rotation=15)
     ax2.grid(True, alpha=0.3)
-    
     # Adiciona linha de limite IoT (exemplo: 10ms)
     ax2.axhline(y=10, color='red', linestyle='--', linewidth=1, label='Limite IoT (~10ms)')
     ax2.legend()
-    
     plt.tight_layout()
-    
-    from experimentos.util_experimentos import salvar_grafico
-    salvar_grafico(fig, "exp04_analise_complexidade")
+    salvar_grafico(fig2, "exp04_analise_complexidade_02")
     plt.close()
     
     # Análise de viabilidade

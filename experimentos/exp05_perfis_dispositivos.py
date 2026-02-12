@@ -329,7 +329,6 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
     
     # Configurações do gráfico
     plt.style.use('seaborn-v0_8-darkgrid')
-    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
     
     # Cores para cada perfil (paleta categórica distinta)
     cores = {
@@ -349,12 +348,17 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
         'nb_iot': 'NB-IoT (10 km/h, ρ≈0.95)'
     }
     
-    # Plot 1: BMR (antes da reconciliação)
+    # Calcula limites Y consistentes para ambas as figuras
+    max_bmr = max(max(d['bmr_rates']) for d in dados_grafico.values())
+    max_kdr = max(max(d['kdr_rates']) for d in dados_grafico.values())
+    y_max = max(min(60, max_bmr * 1.1), min(60, max_kdr * 1.2))
+    
+    # FIGURA 1: BMR (antes da reconciliação)
+    fig1, ax1 = plt.subplots(figsize=(10, 6))
     for perfil, dados in dados_grafico.items():
-        # CORREÇÃO: BMR já está em porcentagem (0-100), não precisa multiplicar
-        axes[0].plot(
+        ax1.plot(
             dados['snr_db'],
-            dados['bmr_rates'],  # Já está em %
+            dados['bmr_rates'],
             marker='o',
             linewidth=2.5,
             markersize=6,
@@ -362,24 +366,29 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
             color=cores.get(perfil, None),
             alpha=0.8
         )
+    ax1.set_xlabel('SNR (dB)', fontsize=13, fontweight='bold')
+    ax1.set_ylabel('BMR (%)', fontsize=13, fontweight='bold')
+    ax1.set_title('BMR Antes da Reconciliação BCH', fontsize=14, fontweight='bold')
+    ax1.legend(loc='upper right', fontsize=9, framealpha=0.95)
+    ax1.grid(True, alpha=0.3, linestyle='--')
+    ax1.set_xlim([min(dados_grafico[list(dados_grafico.keys())[0]]['snr_db']), 
+                  max(dados_grafico[list(dados_grafico.keys())[0]]['snr_db'])])
+    ax1.set_ylim([0, y_max])
+    plt.tight_layout()
     
-    axes[0].set_xlabel('SNR (dB)', fontsize=13, fontweight='bold')
-    axes[0].set_ylabel('BMR (%)', fontsize=13, fontweight='bold')
-    axes[0].set_title('BMR Antes da Reconciliação BCH', fontsize=14, fontweight='bold')
-    axes[0].legend(loc='upper right', fontsize=9, framealpha=0.95)
-    axes[0].grid(True, alpha=0.3, linestyle='--')
-    axes[0].set_xlim([min(dados_grafico[list(dados_grafico.keys())[0]]['snr_db']), 
-                      max(dados_grafico[list(dados_grafico.keys())[0]]['snr_db'])])
-    # Ajusta ylim automaticamente se BMR > 50%
-    max_bmr = max(max(d['bmr_rates']) for d in dados_grafico.values())
-    axes[0].set_ylim([0, min(60, max_bmr * 1.1)])
+    # Salva FIGURA 1
+    dir_figuras = os.path.join(base_dir, 'resultados', 'figuras')
+    os.makedirs(dir_figuras, exist_ok=True)
+    caminho1 = os.path.join(dir_figuras, f'{nome_arquivo}_01.png')
+    plt.savefig(caminho1, dpi=300, bbox_inches='tight', facecolor='white')
+    plt.close()
     
-    # Plot 2: KDR (após reconciliação BCH)
+    # FIGURA 2: KDR (após reconciliação BCH)
+    fig2, ax2 = plt.subplots(figsize=(10, 6))
     for perfil, dados in dados_grafico.items():
-        # CORREÇÃO: KDR já está em porcentagem (0-100), não precisa multiplicar
-        axes[1].plot(
+        ax2.plot(
             dados['snr_db'],
-            dados['kdr_rates'],  # Já está em %
+            dados['kdr_rates'],
             marker='s',
             linewidth=2.5,
             markersize=6,
@@ -387,28 +396,22 @@ def criar_grafico_perfis_dispositivos(dados_grafico, nome_arquivo, base_dir):
             color=cores.get(perfil, None),
             alpha=0.8
         )
-    
-    axes[1].set_xlabel('SNR (dB)', fontsize=13, fontweight='bold')
-    axes[1].set_ylabel('KDR (%)', fontsize=13, fontweight='bold')
-    axes[1].set_title('KDR Após Reconciliação BCH(127,64,10)', fontsize=14, fontweight='bold')
-    axes[1].legend(loc='upper right', fontsize=9, framealpha=0.95)
-    axes[1].grid(True, alpha=0.3, linestyle='--')
-    axes[1].axhline(y=1.0, color='red', linestyle='--', linewidth=2, 
-                    label='Limiar 1% (aceitável)', zorder=1)
-    axes[1].set_xlim([min(dados_grafico[list(dados_grafico.keys())[0]]['snr_db']), 
-                      max(dados_grafico[list(dados_grafico.keys())[0]]['snr_db'])])
-    # Ajusta ylim automaticamente
-    max_kdr = max(max(d['kdr_rates']) for d in dados_grafico.values())
-    axes[1].set_ylim([0, min(25, max_kdr * 1.2)])
-    
+    ax2.set_xlabel('SNR (dB)', fontsize=13, fontweight='bold')
+    ax2.set_ylabel('KDR (%)', fontsize=13, fontweight='bold')
+    ax2.set_title('KDR Após Reconciliação BCH(127,64,10)', fontsize=14, fontweight='bold')
+    ax2.legend(loc='upper right', fontsize=9, framealpha=0.95)
+    ax2.grid(True, alpha=0.3, linestyle='--')
+    ax2.axhline(y=1.0, color='red', linestyle='--', linewidth=2, 
+                label='Limiar 1% (aceitável)', zorder=1)
+    ax2.set_xlim([min(dados_grafico[list(dados_grafico.keys())[0]]['snr_db']), 
+                  max(dados_grafico[list(dados_grafico.keys())[0]]['snr_db'])])
+    ax2.set_ylim([0, y_max])
     plt.tight_layout()
     
-    # Salva figura com caminho absoluto
-    dir_figuras = os.path.join(base_dir, 'resultados', 'figuras')
-    os.makedirs(dir_figuras, exist_ok=True)
-    caminho = os.path.join(dir_figuras, f'{nome_arquivo}.png')
-    plt.savefig(caminho, dpi=300, bbox_inches='tight', facecolor='white')
-    print(f"Gráfico salvo: {caminho}")
+    # Salva FIGURA 2
+    caminho2 = os.path.join(dir_figuras, f'{nome_arquivo}_02.png')
+    plt.savefig(caminho2, dpi=300, bbox_inches='tight', facecolor='white')
+    print(f"Gráficos salvos: {caminho1} e {caminho2}")
     plt.close()
 
 
