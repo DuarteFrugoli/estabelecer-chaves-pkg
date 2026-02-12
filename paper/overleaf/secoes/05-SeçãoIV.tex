@@ -88,14 +88,14 @@ O processamento completo do sistema para geração de uma chave compartilhada se
     \item Quantização das observações utilizando modulação \ac{BPSK} ($\pm 1$) ou \ac{QPSK} (símbolos $\pm 1 \pm j$), com limiarização adaptativa opcional (\textit{guard-band});
     \item Reconciliação das sequências binárias via protocolo \textit{code-offset} com código \ac{BCH}(127,64,10);
     \item Amplificação de privacidade aplicando \ac{SHA}-256 para obtenção da chave final de 256 bits;
-    \item Cálculo das métricas de desempenho: \ac{BER} antes da reconciliação e \ac{KDR} após reconciliação.
+    \item Cálculo das métricas de desempenho: \ac{BMR} antes da reconciliação e \ac{KDR} após reconciliação.
 \end{enumerate}
 
 \subsection{Métricas de Desempenho}
 
-O desempenho do sistema é avaliado por meio de duas métricas principais. A \ac{BER} quantifica a taxa de erro de bits entre as sequências obtidas por Alice e Bob imediatamente após a quantização, antes da aplicação do protocolo de reconciliação:
+O desempenho do sistema é avaliado por meio de duas métricas principais. A \ac{BMR} quantifica a taxa de discordância de bits entre as sequências obtidas por Alice e Bob imediatamente após a quantização, antes da aplicação do protocolo de reconciliação:
 \begin{equation}
-\text{BER} = \frac{\text{número de bits diferentes entre } \mathbf{b}_A \text{ e } \mathbf{b}_B}{\text{número total de bits}} \times 100\%.
+\text{BMR} = \frac{\text{número de bits diferentes entre } \mathbf{b}_A \text{ e } \mathbf{b}_B}{\text{número total de bits}} \times 100\%.
 \end{equation}
 
 O \ac{KDR} mede a taxa de discordância após a reconciliação \ac{BCH}:
