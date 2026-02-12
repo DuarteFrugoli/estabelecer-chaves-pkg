@@ -170,7 +170,7 @@ def experimento_variacao_bch(
     for codigo_str, dados_codigo in dados_todos_codigos.items():
         print(f"\n--- Resultados para {codigo_str} (t={dados_codigo['t']}) ---")
         imprimir_sumario_resultados({
-            'BER': dados_codigo['ber_rates'],
+            'BMR': dados_codigo['bmr_rates'],
             'KDR': dados_codigo['kdr_rates']
         })
     

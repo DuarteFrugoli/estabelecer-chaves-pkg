@@ -15,7 +15,7 @@ from experimentos.exp02_comparacao_modulacao import experimento_comparacao_modul
 from experimentos.exp03_variacao_bch import experimento_variacao_bch
 from experimentos.exp04_analise_complexidade import experimento_analise_complexidade
 from experimentos.exp05_perfis_dispositivos import experimento_perfis_dispositivos
-from experimentos.exp06_analise_eve import experimento_eve_espacial, experimento_eve_temporal
+from experimentos.exp06_analise_eve import executar_experimento_completo as exp06_completo
 from experimentos.exp07_impacto_guard_band import experimento_impacto_guard_band
 
 
@@ -122,20 +122,16 @@ def executar_bateria_completa():
     print("#"*70 + "\n")
     
     try:
-        # 6A: Descorrelação espacial
-        print("\n--- 6A: Descorrelação Espacial ---")
-        exp06a, kdr_bob, lambda_m = experimento_eve_espacial(
+        exp06_completo(
+            tamanho_cadeia_bits=127,
             quantidade_de_testes=1000,
-            distancias_eve_m=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]
+            distancia_alice_bob_m=10,
+            distancias_eve_m=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0],
+            distancia_eve_m_temporal=0.5,
+            atrasos_ms=[0, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0],
+            snr_db=9,
+            perfil_dispositivo='pessoa_andando'
         )
-        
-        # 6B: Descorrelação temporal
-        print("\n--- 6B: Descorrelação Temporal ---")
-        exp06b = experimento_eve_temporal(
-            quantidade_de_testes=1000,
-            atrasos_ms=[0.0, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
-        )
-        
         print("✓ Experimento 6 concluído!")
     except Exception as e:
         print(f"✗ Erro no Experimento 6: {e}")

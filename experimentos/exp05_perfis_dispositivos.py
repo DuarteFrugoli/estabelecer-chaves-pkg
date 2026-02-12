@@ -178,7 +178,7 @@ def experimento_perfis_dispositivos(
                 break
         
         print(f"\nResumo {perfil_nome}:")
-        print(f"  - BER inicial (SNR={snr_db_range[0]:.1f}dB): {ber_rates[0]:.2f}%")
+        print(f"  - BMR inicial (SNR={snr_db_range[0]:.1f}dB): {bmr_rates[0]:.2f}%")
         print(f"  - KDR inicial (SNR={snr_db_range[0]:.1f}dB): {kdr_rates[0]:.2f}%")
         print(f"  - KDR final (SNR={snr_db_range[-1]:.1f}dB): {kdr_rates[-1]:.2f}%")
         if snr_min_viavel:
@@ -271,7 +271,7 @@ def experimento_perfis_dispositivos(
     for perfil_nome, resultado in resultados_perfis.items():
         dados_grafico[perfil_nome] = {
             'snr_db': resultado['snr_db'],
-            'ber_rates': resultado['ber_rates'],
+            'bmr_rates': resultado['bmr_rates'],
             'kdr_rates': resultado['kdr_rates'],
         }
     

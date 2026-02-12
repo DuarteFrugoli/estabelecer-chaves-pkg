@@ -384,31 +384,45 @@ def criar_graficos(resultados_espacial, resultados_temporal, kdr_bob, lambda_cm,
     plt.close()
 
 
-if __name__ == "__main__":
-    print("\n" + "="*80)
-    print("SUITE DE EXPERIMENTOS: ANÁLISE DE SEGURANÇA CONTRA EVE")
-    print("="*80)
+def executar_experimento_completo(
+    tamanho_cadeia_bits=127,
+    quantidade_de_testes=1000,
+    distancia_alice_bob_m=10,
+    distancias_eve_m=None,
+    distancia_eve_m_temporal=0.5,
+    atrasos_ms=None,
+    snr_db=9,
+    perfil_dispositivo='pessoa_andando'
+):
+    """
+    Executa experimento completo (espacial + temporal + salvamento)
+    Para ser chamado por executar_todos.py
+    """
+    if distancias_eve_m is None:
+        distancias_eve_m = [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0]
+    if atrasos_ms is None:
+        atrasos_ms = [0, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     
     # ===== EXPERIMENTO 6A: ESPACIAL =====
     resultados_espacial, kdr_bob, lambda_m = experimento_eve_espacial(
-        tamanho_cadeia_bits=127,
-        quantidade_de_testes=1000,
-        distancia_alice_bob_m=10,
-        distancias_eve_m=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0],
-        snr_db=9,
-        perfil_dispositivo='pessoa_andando'
+        tamanho_cadeia_bits=tamanho_cadeia_bits,
+        quantidade_de_testes=quantidade_de_testes,
+        distancia_alice_bob_m=distancia_alice_bob_m,
+        distancias_eve_m=distancias_eve_m,
+        snr_db=snr_db,
+        perfil_dispositivo=perfil_dispositivo
     )
     
     # ===== EXPERIMENTO 6B: TEMPORAL =====
     resultados_temporal = experimento_eve_temporal(
-        tamanho_cadeia_bits=127,
-        quantidade_de_testes=1000,
-        distancia_eve_m=0.5,
-        atrasos_ms=[0, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0],
-        snr_db=9,
-        perfil_dispositivo='pessoa_andando'
+        tamanho_cadeia_bits=tamanho_cadeia_bits,
+        quantidade_de_testes=quantidade_de_testes,
+        distancia_eve_m=distancia_eve_m_temporal,
+        atrasos_ms=atrasos_ms,
+        snr_db=snr_db,
+        perfil_dispositivo=perfil_dispositivo
     )
     
     # ===== SALVAR RESULTADOS =====
@@ -492,3 +506,22 @@ if __name__ == "__main__":
     print(f"  rho(h_Alice, h_Eve) a 5m = {resultados_espacial['correlacao_h_alice_eve'][5]:.4f}")
     print(f"\n[i] Parametros: lambda/2 = {lambda_m*50:.1f}cm, SNR = 9 dB")
     print("="*80 + "\n")
+    
+    return resultados_espacial, resultados_temporal, kdr_bob, lambda_m
+
+
+if __name__ == "__main__":
+    print("\n" + "="*80)
+    print("SUITE DE EXPERIMENTOS: ANÁLISE DE SEGURANÇA CONTRA EVE")
+    print("="*80)
+    
+    executar_experimento_completo(
+        tamanho_cadeia_bits=127,
+        quantidade_de_testes=1000,
+        distancia_alice_bob_m=10,
+        distancias_eve_m=[0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0],
+        distancia_eve_m_temporal=0.5,
+        atrasos_ms=[0, 0.1, 0.5, 1.0, 2.0, 5.0, 10.0],
+        snr_db=9,
+        perfil_dispositivo='pessoa_andando'
+    )

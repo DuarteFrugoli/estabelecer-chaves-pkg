@@ -1,0 +1,91 @@
+{
+  "experimento": "exp04_analise_complexidade",
+  "descricao": "Análise de tempo de execução dos códigos BCH",
+  "timestamp": "20260211_233110",
+  "data_hora": "2026-02-11 23:31:10",
+  "dados": {
+    "parametros": {
+      "codigos_bch": [
+        [
+          7,
+          4
+        ],
+        [
+          15,
+          7
+        ],
+        [
+          127,
+          64
+        ],
+        [
+          255,
+          139
+        ]
+      ],
+      "repeticoes": 1000
+    },
+    "resultados": {
+      "BCH(7,4)": {
+        "n": 7,
+        "k": 4,
+        "t": 1,
+        "taxa_codigo": 0.5714285714285714,
+        "tempos": {
+          "encode_media": 0.04743050003889948,
+          "encode_std": 0.05219152141230239,
+          "decode_limpo_media": 0.0778366999438731,
+          "decode_limpo_std": 0.028798619773602253,
+          "decode_erros_media": 0.12699420020362595,
+          "decode_erros_std": 0.09921556522895794,
+          "total_media": 0.17442470024252543
+        }
+      },
+      "BCH(15,7)": {
+        "n": 15,
+        "k": 7,
+        "t": 2,
+        "taxa_codigo": 0.4666666666666667,
+        "tempos": {
+          "encode_media": 0.057554499988327734,
+          "encode_std": 0.04133856902748998,
+          "decode_limpo_media": 0.06682439996075118,
+          "decode_limpo_std": 0.03340566150100444,
+          "decode_erros_media": 0.13887200001772726,
+          "decode_erros_std": 0.049307867847013,
+          "total_media": 0.196426500006055
+        }
+      },
+      "BCH(127,64)": {
+        "n": 127,
+        "k": 64,
+        "t": 10,
+        "taxa_codigo": 0.5039370078740157,
+        "tempos": {
+          "encode_media": 0.0594682999435463,
+          "encode_std": 0.0075060377614655375,
+          "decode_limpo_media": 0.0758000000132597,
+          "decode_limpo_std": 0.017681196712908177,
+          "decode_erros_media": 0.3834663998786709,
+          "decode_erros_std": 0.176457743998278,
+          "total_media": 0.4429346998222172
+        }
+      },
+      "BCH(255,139)": {
+        "n": 255,
+        "k": 139,
+        "t": 15,
+        "taxa_codigo": 0.5450980392156862,
+        "tempos": {
+          "encode_media": 0.05575080002017785,
+          "encode_std": 0.01258437601165012,
+          "decode_limpo_media": 1.5702943001961103,
+          "decode_limpo_std": 47.047789733486006,
+          "decode_erros_media": 0.43485079979291186,
+          "decode_erros_std": 0.09508994641317896,
+          "total_media": 0.4906015998130897
+        }
+      }
+    }
+  }
+}
