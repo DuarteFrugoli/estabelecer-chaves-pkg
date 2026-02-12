@@ -1,11 +1,11 @@
 \section{Modelo de Sistema}
 \label{sec:modelo}
 
-Esta seção descreve o cenário físico e o modelo de comunicação adotado para a geração de chaves criptográficas em camada física. O sistema considera dispositivos \ac{IoT} conectados a uma estação rádio base comum, explorando a correlação espacial entre os canais \textit{downlink} para estabelecimento de chaves secretas compartilhadas, enquanto garante segurança contra atacantes passivos por meio da descorrelação espacial natural.
+Esta seção descreve o cenário físico e o modelo de comunicação adotado para a geração de chaves criptográficas em camada física. O objetivo central é possibilitar que dispositivos \ac{IoT} conectados a uma estação rádio base comum estabeleçam uma chave secreta compartilhada através da sondagem do canal \textit{downlink} e processos de reconciliação, viabilizando assim comunicação segura subsequente via criptografia simétrica. O sistema explora a correlação espacial entre os canais observados pelos dispositivos legítimos, enquanto garante segurança contra atacantes passivos por meio da descorrelação espacial natural.
 
 \subsection{Cenário de Operação}
 
-O sistema proposto opera no contexto de redes celulares de quinta geração (\ac{5G}) e tecnologias \ac{IoT}, em que múltiplos dispositivos estabelecem comunicação com uma estação rádio base (gNodeB). Considera-se especificamente o cenário em que dois dispositivos legítimos, denominados Alice e Bob, encontram-se espacialmente próximos (tipicamente a distâncias inferiores a 1~metro) e desejam estabelecer uma chave criptográfica compartilhada para proteger suas comunicações futuras.
+O sistema proposto opera no contexto de redes celulares de quinta geração (\ac{5G}) e tecnologias \ac{IoT}, em que múltiplos dispositivos estabelecem comunicação com uma estação rádio base (gNodeB). Considera-se especificamente o cenário em que dois dispositivos legítimos, denominados Alice e Bob, encontram-se espacialmente próximos (tipicamente a distâncias inferiores a 1~metro) e desejam estabelecer uma chave criptográfica compartilhada que lhes permitirá comunicar-se de forma confidencial.
 
 Ambos os dispositivos recebem sinais de referência (\textit{pilots}) transmitidos pela estação base em canal \textit{downlink}, estimam seus respectivos coeficientes de canal, e utilizam essas estimativas como fonte de aleatoriedade comum para geração da chave. A proximidade espacial entre Alice e Bob garante que seus canais apresentem correlação estatística significativa, enquanto um atacante passivo (Eve), localizado a uma distância superior, observa um canal estatisticamente independente.
 
