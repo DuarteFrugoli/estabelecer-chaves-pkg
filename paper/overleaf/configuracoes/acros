@@ -64,10 +64,16 @@
 
 %%% C
 
+\DeclareAcronym{BSC}{
+	short = BSC,
+	long  = Canal Binário Simétrico,
+	foreign = {\emph{Binary Symmetric Channel}},
+}
+
 \DeclareAcronym{CIA}{
-  short = CIA,
-  long  = {Confidencialidade, Integridade e Disponibilidade},
-  foreign = {\emph{Confidentiality, Integrity and Availability}},
+	short = CIA,
+	long  = Confidencialidade Integridade e Disponibilidade,
+	foreign = {\emph{Confidentiality, Integrity and Availability}},
 }
 
 
@@ -110,9 +116,10 @@
 	foreign = {\emph{Frequency Division Duplex}},
 }
 
-\DeclareAcronym{FDP}{
-	short = FDP,
+\DeclareAcronym{PDF}{
+	short = PDF,
 	long  = Função Densidade de Probabilidade,
+	foreign = {\emph{Probability Density Function}},
 }
 
 %%% I

@@ -64,11 +64,7 @@ Esses trechos de código demonstram a simplicidade da implementação e facilita
 
 O canal sem fio é modelado como desvanecimento Rayleigh plano, representado por coeficientes complexos $h \sim \mathcal{CN}(0,1)$, cujo módulo segue distribuição Rayleigh e a fase é uniformemente distribuída em $[0,2\pi]$. Esse modelo captura condições de propagação multipercurso sem linha de visada direta (\ac{NLoS}), típicas de ambientes internos e urbanos densos.
 
-No cenário considerado, Alice e Bob recebem sinais \textit{downlink} provenientes de uma mesma estação rádio base, que transmite um sinal de referência $x$. Os sinais recebidos são modelados como
-\begin{equation}
-y_A = h_A \, x + n_A, \quad y_B = h_B \, x + n_B,
-\end{equation}
-em que $h_A$ e $h_B$ denotam os coeficientes de canal entre a estação base e cada dispositivo, e $n_A, n_B \sim \mathcal{CN}(0,\sigma^2_n)$ representam ruído \ac{AWGN} independente em cada receptor.
+No cenário considerado, Alice e Bob recebem sinais \textit{downlink} provenientes de uma mesma estação rádio base, que transmite um sinal de referência $x$. Seguindo o modelo descrito em~\eqref{eq:canal_basico}, os sinais recebidos são expressos como $y_A = h_A \, x + n_A$ e $y_B = h_B \, x + n_B$, em que $h_A$ e $h_B$ denotam os coeficientes de canal entre a estação base e cada dispositivo, e $n_A, n_B \sim \mathcal{CN}(0,\sigma^2_n)$ representam ruído \ac{AWGN} independente em cada receptor.
 
 Devido à proximidade espacial entre Alice e Bob, os canais $h_A$ e $h_B$ apresentam correlação estatística significativa, modelada por
 \begin{equation}
@@ -83,7 +79,7 @@ A variância do ruído é calculada a partir da \ac{SNR} desejada como $\sigma^2
 O processamento completo do sistema para geração de uma chave compartilhada segue o fluxo:
 \begin{enumerate}
     \item Geração dos canais correlacionados espacialmente: $h_A \sim \mathcal{CN}(0,1)$ e $h_B$ correlacionado via modelo de Clarke;
-    \item Recepção dos sinais \textit{downlink}: $y_A = h_A x + n_A$ e $y_B = h_B x + n_B$;
+    \item Recepção dos sinais \textit{downlink} conforme~\eqref{eq:canal_basico}: $y_A = h_A x + n_A$ e $y_B = h_B x + n_B$;
     \item Estimação dos coeficientes de canal com erro controlado (tipicamente 10--30\% dependendo do perfil);
     \item Quantização das observações utilizando modulação \ac{BPSK} ($\pm 1$) ou \ac{QPSK} (símbolos $\pm 1 \pm j$), com limiarização adaptativa opcional (\textit{guard-band});
     \item Reconciliação das sequências binárias via protocolo \textit{code-offset} com código \ac{BCH}(127,64,10);

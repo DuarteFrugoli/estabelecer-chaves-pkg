@@ -37,13 +37,7 @@ A análise de mecanismos de segurança em sistemas de comunicação sem fio é t
 No contexto deste trabalho, considera-se um cenário de comunicações móveis no qual Alice e Bob estão fisicamente próximos e exploram observações correlacionadas do canal sem fio. Diferentemente do caso clássico de geração de chaves baseada em reciprocidade direta entre transmissor e receptor, assume-se aqui uma arquitetura na qual ambos os dispositivos recebem sinais provenientes de uma mesma estação rádio base ou ponto de acesso, que atua como fonte comum de excitação do canal. A partir desse sinal compartilhado, Alice e Bob realizam medições independentes e utilizam as propriedades físicas do canal observado para possibilitar o estabelecimento de uma chave secreta comum entre eles.
 Esse tipo de configuração é particularmente relevante em redes celulares modernas e em aplicações de \ac{IoT}, nas quais múltiplos dispositivos compartilham a mesma infraestrutura de acesso e podem explorar fontes comuns de aleatoriedade física~\cite{zhang_pks_survey}.
 
-A Figura~\ref{fig:modelo_sistema} ilustra o modelo geral de segurança adotado neste trabalho. A estação rádio base transmite um sinal $x$, que é recebido por Alice, Bob e pelo invasor Eve através de canais sem fio distintos. O sinal recebido por cada entidade pode ser descrito por
-%
-\begin{equation}
-    y_i = h_i x + n_i,
-\end{equation}
-%
-em que $i \in \{A, B, E\}$ representa, respectivamente, os sinais recebidos por Alice, Bob e Eve; $h_i$ denota o coeficiente complexo de desvanecimento do canal entre a estação rádio base e cada receptor; e $n_i$ corresponde ao ruído \ac{AWGN} observado em cada dispositivo.
+A Figura~\ref{fig:modelo_sistema} ilustra o modelo geral de segurança adotado neste trabalho. A estação rádio base transmite um sinal $x$, que é recebido por Alice, Bob e pelo invasor Eve através de canais sem fio distintos. Conforme o modelo apresentado em~\eqref{eq:canal_basico}, o sinal recebido por cada entidade pode ser descrito por $y_i = h_i x + n_i$, em que $i \in \{A, B, E\}$ identifica Alice, Bob e Eve; $h_i$ denota o coeficiente complexo de desvanecimento do canal entre a estação rádio base e cada receptor; e $n_i$ corresponde ao ruído \ac{AWGN} observado em cada dispositivo.
 
 \begin{figure}[!t]
     \centering
@@ -68,9 +62,19 @@ Matematicamente, o sinal recebido por um dispositivo pode ser expresso como
 %
 \begin{equation}
 y = h x + n,
+\label{eq:canal_basico}
 \end{equation}
 %
 em que $x$ representa o sinal transmitido pela estação rádio base ou ponto de acesso, $h$ denota o coeficiente complexo de desvanecimento do canal sem fio e $n$ corresponde ao ruído aditivo observado no receptor, usualmente modelado como ruído branco Gaussiano aditivo (\ac{AWGN})~\cite{proakis_digital}.
+
+Neste trabalho, adota-se o modelo de desvanecimento Rayleigh plano, apropriado para cenários sem linha de visada direta (\ac{NLoS}) em ambientes urbanos densos e internos, típicos de aplicações \ac{IoT}~\cite{tse_viswanath}. Sob esse modelo, o coeficiente de canal $h$ é uma variável aleatória complexa gaussiana $h \sim \mathcal{CN}(0,1)$, cuja envoltória $|h|$ segue distribuição de Rayleigh com função densidade de probabilidade (\ac{PDF}) dada por
+%
+\begin{equation}
+f_{|h|}(r) = r \, e^{-r^2/2}, \quad r \geq 0,
+\label{eq:pdf_rayleigh}
+\end{equation}
+%
+e cuja fase $\angle h$ é uniformemente distribuída em $[0, 2\pi]$. O parâmetro de desvanecimento (escala) é normalizado para potência unitária, ou seja, $\mathbb{E}[|h|^2] = 1$, de modo que a \ac{SNR} média é determinada exclusivamente pela potência do ruído $\sigma_n^2 = \mathbb{E}[|n|^2]$ segundo $\text{SNR} = 1/\sigma_n^2$. Esse modelo captura as flutuações rápidas de amplitude características de canais multipercurso e é amplamente utilizado em análises teóricas e validações experimentais de sistemas \ac{PKG}~\cite{mathur_pks}.
 
 Como Alice e Bob recebem sinais provenientes de uma mesma fonte transmissora e encontram-se em posições espacialmente próximas, os coeficientes de canal $h_A$ e $h_B$ tendem a apresentar correlação estatística significativa dentro do tempo de coerência do canal. Essa correlação constitui uma fonte essencial de entropia compartilhada, explorada no processo de geração de chaves criptográficas em camada física~\cite{mathur_pks, bloch_wireless_security}.
 
@@ -104,7 +108,7 @@ De forma geral, o processo de geração de chaves pode ser decomposto em quatro 
 \begin{figure}[!t]
 \centering
 \includegraphics[width=0.85\linewidth]{figuras/fig02_fluxograma_pkg.png}
-\caption{Fluxograma do processo de geração de chaves em camada física. O sistema opera em quatro etapas sequenciais: (1) sondagem do canal e amostragem de observações correlacionadas, (2) quantização BPSK/QPSK dos sinais recebidos, (3) reconciliação de informação via código BCH(127,64,10), e (4) amplificação de privacidade com SHA-256, resultando em chave simétrica de 256 bits.}
+\caption{Fluxograma do processo de geração de chaves em camada física. O sistema opera em quatro etapas sequenciais: (1) sondagem do canal e amostragem de observações correlacionadas, (2) quantização BPSK/QPSK dos sinais recebidos, (3) reconciliação de informação via código BCH(127,64,10), e (4) amplificação de privacidade com \ac{SHA}-256, resultando em chave simétrica de 256 bits.}
 \label{fig:Processo_Geração}
 \end{figure}
 
@@ -112,11 +116,7 @@ De forma geral, o processo de geração de chaves pode ser decomposto em quatro 
 
 Na etapa de sondagem do canal, Alice e Bob recebem sinais de referência transmitidos pela infraestrutura de rede, de modo que cada dispositivo observa um sinal contínuo no tempo afetado pelas características do canal de propagação e pelo ruído do receptor de forma sincronizada. Essas observações não correspondem diretamente ao coeficiente do canal, mas sim a sinais recebidos cuja estatística reflete as propriedades físicas do meio sem fio, permitindo a estimação de parâmetros do canal e a extração de aleatoriedade compartilhada.
 
-Considerando um modelo de canal com desvanecimento plano e quase-estático, o sinal recebido pelo dispositivo $i \in \{A,B\}$ pode ser modelado como
-\begin{equation}
-y_i(t) = h_i(t)\,x(t) + n_i(t),
-\end{equation}
-em que $x(t)$ representa o sinal de sondagem transmitido pela estação rádio base ou ponto de acesso, $h_i(t)$ denota o coeficiente complexo do canal entre a infraestrutura e o dispositivo $i$, e $n_i(t)$ corresponde ao ruído \ac{AWGN} no receptor.
+Considerando um modelo de canal com desvanecimento plano e quase-estático, o sinal recebido pelo dispositivo $i \in \{A,B\}$ pode ser modelado conforme~\eqref{eq:canal_basico} na forma dependente do tempo: $y_i(t) = h_i(t)\,x(t) + n_i(t)$, em que $x(t)$ representa o sinal de sondagem transmitido pela estação rádio base ou ponto de acesso, $h_i(t)$ denota o coeficiente complexo do canal entre a infraestrutura e o dispositivo $i$, e $n_i(t)$ corresponde ao ruído \ac{AWGN} no receptor.
 
 No modelo adotado neste trabalho, Alice e Bob recebem sinais provenientes de uma mesma fonte transmissora. Assim, os canais $h_A(t)$ e $h_B(t)$ não são idênticos, uma vez que se referem a enlaces distintos entre a infraestrutura e cada dispositivo. Entretanto, devido à proximidade espacial entre Alice e Bob e às condições semelhantes de propagação, tais canais podem apresentar correlação estatística significativa quando observados dentro do tempo de coerência do canal. Essa correlação constitui a base física para a extração de entropia compartilhada no processo de geração de chaves.
 
@@ -142,21 +142,25 @@ O processo de quantização tem como objetivo converter as observações amostra
 
 Considere $r_i(k)$ como o sinal recebido e amostrado pelo nó $i \in \{A,B\}$ no instante $k$. A partir desse sinal, extrai-se uma métrica escalar $z_i(k)$, como a potência instantânea do sinal recebido, a magnitude da envoltória, ou uma estimativa de um parâmetro do canal. Essa métrica é então utilizada como entrada do quantizador.
 
-De forma geral, a quantização pode ser representada por
+De forma geral, a quantização pode ser representada por~\cite{bloch_wireless_security}
 \begin{equation}
 b_i(k) = Q\big(z_i(k)\big),
 \end{equation}
 em que $Q(\cdot)$ denota a função de quantização responsável por mapear a métrica escalar $z_i(k)$ em símbolos discretos.
 
-Um exemplo elementar é a quantização binária por limiar, definida como
+Neste trabalho, adota-se \textbf{quantização antipodal} diretamente sobre os sinais demodulados \ac{BPSK} ou \ac{QPSK}. Para \ac{BPSK}, os símbolos recebidos são mapeados no conjunto $\{+1, -1\}$, e a quantização binária é realizada com limiar $\tau = 0$ (zero-crossing), definida como~\cite{proakis_digital}
 \begin{equation}
 b_i(k) =
 \begin{cases}
-1, & z_i(k) \geq \tau, \\
-0, & z_i(k) < \tau,
+1, & \text{Re}\{h_i(k) x(k)\} \geq 0, \\
+0, & \text{Re}\{h_i(k) x(k)\} < 0,
 \end{cases}
 \end{equation}
-em que $\tau$ representa um limiar previamente estabelecido. Em cenários práticos com esquemas de modulação digital \ac{BPSK} ou \ac{QPSK}, estratégias de limiarização adaptativa podem ser empregadas para aumentar a robustez contra ruído. Uma abordagem consiste em introduzir uma zona morta (\textit{guard-band}) ao redor do limiar de decisão, tratando de forma especial ou descartando amostras cuja magnitude esteja próxima de $\tau$. Embora essa técnica possa reduzir a taxa de discordância inicial entre Alice e Bob, também diminui a taxa efetiva de geração de bits devido ao descarte de amostras incertas~\cite{proakis_digital}. Estratégias mais elaboradas podem empregar múltiplos níveis de quantização, visando aumentar a taxa de geração de bits, ao custo de maior sensibilidade ao ruído e às imperfeições de estimação~\cite{bloch_wireless_security}.
+em que $\text{Re}\{\cdot\}$ denota a parte real do sinal demodulado. Para \ac{QPSK}, a quantização é aplicada independentemente às componentes em fase (I) e quadratura (Q), gerando 2 bits por símbolo, cada um quantizado com limiar zero sobre suas respectivas componentes.
+
+A escolha da quantização antipodal com limiar $\tau = 0$ justifica-se por três razões principais: (i) \textbf{otimalidade estatística}: para sinais com distribuição simétrica em torno de zero (caso de canais Rayleigh com média nula), o limiar zero maximiza a entropia dos bits gerados~\cite{mathur_pks}; (ii) \textbf{simplicidade de implementação}: não requer estimação de parâmetros estatísticos do canal ou ajuste adaptativo de limiares, reduzindo custo computacional; (iii) \textbf{robustez}: evita viés sistemático introduzido por limiares fixos não-nulos que poderiam favorecer um dos níveis lógicos.
+
+Estratégias de limiarização adaptativa, como introdução de zona morta (\textit{guard-band}) ao redor do limiar de decisão, podem ser empregadas para descartar amostras cuja magnitude esteja próxima de $\tau$, aumentando robustez contra ruído~\cite{proakis_digital}. Embora essa técnica possa reduzir a taxa de discordância inicial (\ac{BMR}) entre Alice e Bob, também diminui a taxa efetiva de geração de bits devido ao descarte de amostras incertas. O Experimento~7 (Seção~\ref{sec:results}) demonstra que, no sistema proposto baseado em correlação espacial, a utilização de \textit{guard-band} não é necessária para garantir segurança, podendo-se operar com limiar simples $\tau = 0$ sem comprometimento da proteção contra espionagem passiva.
 
 Devido às assimetrias introduzidas por ruído, imperfeições de \textit{hardware}, erros de estimação e à própria não identidade entre as observações dos dispositivos, as sequências discretas geradas a partir dos sinais recebidos por Alice e Bob podem diferir em determinadas posições, isto é,
 \begin{equation}
@@ -176,28 +180,60 @@ enquanto Bob possui uma versão correlacionada
 \begin{equation}
 \mathbf{b}_B = \{b_B(1), b_B(2), \dots, b_B(N)\},
 \end{equation}
-obtida a partir de observações correlacionadas do mesmo sinal de sondagem, porém afetadas por ruído e imperfeições do receptor. A relação entre $\mathbf{b}_A$ e $\mathbf{b}_B$ pode ser modelada como uma sequencia sendo uma versão com erros da outra sequência.
+obtida a partir de observações correlacionadas do mesmo sinal de sondagem, porém afetadas por ruído e imperfeições do receptor. A relação entre $\mathbf{b}_A$ e $\mathbf{b}_B$ pode ser modelada como um canal binário simétrico (\ac{BSC}) com probabilidade de erro $p = \text{BMR}$~\cite{bloch_wireless_security}.
 
-Para corrigir essas discrepâncias, adota-se neste trabalho um processo de reconciliação baseado em códigos corretores de erro do tipo \ac{BCH}. Esses códigos são escolhidos por apresentarem estrutura algébrica bem definida, capacidade de correção ajustável e complexidade computacional compatível com dispositivos com recursos limitados.
+Para corrigir essas discrepâncias, adota-se neste trabalho um processo de reconciliação baseado em códigos corretores de erro do tipo \ac{BCH}~\cite{lin_costello_ecc}. Esses códigos são escolhidos por apresentarem estrutura algébrica bem definida, capacidade de correção ajustável e complexidade computacional compatível com dispositivos com recursos limitados.
 
-O princípio da reconciliação consiste na transmissão de informações auxiliares por meio de um canal público, de modo que Bob possa corrigir sua sequência sem que a chave em si seja explicitamente revelada. No contexto de códigos lineares, essas informações auxiliares podem assumir a forma de uma síndrome, que corresponde a um conjunto de verificações de paridade calculadas a partir da sequência binária de Alice.
+O princípio da reconciliação consiste na transmissão de informações auxiliares por meio de um canal público, de modo que Bob possa corrigir sua sequência sem que a chave em si seja explicitamente revelada. No contexto de códigos lineares, essas informações auxiliares podem assumir a forma de uma síndrome, que corresponde a um conjunto de verificações de paridade calculadas a partir da sequência binária~\cite{ding_code_based}.
 
-Seja um código \ac{BCH} linear definido pelos parâmetros $(n,k,t)$, em que $n$ representa o comprimento da palavra-código, $k$ o comprimento da palavra de informação e $t$ a capacidade máxima de correção de erros. Neste trabalho, emprega-se o protocolo \textit{code-offset}, no qual Bob gera uma sequência aleatória $\mathbf{r}$ de $k$ bits e a codifica utilizando o código \ac{BCH}, obtendo a palavra-código $\mathbf{c} = \text{BCH}_{\text{enc}}(\mathbf{r})$ de comprimento $n$. Bob então transmite a síndrome pública
+Seja um código \ac{BCH} linear definido pelos parâmetros $(n,k,t)$, em que $n$ representa o comprimento da palavra-código, $k$ o comprimento da palavra de informação e $t$ a capacidade máxima de correção de erros. Neste trabalho, emprega-se o protocolo \textit{code-offset}, estabelecido por Ding et al.~\cite{ding_code_based}, no qual Bob gera uma sequência aleatória $\mathbf{r}$ de $k$ bits e a codifica utilizando o código \ac{BCH}, obtendo a palavra-código $\mathbf{c} = \text{BCH}_{\text{enc}}(\mathbf{r})$ de comprimento $n$~\cite{lin_costello_ecc}. Bob então transmite a síndrome pública
 \begin{equation}
 \boldsymbol{\sigma} = \mathbf{b}_B \oplus \mathbf{c}
+\label{eq:sindrome}
 \end{equation}
 a Alice através do canal público. A síndrome $\boldsymbol{\sigma}$ não revela diretamente a sequência $\mathbf{b}_B$ ou a palavra-código $\mathbf{c}$, mas permite que Alice corrija sua sequência.
 
-Ao receber $\boldsymbol{\sigma}$, Alice calcula $\mathbf{c}' = \boldsymbol{\sigma} \oplus \mathbf{b}_A = \mathbf{c} \oplus \mathbf{e}$, onde $\mathbf{e} = \mathbf{b}_A \oplus \mathbf{b}_B$ representa o vetor de erros entre as sequências. Aplicando o algoritmo de decodificação \ac{BCH}, Alice estima
+Ao receber $\boldsymbol{\sigma}$, Alice calcula $\mathbf{c}' = \boldsymbol{\sigma} \oplus \mathbf{b}_A = \mathbf{c} \oplus \mathbf{e}$, onde $\mathbf{e} = \mathbf{b}_A \oplus \mathbf{b}_B$ representa o vetor de erros entre as sequências~\cite{bloch_wireless_security}. Aplicando o algoritmo de decodificação \ac{BCH}, Alice estima
 \begin{equation}
 \hat{\mathbf{c}} = \text{BCH}_{\text{dec}}(\mathbf{c}'),
+\label{eq:decod_bch}
 \end{equation}
-recuperando $\hat{\mathbf{c}} = \mathbf{c}$ caso $||\mathbf{e}|| \leq t$. A sequência reconciliada é então obtida por
+recuperando $\hat{\mathbf{c}} = \mathbf{c}$ caso o peso de Hamming $||\mathbf{e}||_H \leq t$~\cite{lin_costello_ecc}. A sequência reconciliada é então obtida por
 \begin{equation}
 \hat{\mathbf{b}}_A = \boldsymbol{\sigma} \oplus \hat{\mathbf{c}} = \mathbf{b}_B.
+\label{eq:reconciliada}
 \end{equation}
 
 Especificamente, este trabalho utiliza o código \ac{BCH}(127,64,10), que apresenta comprimento de bloco $n=127$ bits, $k=64$ bits de informação, e capacidade de correção de até $t=10$ erros. Essa configuração oferece equilíbrio favorável entre taxa de código ($R = k/n \approx 0.50$) e robustez contra erros, sendo adequada para cenários de \ac{PKG} em canais com \ac{SNR} moderada.
+
+\textbf{Geração de Espaço Amostral Eficiente:} Um aspecto prático importante é a geração eficiente do espaço amostral necessário para validação estatística do sistema. Em simulações de Monte Carlo, é necessário gerar $N_{\text{bits}}$ bits compartilhados para cada realização. Como o código \ac{BCH}(127,64,10) opera em blocos de $n=127$ bits, a geração de sequências de comprimento arbitrário ($N_{\text{bits}}$ pode não ser múltiplo de 127) requer processamento de blocos parciais. Para evitar descarte excessivo e garantir taxa efetiva máxima, adota-se a seguinte estratégia: (i) calcula-se o número de blocos completos $N_{\text{blocos}} = \lfloor N_{\text{bits}} / n \rfloor$; (ii) processa-se cada bloco completo via~\eqref{eq:sindrome}-\eqref{eq:reconciliada}; (iii) para o bloco parcial residual ($N_{\text{resto}} = N_{\text{bits}} \mod n$ bits), aplica-se padding com zeros até completar um bloco de 127 bits, reconcilia-se, e descartam-se os bits de padding, retendo apenas os $N_{\text{resto}}$ bits úteis. Esse procedimento garante aproveitamento máximo dos bits gerados sem introduzir viés estatístico, sendo fundamental para obtenção de estimativas acuradas de \ac{BMR} e \ac{KDR} nos experimentos.
+
+O Algoritmo~\ref{alg:reconciliacao} sintetiza o procedimento completo de reconciliação \textit{code-offset} BCH empregado neste trabalho.
+
+\begin{algorithm}[htbp]
+\caption{Reconciliação Code-Offset BCH}
+\label{alg:reconciliacao}
+\begin{algorithmic}[1]
+\REQUIRE Sequências $\mathbf{b}_A, \mathbf{b}_B \in \{0,1\}^N$, código BCH$(n,k,t)$
+\ENSURE Sequências reconciliadas $\hat{\mathbf{b}}_A = \mathbf{b}_B$
+\STATE \textbf{Bob:}
+\STATE Gera vetor aleatório $\mathbf{r} \in \{0,1\}^k$
+\STATE Codifica: $\mathbf{c} \leftarrow \text{BCH}_{\text{enc}}(\mathbf{r})$ \COMMENT{$\mathbf{c} \in \{0,1\}^n$}
+\STATE Calcula síndrome: $\boldsymbol{\sigma} \leftarrow \mathbf{b}_B \oplus \mathbf{c}$
+\STATE Transmite $\boldsymbol{\sigma}$ via canal público para Alice
+\STATE
+\STATE \textbf{Alice:}
+\STATE Recebe $\boldsymbol{\sigma}$
+\STATE Calcula: $\mathbf{c}' \leftarrow \boldsymbol{\sigma} \oplus \mathbf{b}_A$
+\STATE Decodifica BCH: $\hat{\mathbf{c}} \leftarrow \text{BCH}_{\text{dec}}(\mathbf{c}')$
+\IF{decodificação bem-sucedida ($||\mathbf{c}' \oplus \hat{\mathbf{c}}||_H \leq t$)}
+    \STATE $\hat{\mathbf{b}}_A \leftarrow \boldsymbol{\sigma} \oplus \hat{\mathbf{c}}$
+    \STATE \textbf{return} $\hat{\mathbf{b}}_A$ \COMMENT{Alice e Bob compartilham $\mathbf{b}_B$}
+\ELSE
+    \STATE \textbf{return} FALHA \COMMENT{Reconciliação falhou, repetir processo}
+\ENDIF
+\end{algorithmic}
+\end{algorithm}
 
 Embora a síndrome não revele diretamente a sequência binária compartilhada, sua transmissão em um canal público implica vazamento controlado de informação ao potencial invasor. Esse vazamento reduz a entropia da chave condicionada ao conhecimento público e às observações do adversário, tornando necessária a aplicação de uma etapa adicional de amplificação de privacidade, descrita a seguir~\cite{maurer_secret_key}.
 
@@ -211,8 +247,8 @@ Seja $\mathbf{k} \in \{0,1\}^n$ a sequência binária comum obtida após a recon
 \begin{equation}
 \mathbf{k}_{\mathrm{final}} = H(\mathbf{k}),
 \end{equation}
-em que $H(\cdot)$ representa a função hash utilizada e $\mathbf{k}_{\mathrm{final}} \in \{0,1\}^{256}$ é a chave final de 256 bits (saída fixa do SHA-256), adequada para uso direto em algoritmos criptográficos simétricos como \ac{AES}-256. A redução do comprimento em relação à sequência original ($n=127$ bits para a chave BCH) ou a compressão de múltiplas chaves concatenadas está diretamente relacionada à eliminação do vazamento de informação associado às mensagens públicas trocadas durante a reconciliação.
+em que $H(\cdot)$ representa a função hash utilizada e $\mathbf{k}_{\mathrm{final}} \in \{0,1\}^{256}$ é a chave final de 256 bits (saída fixa do \ac{SHA}-256), adequada para uso direto em algoritmos criptográficos simétricos como \ac{AES}-256. A redução do comprimento em relação à sequência original ($n=127$ bits para a chave BCH) ou a compressão de múltiplas chaves concatenadas está diretamente relacionada à eliminação do vazamento de informação associado às mensagens públicas trocadas durante a reconciliação.
 
-No modelo adotado neste trabalho, a amplificação de privacidade é implementada por meio do algoritmo SHA-256, pertencente à família SHA-2, amplamente padronizada e recomendada por órgãos de normalização como o \textit{National Institute of Standards and Technology} (NIST)~\cite{nist_sha}. A escolha dessa função justifica-se por sua eficiência computacional e por propriedades como difusão e resistência a colisões, que dificultam a inferência do segredo original mesmo quando o adversário conhece a função empregada e tem acesso às informações públicas trocadas.
+No modelo adotado neste trabalho, a amplificação de privacidade é implementada por meio do algoritmo \ac{SHA}-256, pertencente à família SHA-2, amplamente padronizada e recomendada por órgãos de normalização como o \textit{National Institute of Standards and Technology} (NIST)~\cite{nist_sha}. A escolha dessa função justifica-se por sua eficiência computacional e por propriedades como difusão e resistência a colisões, que dificultam a inferência do segredo original mesmo quando o adversário conhece a função empregada e tem acesso às informações públicas trocadas.
 
 Ao final do processo, Alice e Bob compartilham uma chave secreta estatisticamente segura, cuja confidencialidade é fundamentada nas propriedades físicas do canal sem fio e reforçada por técnicas de processamento da informação. Essa chave pode então ser utilizada diretamente em algoritmos criptográficos simétricos convencionais, como o \ac{AES}, atendendo aos requisitos de segurança do sistema considerado.

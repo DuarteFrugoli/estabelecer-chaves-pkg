@@ -1,56 +1,37 @@
-\section{Modelo de Sistema}
+\section{Arquitetura do Sistema Proposto}
 \label{sec:modelo}
 
-Esta seção descreve o cenário físico e o modelo de comunicação adotado para a geração de chaves criptográficas em camada física. O objetivo central é possibilitar que dispositivos \ac{IoT} conectados a uma estação rádio base comum estabeleçam uma chave secreta compartilhada através da sondagem do canal \textit{downlink} e processos de reconciliação, viabilizando assim comunicação segura subsequente via criptografia simétrica. O sistema explora a correlação espacial entre os canais observados pelos dispositivos legítimos, enquanto garante segurança contra atacantes passivos por meio da descorrelação espacial natural.
+Esta seção complementa os fundamentos teóricos apresentados na Seção~II com a justificativa arquitetural específica do sistema implementado neste trabalho. A Seção~II estabeleceu os conceitos gerais de \ac{PKG} (cenário Alice-Bob-Eve, modelo de canal, correlação espacial, quantização, reconciliação e amplificação de privacidade). Aqui, apresenta-se a escolha técnica central deste trabalho: a adoção explícita do modelo baseado em \textbf{correlação espacial de canais \textit{downlink}} em detrimento do modelo tradicional de \textbf{reciprocidade temporal em sistemas TDD}, detalhando as vantagens operacionais dessa abordagem para aplicações \ac{5G} e \ac{IoT}.
 
-\subsection{Cenário de Operação}
+\subsection{Justificativa do Modelo: Correlação Espacial vs. Reciprocidade Temporal}
 
-O sistema proposto opera no contexto de redes celulares de quinta geração (\ac{5G}) e tecnologias \ac{IoT}, em que múltiplos dispositivos estabelecem comunicação com uma estação rádio base (gNodeB). Considera-se especificamente o cenário em que dois dispositivos legítimos, denominados Alice e Bob, encontram-se espacialmente próximos (tipicamente a distâncias inferiores a 1~metro) e desejam estabelecer uma chave criptográfica compartilhada que lhes permitirá comunicar-se de forma confidencial.
+A maioria dos trabalhos na literatura de \ac{PKG} explora a reciprocidade do canal em sistemas \ac{TDD} (\textit{Time Division Duplex}), nos quais Alice e Bob observam coeficientes de canal idênticos nos enlaces direto e reverso quando medidos dentro do tempo de coerência~\cite{mathur_pks}. Entretanto, esse modelo apresenta limitações práticas significativas em redes celulares modernas.
 
-Ambos os dispositivos recebem sinais de referência (\textit{pilots}) transmitidos pela estação base em canal \textit{downlink}, estimam seus respectivos coeficientes de canal, e utilizam essas estimativas como fonte de aleatoriedade comum para geração da chave. A proximidade espacial entre Alice e Bob garante que seus canais apresentem correlação estatística significativa, enquanto um atacante passivo (Eve), localizado a uma distância superior, observa um canal estatisticamente independente.
+Este trabalho adota explicitamente o modelo de \textbf{correlação espacial}, no qual Alice e Bob, espacialmente próximos (distâncias típicas $d_{AB} < 0.5$~m), observam canais \textit{downlink} altamente correlacionados ($\rho \approx 0.9$) provenientes de uma mesma estação rádio base. Conforme estabelecido na Seção~II-C, a correlação espacial segue o modelo de Clarke~\cite{clarke_1968}: $\rho_{\text{espacial}}(d) = J_0(2\pi d/\lambda)$, garantindo $\rho > 0.7$ para $d < \lambda/2$. Essa escolha arquitetural justifica-se por quatro vantagens principais:
 
-\subsection{Modelo Matemático}
+\textbf{(i) Compatibilidade com FDD e bandas assimétricas:} Sistemas \ac{5G} e \ac{NB-IoT} frequentemente operam em modo \ac{FDD} (\textit{Frequency Division Duplex}) ou utilizam bandas assimétricas (diferentes frequências para \textit{uplink} e \textit{downlink}), impossibilitando a exploração direta de reciprocidade temporal. O modelo baseado em correlação espacial aplica-se independentemente do esquema de duplexação, pois ambos os dispositivos observam o mesmo canal \textit{downlink} da estação base~\cite{zhang_pks_survey}.
 
-A estação base transmite um sinal de referência $x$ conhecido por todos os dispositivos. Os sinais recebidos por Alice e Bob são modelados como
-\begin{equation}
-y_A = h_A \, x + n_A, \quad y_B = h_B \, x + n_B,
-\end{equation}
-em que $h_A, h_B \in \mathbb{C}$ denotam os coeficientes complexos de canal entre a estação base e cada dispositivo, representando desvanecimento Rayleigh plano, e $n_A, n_B \sim \mathcal{CN}(0, \sigma^2_n)$ correspondem ao ruído \ac{AWGN} independente em cada receptor.
+\textbf{(ii) Simplicidade de implementação:} Não é necessária sincronização temporal precisa entre Alice e Bob, nem transmissão de pilotos por ambos os dispositivos. Basta a recepção de sinais \textit{downlink} de referência já disponíveis para estimação de canal em protocolos celulares padrão (\ac{5G} NR, \ac{NB-IoT}), reduzindo sobrecarga de sinalização e complexidade de hardware~\cite{3gpp_nr_coverage}.
 
-Os coeficientes de canal são modelados como variáveis aleatórias complexas gaussianas $h_A, h_B \sim \mathcal{CN}(0,1)$, cujos módulos seguem distribuição Rayleigh e cujas fases são uniformemente distribuídas em $[0, 2\pi]$. Esse modelo captura condições de propagação multipercurso sem linha de visada direta (\ac{NLoS}), típicas de ambientes internos e urbanos densos.
+\textbf{(iii) Escalabilidade natural:} Múltiplos pares de dispositivos próximos podem gerar chaves simultaneamente utilizando os mesmos sinais de referência da estação base, sem interferência mútua. Essa propriedade é fundamental para redes \ac{IoT} densas com milhares de dispositivos por célula~\cite{nb_iot_link_budget}.
 
-\subsection{Correlação Espacial entre Alice e Bob}
+\textbf{(iv) Segurança física intrínseca:} A descorrelação espacial segundo o modelo de Clarke garante que atacantes distantes ($d_E > \lambda/2$) observem canais estatisticamente independentes ($\rho_E \approx 0$), resultando em \ac{BER} próxima a 50\% sem necessidade de suposições adicionais sobre comportamento temporal do canal. Conforme demonstrado na Seção~II-D e validado experimentalmente no Experimento~6 (Seção~\ref{sec:results}), essa propriedade garante segurança contra espionagem passiva mesmo quando Eve intercepta toda a comunicação pública durante a reconciliação.
 
-Devido à proximidade física entre Alice e Bob, os canais $h_A$ e $h_B$ apresentam correlação estatística significativa. Essa correlação é modelada por
-\begin{equation}
-h_B = \rho \, h_A + \sqrt{1 - \rho^2} \, h_{\text{ind}},
-\end{equation}
-em que $\rho \in [0,1]$ é o coeficiente de correlação espacial e $h_{\text{ind}} \sim \mathcal{CN}(0,1)$ representa uma componente independente de $h_A$.
+\subsection{Cenários de Aplicação Típicos}
 
-Conforme apresentado na Seção~II, o valor de $\rho$ é determinado pela separação física $d$ entre os dispositivos segundo o modelo de Clarke~\cite{clarke_1968}:
-\begin{equation}
-\rho_{\text{espacial}}(d) = J_0\left( \frac{2\pi d}{\lambda} \right),
-\end{equation}
-em que $J_0(\cdot)$ denota a função de Bessel de primeira espécie e ordem zero, e $\lambda$ é o comprimento de onda da portadora. Para dispositivos próximos, com separação $d < \lambda/2$, tem-se tipicamente $\rho > 0.7$, garantindo elevada similaridade entre as observações de canal realizadas por Alice e Bob.
+O sistema proposto aplica-se a contextos de redes celulares \ac{5G} e \ac{NB-IoT} nos quais dois dispositivos legítimos (Alice e Bob) espacialmente próximos desejam estabelecer uma chave criptográfica compartilhada. Cenários práticos incluem:
 
-Neste trabalho, adota-se $\rho = 0.9$ como valor típico, correspondente a uma separação espacial de aproximadamente $d \approx 0.1\lambda$ em cenários de alta correlação. Esse valor representa situações práticas como dispositivos \textit{wearable} carregados por um mesmo usuário, sensores \ac{IoT} instalados próximos, ou dispositivos embarcados em um mesmo veículo.
+\begin{itemize}
+    \item \textbf{Dispositivos wearable} carregados por um mesmo usuário (relógio inteligente + smartphone), com separação típica $d_{AB} \approx 0.3$--$0.5$~m, resultando em $\rho \gtrsim 0.85$ em frequências de 2.4~GHz ($\lambda = 12.5$~cm);
+    \item \textbf{Sensores IoT co-localizados} em ambientes industriais ou residenciais inteligentes, instalados a distâncias $d_{AB} < 1$~m, garantindo $\rho \gtrsim 0.7$;
+    \item \textbf{Dispositivos embarcados} em um mesmo veículo (sistemas veiculares V2X), operando em frequências de 5.9~GHz com correlação espacial elevada devido à proximidade física;
+    \item \textbf{Comunicação D2D assistida} por infraestrutura, na qual dispositivos próximos exploram sinais de âncora da estação base como fonte comum de aleatoriedade.
+\end{itemize}
 
-\subsection{Segurança contra Espionagem Passiva}
+Para garantir correlação espacial adequada ($\rho > 0.7$), adota-se neste trabalho o valor típico $\rho = 0.9$, representativo de dispositivos com separação $d_{AB} \approx 0.1\lambda$. Em frequências de 900~MHz ($\lambda \approx 33$~cm), isso corresponde a $d_{AB} \approx 3.3$~cm; em 2.4~GHz ($\lambda = 12.5$~cm), a $d_{AB} \approx 1.25$~cm. Esses valores são plenamente alcançáveis nos cenários descritos anteriormente.
 
-A segurança do sistema baseia-se na descorrelação espacial natural entre os canais observados pelos usuários legítimos (Alice e Bob) e por um atacante passivo (Eve). Assume-se que Eve possui capacidade ilimitada de escuta do canal público (podendo interceptar toda a informação trocada durante a reconciliação), mas não pode alterar ou injetar mensagens (\textit{eavesdropper passivo}).
+A segurança contra espionagem passiva é garantida pela separação mínima $d_E \geq 20$~cm entre usuários legítimos e atacante Eve, distância na qual a correlação espacial $\rho_{\text{espacial}}(d_E) < 0.02$ torna-se desprezível (Experimento~6, Seção~\ref{sec:results}), assegurando \ac{BER} de Eve próxima a 50\% e impossibilitando inferência da chave final mesmo com conhecimento completo da informação pública trocada durante a reconciliação.
 
-Eve observa o sinal transmitido pela estação base através de um canal independente:
-\begin{equation}
-y_E = h_E \, x + n_E,
-\end{equation}
-em que $h_E \sim \mathcal{CN}(0,1)$ representa o coeficiente de canal entre a estação base e Eve.
+\subsection{Extensão para Cenários Device-to-Device}
 
-Devido à separação espacial entre Eve e os usuários legítimos, o canal $h_E$ apresenta correlação desprezível com $h_A$ e $h_B$. Especificamente, para distâncias $d_E > \lambda/2$ (aproximadamente 6.25~cm em frequências de 2.4~GHz), a correlação espacial $\rho_{\text{espacial}}(d_E) \approx 0$, garantindo que as observações de Eve sejam estatisticamente independentes das observações de Alice e Bob.
-
-Nesse regime, mesmo que Eve conheça toda a informação pública trocada durante a reconciliação (síndrome transmitida via \textit{code-offset}), sua capacidade de inferir a chave final é equivalente a uma tentativa de adivinhação aleatória, caracterizada por uma \ac{BER} próxima a 50\%. Esse comportamento é validado experimentalmente no Experimento~6 apresentado na Seção~IV.
-
-\subsection{Justificativa do Modelo: Correlação Espacial vs. Temporal}
-
-Este trabalho adota o modelo de correlação espacial (dispositivos próximos observando canais \textit{downlink} correlacionados) em detrimento do modelo de reciprocidade temporal tradicional (exploração da reciprocidade do canal em sistemas TDD). A escolha justifica-se por quatro fatores principais. Primeiramente, a compatibilidade com sistemas \ac{5G} e \ac{NB-IoT} que frequentemente operam em modo FDD ou utilizam bandas assimétricas, impossibilitando exploração direta de reciprocidade temporal; o modelo espacial aplica-se independentemente da duplex. Em segundo lugar, a simplicidade de implementação: não é necessária sincronização temporal precisa nem transmissão de pilotos por Alice e Bob, bastando a recepção de sinais \textit{downlink} já disponíveis para estimação de canal em protocolos celulares padrão. Adicionalmente, a escalabilidade é naturalmente garantida, uma vez que múltiplos pares de dispositivos próximos podem gerar chaves simultaneamente sem interferência, utilizando os mesmos sinais de referência da estação base. Finalmente, a descorrelação espacial garante segurança física intrínseca contra atacantes distantes sem necessidade de suposições adicionais sobre o comportamento temporal do canal.
-
-Adicionalmente, o modelo pode ser estendido para cenários \textit{Device-to-Device} (\ac{D2D}), nos quais dispositivos próximos observam canais correlacionados espacialmente em relação a uma fonte transmissora comum (que pode ser outro dispositivo \ac{D2D} ou a própria estação base operando como âncora).
+Embora este trabalho foque no cenário de dispositivos recebendo sinais \textit{downlink} de uma estação base comum, o modelo de correlação espacial pode ser estendido para cenários \ac{D2D} (\textit{Device-to-Device}). Nessa configuração, dispositivos próximos observam canais espacialmente correlacionados em relação a uma fonte transmissora comum, que pode ser outro dispositivo \ac{D2D} atuando como transmissor de referência, a própria estação base operando como âncora de segurança, ou múltiplas estações base em cenários de cooperação celular. A validação experimental dessa extensão e a análise de seus requisitos de sincronização e coordenação constituem direções promissoras para trabalhos futuros (Seção~VI).
