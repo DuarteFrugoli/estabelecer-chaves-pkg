@@ -190,3 +190,12 @@ benchmark_pkg/
 # Chaves geradas em testes
 chaves_teste/
 *.key_output
+
+# Reproducible experiment outputs
+results/
+
+# Local command reference
+commands.md
+
+# Artigos
+paper/

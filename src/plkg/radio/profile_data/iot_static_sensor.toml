@@ -1,0 +1,10 @@
+name = "iot_static_sensor"
+measurement = "rssi"
+carrier_frequency_hz = 868.0e6
+speed_kmh = 0.0
+sample_interval_s = 0.1
+alice_bob_correlation = 0.95
+alice_eve_correlation = 0.0
+rssi_reference_power_dbm = -60.0
+rssi_noise_std_db = 1.5
+rssi_resolution_db = 1.0

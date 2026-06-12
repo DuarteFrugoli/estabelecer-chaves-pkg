@@ -1,0 +1,8 @@
+name = "nr_fr1_n78"
+measurement = "csi"
+carrier_frequency_hz = 3.5e9
+speed_kmh = 5.0
+sample_interval_s = 1.0e-3
+alice_bob_correlation = 0.95
+alice_eve_correlation = 0.0
+estimation_error = 0.18

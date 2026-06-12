@@ -1,0 +1,8 @@
+name = "nr_mmwave_n257"
+measurement = "csi"
+carrier_frequency_hz = 28.0e9
+speed_kmh = 3.0
+sample_interval_s = 2.5e-4
+alice_bob_correlation = 0.95
+alice_eve_correlation = 0.0
+estimation_error = 0.35

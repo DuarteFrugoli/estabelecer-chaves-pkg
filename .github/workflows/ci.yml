@@ -1,0 +1,65 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install Poetry
+        run: pipx install poetry==2.2.1
+
+      - name: Select Python
+        run: poetry env use python
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Validate project metadata
+        run: poetry check
+
+      - name: Lint
+        run: poetry run ruff check src experiments tests
+
+      - name: Type check
+        run: poetry run mypy
+
+      - name: Test
+        run: poetry run python -m pytest -p no:cacheprovider
+
+      - name: Run quick experiments
+        if: matrix.python-version == '3.13'
+        run: |
+          poetry run python -m experiments.run_all --seed 20260612
+          test -n "$(find results -name manifest.json -print -quit)"
+          test -n "$(find results -name results.csv -print -quit)"
+
+      - name: Build distributions
+        run: poetry build
+
+      - name: Smoke test wheel and packaged profiles
+        run: |
+          python -m venv /tmp/plkg-wheel
+          /tmp/plkg-wheel/bin/python -m pip install dist/*.whl
+          /tmp/plkg-wheel/bin/python -c "from plkg.radio.profiles import list_profiles; assert 'nr_fr1_n78' in list_profiles()"
